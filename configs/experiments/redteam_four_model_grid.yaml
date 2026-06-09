@@ -1,0 +1,13 @@
+models:
+  - name: t2i_sd35
+    config: configs/experiments/redteam_t2i_sd35.yaml
+  - name: t2i_flux1
+    config: configs/experiments/redteam_t2i_flux1.yaml
+  - name: t2v_cogvideox
+    config: configs/experiments/redteam_t2v_cogvideox.yaml
+  - name: t2v_wan22
+    config: configs/experiments/redteam_t2v_wan22.yaml
+attempt:
+  name: try_First
+  report_path: debugging/try_First.md
+

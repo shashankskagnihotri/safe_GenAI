@@ -1,0 +1,9 @@
+base_config: configs/default.yaml
+model_config: configs/models/t2v_cogvideox_5b.yaml
+concept_config: configs/concept_hierarchies/violence.yaml
+generation:
+  prompt_file: configs/prompts/violence_placeholder.txt
+  num_inference_steps: 40
+logging:
+  output_dir: outputs/main_violence_t2v
+

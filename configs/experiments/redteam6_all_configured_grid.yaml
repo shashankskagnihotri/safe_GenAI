@@ -1,0 +1,27 @@
+models:
+  - name: t2i_sd35
+    config: configs/experiments/redteam6_t2i_sd35.yaml
+  - name: t2i_flux1
+    config: configs/experiments/redteam6_t2i_flux1.yaml
+  - name: t2i_flux2
+    config: configs/experiments/redteam6_t2i_flux2.yaml
+  - name: t2i_qwen_image
+    config: configs/experiments/redteam6_t2i_qwen_image.yaml
+  - name: t2i_qwen_image_2512
+    config: configs/experiments/redteam6_t2i_qwen_image_2512.yaml
+  - name: t2i_cosmos3_super_text2image
+    config: configs/experiments/redteam6_t2i_cosmos3_super_text2image.yaml
+  - name: t2v_cogvideox
+    config: configs/experiments/redteam6_t2v_cogvideox.yaml
+  - name: t2v_wan22
+    config: configs/experiments/redteam6_t2v_wan22.yaml
+  - name: t2v_ltx_23
+    config: configs/experiments/redteam6_t2v_ltx_23.yaml
+  - name: t2v_hunyuan_video
+    config: configs/experiments/redteam6_t2v_hunyuan_video.yaml
+  - name: t2v_joyai_echo
+    config: configs/experiments/redteam6_t2v_joyai_echo.yaml
+attempt:
+  name: try_6_prompts
+  report_path: debugging/try_6_prompts_All_models.md
+  prompt_file: configs/prompts/redteam_6_prompts_all_models.txt

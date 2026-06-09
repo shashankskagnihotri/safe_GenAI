@@ -1,0 +1,16 @@
+base_config: configs/default.yaml
+model_config: configs/models/t2i_cosmos3_super_text2image.yaml
+concept_config: configs/concept_hierarchies/all_safety.yaml
+generation:
+  task: text_to_image
+  prompt_file: configs/prompts/redteam_6_prompts_all_models.txt
+  num_inference_steps: 28
+  height: 1024
+  width: 1024
+  num_outputs_per_prompt: 1
+  guidance_scale: 4.0
+runtime:
+  device: cuda
+  dtype: bfloat16
+logging:
+  output_dir: outputs/redteam/try_6_prompts/t2i_cosmos3_super_text2image

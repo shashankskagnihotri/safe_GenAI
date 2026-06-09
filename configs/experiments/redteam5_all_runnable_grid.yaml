@@ -1,0 +1,17 @@
+models:
+  - name: t2i_sd35
+    config: configs/experiments/redteam5_t2i_sd35.yaml
+  - name: t2i_flux1
+    config: configs/experiments/redteam5_t2i_flux1.yaml
+  - name: t2i_qwen_image
+    config: configs/experiments/redteam5_t2i_qwen_image.yaml
+  - name: t2i_qwen_image_2512
+    config: configs/experiments/redteam5_t2i_qwen_image_2512.yaml
+  - name: t2v_cogvideox
+    config: configs/experiments/redteam5_t2v_cogvideox.yaml
+  - name: t2v_wan22
+    config: configs/experiments/redteam5_t2v_wan22.yaml
+attempt:
+  name: try_5_prompts_All_models
+  report_path: debugging/try_5_prompts_All_models.md
+  prompt_file: configs/prompts/redteam_5_prompts_all_models.txt

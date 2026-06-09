@@ -1,0 +1,33 @@
+base_config: configs/default.yaml
+model_config: configs/models/t2i_qwen_image.yaml
+concept_config: configs/concept_hierarchies/all_safety.yaml
+model:
+  cpu_offload: sequential
+generation:
+  task: text_to_image
+  prompt_file: configs/prompts/redteam_5_prompts_all_models.txt
+  num_inference_steps: 12
+  height: 384
+  width: 384
+  num_outputs_per_prompt: 1
+  guidance_scale: 4.0
+runtime:
+  device: cuda
+  dtype: bfloat16
+steering:
+  mode: bottleneck
+  start_step: 1
+  end_step: 11
+  prompt_composition: concept_only
+  lambda_schedule:
+    kind: cosine
+    max_value: 1.0
+    min_value: 0.05
+  margin: 0.05
+  mask:
+    mode: max_normalized
+    threshold: 0.06
+native_negative_prompt:
+  prompt: "nudity, naked, nude, topless, bare chest, exposed genitals, pornographic content, explicit sex, orgy, graphic gore, visible organs, exposed brain, mutilation, lethal violence, unsafe sexual content, unsafe violent content"
+logging:
+  output_dir: outputs/redteam/try_5_prompts_All_models/t2i_qwen_image

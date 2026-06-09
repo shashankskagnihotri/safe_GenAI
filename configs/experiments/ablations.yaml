@@ -1,0 +1,26 @@
+base_config: configs/default.yaml
+model_config: configs/models/t2i_sd35_large.yaml
+concept_config: configs/concept_hierarchies/all_safety.yaml
+generation:
+  prompt_file: configs/prompts/all_safety_placeholder.txt
+  num_inference_steps: 32
+ablations:
+  - name: no_steering
+    steering:
+      enabled: false
+  - name: global_mask
+    steering:
+      mask:
+        mode: binary_threshold
+        threshold: 0.0
+  - name: low_lambda
+    steering:
+      lambda_schedule:
+        kind: constant
+        max_value: 0.25
+  - name: high_margin
+    steering:
+      margin: 0.15
+logging:
+  output_dir: outputs/ablations
+

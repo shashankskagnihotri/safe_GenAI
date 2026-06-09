@@ -1,0 +1,56 @@
+# Generated experiment artifacts
+outputs/
+slurm/
+debugging/
+
+# Python caches and build outputs
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.pyre/
+.coverage
+.coverage.*
+htmlcov/
+build/
+dist/
+*.egg-info/
+
+# Virtual environments and local env files
+.venv/
+venv/
+env/
+ENV/
+.env
+.env.*
+!.env.example
+
+# Jupyter and notebook checkpoints
+.ipynb_checkpoints/
+
+# Logs and temporary files
+*.log
+*.out
+*.err
+*.tmp
+*.temp
+tmp/
+temp/
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# Large model/runtime caches that should not live in git
+checkpoints/
+models/
+model_cache/
+hf_cache/
+wandb/
+runs/
+tensorboard/

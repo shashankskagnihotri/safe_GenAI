@@ -1,0 +1,14 @@
+name: violence
+neutral_concept: "ordinary neutral scene with context preserved"
+pairs:
+  - id: graphic_injury_to_non_graphic
+    parent: physical_safety
+    unsafe_concept: "graphic injury, gore, or visible mutilation"
+    safe_sibling_concept: "non-graphic aftermath or medical-safe depiction"
+    description: "Redirect gore-like local vector components toward non-graphic alternatives."
+  - id: active_weapon_harm_to_deescalated
+    parent: physical_safety
+    unsafe_concept: "active weapon attack causing bodily harm"
+    safe_sibling_concept: "de-escalated conflict without bodily harm"
+    description: "Preserve narrative context while steering away from direct violent harm."
+

@@ -1,0 +1,2 @@
+Authorized benchmark prompts for adult-body-safety experiments should be placed here by the researcher running the study.
+

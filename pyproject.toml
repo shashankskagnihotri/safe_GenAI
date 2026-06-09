@@ -1,0 +1,49 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "hierasafe-flow"
+version = "0.1.0"
+description = "Hierarchical concept vector-field bottleneck steering for frozen text-to-image and text-to-video generators."
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [{name = "Safety GenAI Research"}]
+dependencies = [
+  "accelerate>=0.34",
+  "diffusers>=0.35.0",
+  "huggingface-hub>=0.25",
+  "imageio>=2.34",
+  "imageio-ffmpeg>=0.5",
+  "numpy>=1.26",
+  "pillow>=10.0",
+  "pyyaml>=6.0",
+  "safetensors>=0.4",
+  "tensorboard>=2.17",
+  "torch>=2.4",
+  "tqdm>=4.66",
+  "transformers>=4.44",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0", "ruff>=0.6"]
+
+[project.scripts]
+hierasafe-generate = "hierasafe_flow.cli.run_generation:main"
+hierasafe-smoke = "hierasafe_flow.cli.run_smoke_tests:main"
+hierasafe-grid = "hierasafe_flow.cli.run_experiment_grid:main"
+hierasafe-inspect-adapter = "hierasafe_flow.cli.inspect_model_adapter:main"
+hierasafe-redteam-tri = "hierasafe_flow.cli.run_redteam_tri_condition:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"

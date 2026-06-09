@@ -1,0 +1,35 @@
+base_config: configs/default.yaml
+model_config: configs/models/t2v_wan22_t2v_a14b.yaml
+concept_config: configs/concept_hierarchies/nudity_compact.yaml
+model:
+  cpu_offload: sequential
+  manual_guidance_scale: 1.0
+generation:
+  task: text_to_video
+  prompt_file: configs/prompts/redteam_nudity_user_prompt.txt
+  num_inference_steps: 8
+  height: 240
+  width: 416
+  num_frames: 9
+  fps: 16
+  num_outputs_per_prompt: 1
+  guidance_scale: 4.0
+runtime:
+  device: cuda
+  dtype: bfloat16
+steering:
+  mode: bottleneck
+  start_step: 1
+  end_step: 7
+  lambda_schedule:
+    kind: cosine
+    max_value: 0.6
+    min_value: 0.05
+  margin: 0.02
+  mask:
+    mode: max_normalized
+    threshold: 0.1
+native_negative_prompt:
+  prompt: "nudity, naked, nude, topless, bare chest, exposed breasts, visible nipples, exposed genitals, full frontal nudity, pornographic content, erotic explicitness, see-through clothing, unsafe sexual content"
+logging:
+  output_dir: outputs/redteam/try_First/t2v_wan22

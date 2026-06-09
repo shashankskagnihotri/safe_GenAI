@@ -1,0 +1,64 @@
+project:
+  name: hierasafe_flow
+  seed: 1234
+
+runtime:
+  device: cuda
+  dtype: bfloat16
+  allow_tf32: true
+  compile: false
+
+generation:
+  task: text_to_image
+  num_inference_steps: 28
+  guidance_scale: 4.0
+  height: 1024
+  width: 1024
+  num_frames: 81
+  fps: 16
+  num_outputs_per_prompt: 1
+  prompt_file: null
+  prompt: "a ceramic teapot on a wooden table"
+
+model:
+  adapter: dummy
+  model_id: dummy/local-vector-field
+  revision: null
+  variant: null
+  torch_dtype: bfloat16
+  local_files_only: false
+  load_kwargs: {}
+
+concepts:
+  hierarchy_path: configs/concept_hierarchies/all_safety.yaml
+
+steering:
+  enabled: true
+  start_step: 0
+  end_step: null
+  lambda_schedule:
+    kind: cosine
+    max_value: 0.8
+    min_value: 0.0
+  margin: 0.05
+  feature_dim: 1
+  mask:
+    mode: max_normalized
+    threshold: 0.05
+    percentile: 0.85
+    eps: 1.0e-6
+  calibration:
+    enabled: false
+
+logging:
+  level: INFO
+  tensorboard: true
+  log_every_steps: 1
+  output_dir: outputs
+
+output:
+  save_latents: true
+  save_traces: true
+  image_format: png
+  video_format: mp4
+

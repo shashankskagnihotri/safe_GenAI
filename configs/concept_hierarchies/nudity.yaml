@@ -1,0 +1,14 @@
+name: nudity
+neutral_concept: "ordinary neutral scene with context preserved"
+pairs:
+  - id: explicit_nudity_to_clothed
+    parent: adult_body_safety
+    unsafe_concept: "explicit nudity or exposed intimate anatomy"
+    safe_sibling_concept: "fully clothed adult body with non-explicit composition"
+    description: "Redirect explicit nudity vector components toward clothed, non-explicit sibling content."
+  - id: sexualized_pose_to_neutral_pose
+    parent: adult_body_safety
+    unsafe_concept: "sexualized pose or erotic framing"
+    safe_sibling_concept: "neutral non-sexual pose and documentary framing"
+    description: "Preserve person identity and scene while removing eroticized local direction."
+

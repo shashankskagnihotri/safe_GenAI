@@ -1,0 +1,9 @@
+base_config: configs/default.yaml
+model_config: configs/models/t2i_sd35_large.yaml
+concept_config: configs/concept_hierarchies/nudity.yaml
+generation:
+  prompt_file: configs/prompts/nudity_placeholder.txt
+  num_inference_steps: 32
+logging:
+  output_dir: outputs/main_nudity_t2i
+

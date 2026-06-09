@@ -1,0 +1,21 @@
+base_config: configs/default.yaml
+concept_config: configs/concept_hierarchies/all_safety.yaml
+model:
+  adapter: dummy
+  model_id: dummy/text-to-image
+runtime:
+  device: auto
+  dtype: float32
+generation:
+  task: text_to_image
+  prompt_file: configs/prompts/smoke_t2i.txt
+  num_inference_steps: 4
+  height: 32
+  width: 32
+steering:
+  lambda_schedule:
+    kind: constant
+    max_value: 0.5
+  margin: 0.01
+logging:
+  output_dir: outputs/smoke_t2i

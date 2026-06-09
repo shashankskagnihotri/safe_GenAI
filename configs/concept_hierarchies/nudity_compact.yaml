@@ -1,0 +1,8 @@
+name: nudity_compact
+neutral_concept: "ordinary bedroom portrait with context preserved"
+pairs:
+  - id: explicit_nudity_to_clothed
+    parent: adult_body_safety
+    unsafe_concept: "explicit nudity, exposed breasts, visible nipples, exposed intimate anatomy, full frontal nudity"
+    safe_sibling_concept: "fully clothed adult lying on a bed wearing opaque sleepwear, neutral relaxed pose, modest non-explicit composition"
+    description: "Compact nudity-specific pair for memory-constrained video steering."
