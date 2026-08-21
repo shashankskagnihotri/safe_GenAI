@@ -64,19 +64,31 @@ case "$method" in
 The upstream commit leaves every runtime dependency unbounded. To reconstruct a
 2023-compatible environment, this build pins the contemporary Diffusers 0.20.2,
 Transformers 4.31.0, Accelerate 0.21.0, Torch 2.0.1, Torchvision 0.15.2, and
-Pillow 9.5.0. Its legacy setup.py imports pkg_resources, so editable installation
-uses the environment's setuptools instead of an isolated PEP 517 build sandbox.
+Pillow 9.5.0. Its legacy setup.py imports pkg_resources, so installation
+requires the April 2023 packaging stack: pip 23.1.2, setuptools 67.7.2, and
+wheel 0.40.0. A self-contained wheel is built without isolation instead of
+leaving an editable link to the source checkout.
 The numerical paper-row gate, not this inference alone, determines admission.
 EOF
+    "$PIP" install pip==23.1.2 setuptools==67.7.2 wheel==0.40.0
     "$PIP" install torch==2.0.1 torchvision==0.15.2
     "$PIP" install diffusers==0.20.2 transformers==4.31.0 accelerate==0.21.0 Pillow==9.5.0
-    "$PIP" install --no-build-isolation --no-deps -e "$repo"
+    mkdir -p "$tmp/wheels"
+    "$PIP" wheel --no-build-isolation --no-deps --wheel-dir "$tmp/wheels" "$repo"
+    sld_wheel=$(find "$tmp/wheels" -maxdepth 1 -type f -name 'sld-0.0.1-*.whl' -print -quit)
+    test -n "$sld_wheel"
+    "$PIP" install --no-deps "$sld_wheel"
     ;;
   safree)
     OPENAI_CLIP_COMMIT=d05afc436d78f1c48dc0dbf8e5980a9d471f35f6
+    SAFREE_SLD_REPO=/ceph/sagnihot/projects/safety_genAI/debugging/t2i_safety_27_july/upstream/repos/safe-latent-diffusion
+    SAFREE_SLD_COMMIT=a42923c3de0e4346bee3f61891a510bdcc2aedd2
+    test "$(git -C "$SAFREE_SLD_REPO" rev-parse HEAD)" = "$SAFREE_SLD_COMMIT"
     awk '
       $0 == "Pillow==9.5.0" {next}
       $0 == "clip==1.0" {next}
+      $0 == "skimage==0.0" {print "scikit-image==0.25.0"; next}
+      $0 == "sld==0.0.1" {next}
       $0 ~ /^torch==/ {next}
       $0 ~ /^torchvision==/ {next}
       {print}
@@ -88,11 +100,23 @@ installed from the official CUDA 11.8 index because the +cu118 pins are not on
 the default package index. The declared clip==1.0 is not published on PyPI, while
 generate_safree.py calls the API implemented by OpenAI/CLIP; that official source
 is therefore installed at commit d05afc436d78f1c48dc0dbf8e5980a9d471f35f6.
+The skimage==0.0 placeholder explicitly directs users to the scikit-image
+distribution; version 0.25.0 is the release contemporary with this January 2025
+commit. The unavailable sld==0.0.1 distribution is built from official Safe
+Latent Diffusion commit a42923c3de0e4346bee3f61891a510bdcc2aedd2, whose package
+metadata declares that exact version.
 No runtime method code is changed.
 EOF
     printf 'openai_clip\thttps://github.com/openai/CLIP.git\t%s\n' "$OPENAI_CLIP_COMMIT" > "$tmp/UPSTREAM_AUXILIARY_LOCKS.tsv"
+    printf 'safe_latent_diffusion\t%s\t%s\n' "$SAFREE_SLD_REPO" "$SAFREE_SLD_COMMIT" >> "$tmp/UPSTREAM_AUXILIARY_LOCKS.tsv"
     "$PIP" install --extra-index-url https://download.pytorch.org/whl/cu118 torch==2.4.0+cu118 torchvision==0.19.0+cu118
     "$PIP" install -r "$tmp/requirements.resolved.txt"
+    "$PIP" install setuptools==67.7.2 wheel==0.40.0
+    mkdir -p "$tmp/wheels"
+    "$PIP" wheel --no-build-isolation --no-deps --wheel-dir "$tmp/wheels" "$SAFREE_SLD_REPO"
+    sld_wheel=$(find "$tmp/wheels" -maxdepth 1 -type f -name 'sld-0.0.1-*.whl' -print -quit)
+    test -n "$sld_wheel"
+    "$PIP" install --no-deps "$sld_wheel"
     "$PIP" install --no-deps "git+https://github.com/openai/CLIP.git@$OPENAI_CLIP_COMMIT"
     ;;
   stg)
@@ -170,7 +194,7 @@ import sys
 method, commit, repair = sys.argv[1:]
 names = [
     "torch", "torchvision", "diffusers", "transformers", "accelerate",
-    "numpy", "pandas", "Pillow", "xformers", "ultralytics", "nudenet", "clip"
+    "numpy", "pandas", "Pillow", "xformers", "ultralytics", "nudenet", "clip", "setuptools"
 ]
 versions = {}
 for name in names:
