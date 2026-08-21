@@ -19,7 +19,11 @@ test "$actual_commit" = "$commit"
 
 short_commit=$(printf '%s' "$commit" | cut -c1-12)
 method_root=$ENV_ROOT/$method
-final=$method_root/$short_commit
+environment_key=$short_commit
+if [ "$method" = groce ] && [ "$repair_profile" = readme_cu118_torch271_constrained_v2 ]; then
+  environment_key=${short_commit}_readme_cu118_torch271_v2
+fi
+final=$method_root/$environment_key
 tmp=$method_root/.building_${SLURM_ARRAY_JOB_ID}_${SLURM_ARRAY_TASK_ID}
 failed=$method_root/FAILED_BUILD_${SLURM_ARRAY_JOB_ID}_${SLURM_ARRAY_TASK_ID}
 mkdir -p "$method_root"
@@ -132,13 +136,24 @@ EOF
     "$PIP" install -r "$repo/requirements.txt"
     ;;
   groce)
-    cat > "$tmp/REPAIR_NOTES.txt" <<'EOF'
-The release omits Torch from requirements. Torch 2.6.0 CUDA 12.4 is supplied as
-a compatibility reconstruction for Diffusers 0.34.0 and Python 3.11. The exact
-resolved lock is retained and paper metrics determine admission.
+    cat > "$tmp/pytorch-constraints.txt" <<'EOF'
+torch==2.7.1+cu118
+torchvision==0.22.1+cu118
+torchaudio==2.7.1+cu118
 EOF
-    "$PIP" install --extra-index-url https://download.pytorch.org/whl/cu124 torch==2.6.0
-    "$PIP" install -r "$repo/requirements.txt"
+    cat > "$tmp/REPAIR_NOTES.txt" <<'EOF'
+The release README installs Torch, Torchvision, and Torchaudio from the official
+CUDA 11.8 index before requirements.txt. That index resolves to Torch 2.7.1,
+Torchvision 0.22.1, and Torchaudio 2.7.1. All three are constrained during the
+requirements solve so torch-fidelity cannot replace them with current PyPI
+builds. The earlier unconstrained environment is preserved but rejected because
+it resolved Torch 2.13.0 and Torchvision 0.28.0. Paper metrics determine final
+method admission.
+EOF
+    "$PIP" install --index-url https://download.pytorch.org/whl/cu118 \
+      torch==2.7.1+cu118 torchvision==0.22.1+cu118 torchaudio==2.7.1+cu118
+    "$PIP" install --extra-index-url https://download.pytorch.org/whl/cu118 \
+      --constraint "$tmp/pytorch-constraints.txt" -r "$repo/requirements.txt"
     ;;
   nlce)
     printf '%s\n' 'The exact Torch +cu124 pin is resolved from the official PyTorch CUDA 12.4 index.' > "$tmp/REPAIR_NOTES.txt"
@@ -170,7 +185,7 @@ import sys
 method, commit, repair = sys.argv[1:]
 names = [
     "torch", "torchvision", "diffusers", "transformers", "accelerate",
-    "numpy", "pandas", "Pillow", "xformers", "ultralytics", "nudenet", "clip"
+    "numpy", "pandas", "Pillow", "xformers", "ultralytics", "nudenet", "clip", "torchaudio"
 ]
 versions = {}
 for name in names:
