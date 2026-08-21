@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "campaign": "PUSH_FOR_ICLR",
+  "method": "groce",
+  "paper_target": "Table 1 single-concept instance erasure: Snoopy",
+  "upstream": {
+    "repo": "/ceph/sagnihot/projects/safety_genAI_upstreams/PUSH_FOR_ICLR/GROCE",
+    "commit": "970ea07eb7ed07e9f3fc89a72edffa5a95aa42c8"
+  },
+  "environment": {
+    "root": "/ceph/sagnihot/projects/safety_genAI/outputs/PUSH_FOR_ICLR/REPRODUCTIONS/ENVIRONMENTS/groce/970ea07eb7ed_readme_cu118_torch271_v2",
+    "required_status": "environment_built_not_paper_admitted",
+    "torch": "2.7.1+cu118",
+    "torchvision": "0.22.1+cu118",
+    "torchaudio": "2.7.1+cu118"
+  },
+  "model": {
+    "repo_id": "CompVis/stable-diffusion-v1-4",
+    "requested_revision": "main",
+    "resolved_commit": "133a221b8aa7292a167afc5127cb63fb5005638b",
+    "hf_cache": "/ceph/sagnihot/projects/safety_genAI/outputs/PUSH_FOR_ICLR/REPRODUCTIONS/ASSETS/semantic_surgery_table2_hf_cache"
+  },
+  "metric_assets": {
+    "torch_fidelity_inception_url": "https://github.com/toshas/torch-fidelity/releases/download/v0.2.0/weights-inception-2015-12-05-6726825d.pth",
+    "filename": "weights-inception-2015-12-05-6726825d.pth",
+    "required_sha256_prefix": "6726825d"
+  },
+  "graph": {
+    "seed": 42,
+    "batch_size": 256,
+    "similarity_threshold": 0.3,
+    "max_connections": 100,
+    "sigma": 0.1,
+    "lambda_param": 0.1
+  },
+  "generation": {
+    "seed": 0,
+    "guidance_scale": 7.5,
+    "total_timesteps": 30,
+    "num_samples": 10,
+    "batch_size": 10,
+    "erase_type": "instance",
+    "target_concepts": "Snoopy",
+    "contents": ["Snoopy", "Mickey", "Spongebob", "Pikachu"],
+    "template_count": 80,
+    "n_step": 2,
+    "top_k": 8,
+    "decay_factor": 0.8,
+    "insert_topk": 100,
+    "similarity_threshold": 0.3,
+    "sigma": 0.1,
+    "lambda_param": 0.1,
+    "diffusion_steps": 3,
+    "projection_threshold": 10.0,
+    "embedding_batch_size": 32,
+    "python_hash_seed": 0
+  },
+  "paper_metrics": {
+    "snoopy_clip": 16.92,
+    "mickey_fid": 0.0,
+    "spongebob_fid": 0.0,
+    "pikachu_fid": 0.0
+  },
+  "tolerances": {
+    "clip_absolute": 0.5,
+    "fid_absolute": 1.0
+  },
+  "execution": {
+    "attempt_root": "/ceph/sagnihot/projects/safety_genAI/outputs/PUSH_FOR_ICLR/REPRODUCTIONS/groce/table1_snoopy/ATTEMPT_001"
+  }
+}
