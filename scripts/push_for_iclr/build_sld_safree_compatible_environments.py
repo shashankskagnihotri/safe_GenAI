@@ -52,7 +52,8 @@ def build(task_id):
             "1.4.14 declared albucore>=0.0.13 and resolved to incompatible 0.2.13; "
             "albucore 0.0.16 restores the released API. The official I2P evaluator "
             "hard-codes CUDAExecutionProvider, so CPU onnxruntime 1.18.1 is replaced "
-            "by CUDA-11.8-compatible onnxruntime-gpu 1.17.3. NudeNet 2.0.9, the "
+            "by the same-version CUDA-11.8-compatible onnxruntime-gpu 1.18.1. "
+            "NudeNet 2.0.9, the "
             "contemporary v0 detector API, is added. No SAFREE method code changes."
         )
     else:
@@ -99,7 +100,7 @@ def build(task_id):
         else:
             run([python, "-m", "pip", "uninstall", "-y", "onnxruntime", "onnxruntime-gpu"])
             run([python, "-m", "pip", "install", "--no-deps", "--force-reinstall",
-                 "albucore==0.0.16", "onnxruntime-gpu==1.17.3", "nudenet==2.0.9"])
+                 "albucore==0.0.16", "onnxruntime-gpu==1.18.1", "nudenet==2.0.9"])
             probe = (
                 "import albumentations, albucore, onnxruntime, nudenet, torch; "
                 "assert albucore.__version__=='0.0.16'; "
