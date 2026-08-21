@@ -125,7 +125,7 @@ def main() -> int:
             raise RuntimeError(f"CLIP revision mismatch: {clip_snapshot_result}")
         clip_model_root = temporary / model_cache_name(clip_contract["repo_id"])
         (clip_model_root / "refs").mkdir(exist_ok=True)
-        (clip_model_root / "refs" / "main").write_text(clip_contract["resolved_commit"] + "\n", encoding="utf-8")
+        (clip_model_root / "refs" / "main").write_text(clip_contract["resolved_commit"], encoding="utf-8")
 
         sd_snapshot = sd_target / "snapshots" / sd_contract["resolved_commit"]
         clip_snapshot = clip_model_root / "snapshots" / clip_contract["resolved_commit"]
