@@ -2,11 +2,13 @@
 set -euo pipefail
 
 TASK_ID=$1
-METHODS_ROOT=/ceph/sagnihot/projects/safety_genAI_worktrees/push_for_iclr_methods
+METHODS_ROOT=${PUSH_FOR_ICLR_EXECUTION_ROOT:?PUSH_FOR_ICLR_EXECUTION_ROOT must identify the frozen submitted worktree}
 MAIN_ROOT=/ceph/sagnihot/projects/safety_genAI
 MATRIX=$METHODS_ROOT/scripts/push_for_iclr/reproduction_env_matrix.tsv
 ENV_ROOT=$MAIN_ROOT/outputs/PUSH_FOR_ICLR/REPRODUCTIONS/ENVIRONMENTS
 CONDA=/ceph/sagnihot/miniconda3/bin/conda
+
+test -d "$METHODS_ROOT"
 
 row=$(awk -F '	' -v id="$TASK_ID" 'NR > 1 && $1 == id {print; found=1} END {if (!found) exit 2}' "$MATRIX")
 IFS=$'	' read -r matrix_id method repo commit pyver repair_profile <<< "$row"
@@ -62,16 +64,19 @@ case "$method" in
 The upstream commit leaves every runtime dependency unbounded. To reconstruct a
 2023-compatible environment, this build pins the contemporary Diffusers 0.20.2,
 Transformers 4.31.0, Accelerate 0.21.0, Torch 2.0.1, Torchvision 0.15.2, and
-Pillow 9.5.0. The numerical paper-row gate, not this inference alone, determines
-admission.
+Pillow 9.5.0. Its legacy setup.py imports pkg_resources, so editable installation
+uses the environment's setuptools instead of an isolated PEP 517 build sandbox.
+The numerical paper-row gate, not this inference alone, determines admission.
 EOF
     "$PIP" install torch==2.0.1 torchvision==0.15.2
     "$PIP" install diffusers==0.20.2 transformers==4.31.0 accelerate==0.21.0 Pillow==9.5.0
-    "$PIP" install --no-deps -e "$repo"
+    "$PIP" install --no-build-isolation --no-deps -e "$repo"
     ;;
   safree)
+    OPENAI_CLIP_COMMIT=d05afc436d78f1c48dc0dbf8e5980a9d471f35f6
     awk '
       $0 == "Pillow==9.5.0" {next}
+      $0 == "clip==1.0" {next}
       $0 ~ /^torch==/ {next}
       $0 ~ /^torchvision==/ {next}
       {print}
@@ -80,10 +85,15 @@ EOF
 The official requirements are unsatisfiable because Pillow 9.5.0 and 10.4.0 are
 both exact pins. The later 10.4.0 pin is retained. Torch and Torchvision are
 installed from the official CUDA 11.8 index because the +cu118 pins are not on
-the default package index. No runtime method code is changed.
+the default package index. The declared clip==1.0 is not published on PyPI, while
+generate_safree.py calls the API implemented by OpenAI/CLIP; that official source
+is therefore installed at commit d05afc436d78f1c48dc0dbf8e5980a9d471f35f6.
+No runtime method code is changed.
 EOF
+    printf 'openai_clip\thttps://github.com/openai/CLIP.git\t%s\n' "$OPENAI_CLIP_COMMIT" > "$tmp/UPSTREAM_AUXILIARY_LOCKS.tsv"
     "$PIP" install --extra-index-url https://download.pytorch.org/whl/cu118 torch==2.4.0+cu118 torchvision==0.19.0+cu118
     "$PIP" install -r "$tmp/requirements.resolved.txt"
+    "$PIP" install --no-deps "git+https://github.com/openai/CLIP.git@$OPENAI_CLIP_COMMIT"
     ;;
   stg)
     printf '%s\n' 'No dependency repair; installing the exact released requirements.' > "$tmp/REPAIR_NOTES.txt"
@@ -160,7 +170,7 @@ import sys
 method, commit, repair = sys.argv[1:]
 names = [
     "torch", "torchvision", "diffusers", "transformers", "accelerate",
-    "numpy", "pandas", "Pillow", "xformers", "ultralytics", "nudenet"
+    "numpy", "pandas", "Pillow", "xformers", "ultralytics", "nudenet", "clip"
 ]
 versions = {}
 for name in names:
