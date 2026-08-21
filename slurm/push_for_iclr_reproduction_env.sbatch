@@ -11,7 +11,7 @@
 #SBATCH --error=/ceph/sagnihot/projects/safety_genAI/outputs/PUSH_FOR_ICLR/JOB_LOGS/reproduction_env_%A_%a.err
 
 set -euo pipefail
-METHODS_ROOT=/ceph/sagnihot/projects/safety_genAI_worktrees/push_for_iclr_methods
-actual=$(git -C "$METHODS_ROOT" rev-parse HEAD)
+test -n "$PUSH_FOR_ICLR_EXECUTION_ROOT"
+actual=$(git -C "$PUSH_FOR_ICLR_EXECUTION_ROOT" rev-parse HEAD)
 test "$actual" = "$PUSH_FOR_ICLR_METHODS_COMMIT"
-exec "$METHODS_ROOT/scripts/push_for_iclr/build_reproduction_env.sh" "$SLURM_ARRAY_TASK_ID"
+exec "$PUSH_FOR_ICLR_EXECUTION_ROOT/scripts/push_for_iclr/build_reproduction_env.sh" "$SLURM_ARRAY_TASK_ID"
