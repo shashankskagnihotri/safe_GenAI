@@ -12,12 +12,15 @@ from pathlib import Path
 import re
 import runpy
 import shutil
+import ssl
 import subprocess
 import sys
 import tarfile
 import time
 from typing import Any
 import urllib.request
+
+import certifi
 
 
 def sha256_file(path: Path) -> str:
@@ -156,7 +159,10 @@ def fetch_metric_asset(contract: dict[str, Any]) -> None:
         raise RuntimeError(f"Refusing unadmitted metric asset: {final}")
     temporary = final.with_suffix(final.suffix + f".downloading_{os.environ.get('SLURM_JOB_ID', os.getpid())}")
     try:
-        with urllib.request.urlopen(asset["torch_fidelity_inception_url"], timeout=120) as response, temporary.open("wb") as output:
+        tls_context = ssl.create_default_context(cafile=certifi.where())
+        with urllib.request.urlopen(
+            asset["torch_fidelity_inception_url"], timeout=120, context=tls_context
+        ) as response, temporary.open("wb") as output:
             while True:
                 block = response.read(8 * 1024 * 1024)
                 if not block:
