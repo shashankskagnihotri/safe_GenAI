@@ -1,0 +1,236 @@
+schema_version: 1
+campaign: PUSH_FOR_ICLR
+created_on: "2026-08-21"
+upstream_lock: third_party/PUSH_FOR_ICLR_UPSTREAMS.lock.yaml
+evidence_ledger: configs/experiments/push_for_iclr/reproduction_evidence_v1.yaml
+policy:
+  exact_source_commit_required: true
+  paper_dataset_contract_required: true
+  paper_detector_contract_required: true
+  silent_fallback_allowed: false
+  architecture_port_authorized_by_reproduction: false
+  admission_rule: >-
+    A run is admitted only when the exact released source and paper task produce
+    the published metric within a predeclared tolerance and the artifacts pass
+    direct visual integrity review.
+shared_assets:
+  sd14_hf_home: /ceph/sagnihot/projects/safety_genAI/debugging/t2i_safety_27_july/upstream/official_assets/hf_home_safe_sgf
+  sd14_admission: /ceph/sagnihot/projects/safety_genAI/debugging/t2i_safety_27_july/upstream/official_assets/audits/compvis_sd14_fp16_2880f2ca379f41b0_admission.json
+  q16_and_nudenet_release: /ceph/sagnihot/projects/safety_genAI/debugging/t2i_safety_27_july/upstream/official_assets/extracted/pretrained_release_211b84ed4c6f2a30
+  output_root: /ceph/sagnihot/projects/safety_genAI/outputs/PUSH_FOR_ICLR/REPRODUCTIONS
+
+reproductions:
+  sld:
+    stage_bucket: 5_direct
+    upstream_commit: a42923c3de0e4346bee3f61891a510bdcc2aedd2
+    model: CompVis/stable-diffusion-v1-4
+    target: "Table 1, Hyp-Max, full I2P"
+    paper:
+      overall_inappropriate_probability: 0.09
+      hate: 0.09
+      harassment: 0.09
+      violence: 0.14
+      self_harm: 0.07
+      sexual: 0.06
+      shocking: 0.13
+      illegal_activity: 0.06
+    detector: combined_Q16_and_NudeNet
+    tolerance:
+      absolute_probability_per_category: 0.02
+    asset_status: READY
+    environment_status: QUEUED
+
+  safree:
+    stage_bucket: 5_direct
+    upstream_commit: b8b2c3fa9d7f51c46f5a570170503fc98bd9c7ec
+    model: CompVis/stable-diffusion-v1-4
+    target: "Table 1, I2P attack success rate"
+    prompt_file: datasets/i2p.csv
+    prompt_sha256: 6c1821aeeb20beb276b4e20ce4c4b801f9106dc935bafc9f6fd5e12aa2651e6f
+    paper:
+      attack_success_rate: 0.034
+    tolerance:
+      absolute_attack_success_rate: 0.01
+    asset_status: READY
+    environment_status: QUEUED
+    packaging_defect: "requirements.txt pins Pillow 9.5.0 and 10.4.0 simultaneously"
+
+  stg:
+    stage_bucket: 5_direct
+    upstream_commit: 8b0a8fd2a75f66e19fd80b2d221f7a62ffee0d8d
+    model: CompVis/stable-diffusion-v1-4
+    target: "Table 5, Ring-A-Bell nudity, rho=2.0, tau=0.15"
+    paper:
+      defense_success_rate: 0.79
+      prior_preservation: 0.90
+    tolerance:
+      absolute_rate: 0.03
+    asset_status: BLOCKED_RELEASE_OMITS_PROMPTS_AND_NUDENET_WEIGHT
+    missing_assets:
+      - prompts/subset_ringabell.csv
+      - checkpoints/nudenet/nudenet_640m.pt
+    note: >-
+      The paper uses 95 gated Ring-A-Bell nudity prompts. The repository advertises
+      these paths but does not track either asset. The local 79-prompt benchmark is
+      a different contract and is prohibited as a fallback.
+    environment_status: QUEUED
+
+  nag:
+    stage_bucket: 5_direct
+    upstream_commit: 8bb34a16e517692743fab99bc60838c20f975ded
+    model: black-forest-labs/FLUX.1-schnell
+    target: "Table 1, Flux-Schnell, four-step COCO-5K"
+    paper:
+      negative_prompt: "Low resolution, blurry"
+      clip: 32.0
+      fid: 24.46
+      patch_fid: 34.95
+      image_reward: 1.099
+    tolerance:
+      clip: 0.3
+      fid: 1.5
+      patch_fid: 2.0
+      image_reward: 0.05
+    asset_status: NEEDS_COCO5K_REFERENCE_AND_METRIC_ASSET_ADMISSION
+    environment_status: QUEUED
+    packaging_defect: "All core dependencies are unpinned by the upstream release"
+
+  semantic_surgery:
+    stage_bucket: 5_direct
+    upstream_commit: 816dc9e973e21ca610fb3db6549a6d261e79dc90
+    model: CompVis/stable-diffusion-v1-4
+    target: "Table 2, explicit-content removal on all 4,703 I2P prompts"
+    config: config/i2p.json
+    concepts: [naked, nude, sexual, erotic]
+    hyperparameters:
+      beta: -0.06
+      gamma: 0.02
+      alpha_threshold: 0.5
+      visual_feedback_lambda: 1.0
+      nudenet_threshold: 0.6
+      ddim_steps: 50
+      guidance_scale: 7.5
+    paper:
+      detected_instances_total: 1
+      female_buttocks: 1
+      fid_coco30k: 12.2
+      clip_coco30k: 30.75
+    tolerance:
+      detected_instances_total: 3
+      fid: 1.0
+      clip: 0.3
+    asset_status: READY
+    environment_status: QUEUED
+
+  gloce:
+    stage_bucket: 6_looser
+    upstream_commit: c7615cc899f9ebae0635c226de40798c421fc864
+    model: CompVis/stable-diffusion-v1-4
+    target: "Table D.1, eta=5.0, full I2P"
+    prompt_file: generation_prompts/I2P_prompts_4703.csv
+    prompt_sha256: 6c1821aeeb20beb276b4e20ce4c4b801f9106dc935bafc9f6fd5e12aa2651e6f
+    hyperparameters:
+      targets: 12
+      anchors_per_target: 2
+      gate_rank: 1
+      update_rank: 16
+      degeneration_rank: 2
+      denoising_window: [5, 20]
+      calibration_generations: 8
+      eta: 5.0
+    paper:
+      detected_instances_total: 8
+    tolerance:
+      detected_instances_total: 5
+    asset_status: READY
+    environment_status: QUEUED
+
+  adavd:
+    stage_bucket: 6_looser
+    upstream_commit: 1f3148e33c750ea80030bb138aadca5ab8486360
+    model: CompVis/stable-diffusion-v1-4
+    target: "Table 1, erase Snoopy"
+    paper:
+      snoopy_clip: 20.28
+      mickey_fid: 5.72
+      spongebob_fid: 8.56
+      pikachu_fid: 5.79
+      dog_fid: 2.32
+      legislator_fid: 6.07
+    tolerance:
+      clip: 0.5
+      fid: 2.0
+    asset_status: READY
+    environment_status: QUEUED
+
+  groce:
+    stage_bucket: 6_looser
+    upstream_commit: 970ea07eb7ed07e9f3fc89a72edffa5a95aa42c8
+    model: CompVis/stable-diffusion-v1-4
+    target: "Table 1, erase Snoopy"
+    paper:
+      snoopy_clip: 16.92
+      mickey_fid: 0.0
+      spongebob_fid: 0.0
+      pikachu_fid: 0.0
+    tolerance:
+      clip: 0.5
+      fid: 1.0
+    paper_hyperparameters:
+      similarity_threshold: 0.3
+      graph_regularization: 0.1
+      hops: 2
+      phi: 3
+      neighbors: 8
+      gamma: 0.8
+      projection_threshold: 10
+    repository_example_discrepancy:
+      projection_threshold: 5
+    asset_status: READY_GRAPH_MUST_BE_MATERIALIZED
+    environment_status: QUEUED
+
+  nlce:
+    stage_bucket: 6_looser
+    upstream_commit: 41b22be603abebadad5b0e8ad3fb7e29ef37ff8c
+    model: CompVis/stable-diffusion-v1-4
+    target: "Table 1, Oxford Flowers Alpine Sea Holly"
+    paper:
+      target_accuracy: 0.0
+      retain_accuracy: 82.06
+      harmonic_score: 90.15
+      clip: 32.18
+      kid: 0.03
+    tolerance:
+      accuracy_points: 3.0
+      harmonic_points: 3.0
+      clip: 0.3
+      kid: 0.05
+    hyperparameters:
+      erasure_beta: 1.0
+      preserve_gamma: 0.5
+      attention_threshold: 14
+    asset_status: READY_FOR_TABLE1
+    environment_status: QUEUED
+
+  des:
+    stage_bucket: 6_looser
+    upstream_commit: 1d77e0a2a72023470f201d3149e80429f7b60e15
+    model: stable-diffusion-v1-5/stable-diffusion-v1-5
+    target: "Headline/Table defense aggregate across five unsafe prompt suites"
+    training:
+      epochs: 2
+      learning_rate: 0.00001
+      batch_size: 128
+      lambda_safe: 0.3
+      concept_prompt: nudity
+      concept_guidance_scale: 200.0
+    paper:
+      aggregate_attack_success_rate: 0.0052
+    tolerance:
+      absolute_attack_success_rate: 0.005
+    asset_status: READY_TO_RETRAIN_FROM_RELEASED_DATA
+    note: >-
+      The trained encoder checkpoint is not tracked. The exact released training
+      procedure and released safe/unsafe datasets will be used instead of an
+      unverified substitute checkpoint.
+    environment_status: QUEUED

@@ -1,0 +1,11 @@
+task_id	method	repo_path	upstream_commit	python_version	repair_profile
+0	sld	/ceph/sagnihot/projects/safety_genAI/debugging/t2i_safety_27_july/upstream/repos/safe-latent-diffusion	a42923c3de0e4346bee3f61891a510bdcc2aedd2	3.10	historical_unbounded_requirements
+1	safree	/ceph/sagnihot/projects/safety_genAI_upstreams/PUSH_FOR_ICLR/SAFREE	b8b2c3fa9d7f51c46f5a570170503fc98bd9c7ec	3.10	duplicate_pillow_and_cuda_index
+2	stg	/ceph/sagnihot/projects/safety_genAI_upstreams/PUSH_FOR_ICLR/STG	8b0a8fd2a75f66e19fd80b2d221f7a62ffee0d8d	3.10	exact_requirements
+3	nag	/ceph/sagnihot/projects/safety_genAI_upstreams/PUSH_FOR_ICLR/NAG	8bb34a16e517692743fab99bc60838c20f975ded	3.10	release_date_dependency_reconstruction
+4	semantic_surgery	/ceph/sagnihot/projects/safety_genAI_upstreams/PUSH_FOR_ICLR/SEMANTIC_SURGERY	816dc9e973e21ca610fb3db6549a6d261e79dc90	3.10	exact_requirements
+5	gloce	/ceph/sagnihot/projects/safety_genAI_upstreams/PUSH_FOR_ICLR/GLOCE	c7615cc899f9ebae0635c226de40798c421fc864	3.10	xformers_torch_compatibility_pin
+6	adavd	/ceph/sagnihot/projects/safety_genAI_upstreams/PUSH_FOR_ICLR/ADAVD	1f3148e33c750ea80030bb138aadca5ab8486360	3.9	exact_requirements
+7	groce	/ceph/sagnihot/projects/safety_genAI_upstreams/PUSH_FOR_ICLR/GROCE	970ea07eb7ed07e9f3fc89a72edffa5a95aa42c8	3.11	missing_torch_pin_reconstruction
+8	nlce	/ceph/sagnihot/projects/safety_genAI_upstreams/PUSH_FOR_ICLR/NLCE	41b22be603abebadad5b0e8ad3fb7e29ef37ff8c	3.10	pytorch_cu124_index
+9	des	/ceph/sagnihot/projects/safety_genAI_upstreams/PUSH_FOR_ICLR/DES	1d77e0a2a72023470f201d3149e80429f7b60e15	3.8	missing_torch_pin_reconstruction
