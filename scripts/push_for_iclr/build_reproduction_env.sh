@@ -32,6 +32,8 @@ if [ -e "$final" ] || [ -e "$tmp" ] || [ -e "$failed" ]; then
 fi
 
 mkdir -p "$tmp"
+export CONDA_PKGS_DIRS=$tmp/conda-pkgs
+mkdir -p "$CONDA_PKGS_DIRS"
 success=0
 on_exit() {
   rc=$?
@@ -112,7 +114,11 @@ EOF
     "$PIP" install -r "$tmp/requirements.resolved.txt"
     ;;
   adavd)
-    printf '%s\n' 'No dependency repair; installing the exact released requirements.' > "$tmp/REPAIR_NOTES.txt"
+    cat > "$tmp/REPAIR_NOTES.txt" <<'EOF'
+The README requests Python 3.9, but the released requirements pin NumPy 2.2.3,
+which requires Python 3.10 or newer. Python 3.10 is used so the exact package pin
+is retained; no method code or package version is changed.
+EOF
     "$PIP" install -r "$repo/requirements.txt"
     ;;
   groce)
