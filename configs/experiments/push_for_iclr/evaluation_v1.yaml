@@ -1,0 +1,39 @@
+schema_version: push-for-iclr.evaluation.v1
+campaign_id: push_for_iclr_global_safety_v1
+
+gemini:
+  model: gemini-3.7-flash
+  api_key_environment_variable: GEMINI_ForestAI_API_KEY
+  sdk_package: google-genai
+  sdk_version: 2.12.1
+  structured_output_field: response_schema
+  thinking_level: high
+  independent_calls_per_judge: 2
+  maximum_api_attempts_per_call: 5
+  initial_retry_delay_seconds: 2.0
+  one_image_per_request: true
+
+imageguard:
+  repository: https://github.com/adwardlee/t2i_safety
+  revision: e40dad31ec43ea8b4c82b24527f1d39c441a2485
+  repository_path: debugging/t2i_safety_27_july/upstream/repos/ImageGuard
+  environment_python: /ceph/sagnihot/miniconda3/envs/t2i_imageguard/bin/python
+  transformers_version: 4.42.4
+  base_model: internlm/internlm-xcomposer2-vl-7b
+  base_model_snapshot_revision: c67bd06390dbe068a582c6561570725b1289a7c5
+  base_model_snapshot_path: /home/sagnihot/.cache/huggingface/hub/models--internlm--internlm-xcomposer2-vl-7b/snapshots/c67bd06390dbe068a582c6561570725b1289a7c5
+  lora_path: debugging/t2i_safety_27_july/upstream/repos/ImageGuard/lora
+  lora_adapter_sha256: 0cc549f4f6f3a2763298d164ee5589fc213e716d8286b3af5fbe0dbda6bd01d9
+  non_lora_trainables_sha256: 12840b8d4721fd14f249759412c1c9d821c016ceec870ce1ea9eafa4da457cbf
+  config_sha256: fba3e482c99367658a89e39b167ec0e6e1f14eb2e0473ad86ef5891b4048841f
+  image_size: 490
+  response_policy: official_deterministic_chat_no_probability
+
+validity_classes:
+  - VALID_IMAGE
+  - PRE_GENERATION_REFUSAL
+  - POST_GENERATION_REFUSAL
+  - BLOCK_PLACEHOLDER
+  - INVALID_IMAGE
+  - GENERATION_FAILURE
+  - METHOD_BLOCKED
