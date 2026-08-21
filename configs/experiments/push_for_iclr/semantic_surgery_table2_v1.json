@@ -1,0 +1,75 @@
+{
+  "schema_version": 1,
+  "campaign": "PUSH_FOR_ICLR",
+  "method": "semantic_surgery",
+  "paper_target": "Table 2 explicit-content removal on the full 4,703-prompt I2P set",
+  "upstream": {
+    "repo": "/ceph/sagnihot/projects/safety_genAI_upstreams/PUSH_FOR_ICLR/SEMANTIC_SURGERY",
+    "commit": "816dc9e973e21ca610fb3db6549a6d261e79dc90",
+    "config_path": "config/i2p.json",
+    "config_sha256": "cf66c58c96350810772e2894ba59b4632f3b88ba6eb83ba898aefcf58fe7ac15"
+  },
+  "environment": {
+    "root": "/ceph/sagnihot/projects/safety_genAI/outputs/PUSH_FOR_ICLR/REPRODUCTIONS/ENVIRONMENTS/semantic_surgery/816dc9e973e2",
+    "required_status": "environment_built_not_paper_admitted"
+  },
+  "models": {
+    "stable_diffusion": {
+      "repo_id": "CompVis/stable-diffusion-v1-4",
+      "requested_revision": "main",
+      "resolved_commit": "133a221b8aa7292a167afc5127cb63fb5005638b",
+      "source_cache_model_dir": "/ceph/sagnihot/projects/safety_genAI/debugging/t2i_safety_27_july/upstream/official_assets/hf_home_safe_sgf/hub/models--CompVis--stable-diffusion-v1-4"
+    },
+    "clip_text_encoder": {
+      "repo_id": "openai/clip-vit-large-patch14",
+      "requested_revision": "32bd64288804d66eefd0ccbe215aa642df71cc41",
+      "resolved_commit": "32bd64288804d66eefd0ccbe215aa642df71cc41"
+    }
+  },
+  "datasets": {
+    "i2p": {
+      "path": "/ceph/sagnihot/projects/safety_genAI_upstreams/PUSH_FOR_ICLR/SEMANTIC_SURGERY/prompts_csv/unsafe-prompts4703.csv",
+      "sha256": "6c1821aeeb20beb276b4e20ce4c4b801f9106dc935bafc9f6fd5e12aa2651e6f",
+      "rows": 4703,
+      "required_columns": ["prompt", "evaluation_seed", "case_number"]
+    },
+    "coco_30k": {
+      "path": "/ceph/sagnihot/projects/safety_genAI_upstreams/PUSH_FOR_ICLR/SEMANTIC_SURGERY/prompts_csv/coco_30k.csv",
+      "sha256": "0457ce08df8176aa51d230d5193e7a3dca8c6ffb26cfff3e4d3e1523d617ea3a",
+      "rows": 30000
+    }
+  },
+  "method_hyperparameters": {
+    "scheduler": "DDIM",
+    "concepts_to_erase": ["naked", "nude", "sexual", "erotic"],
+    "neutral_concept": "",
+    "gamma": 0.02,
+    "beta": -0.06,
+    "alpha_threshold": 0.5,
+    "detect_threshold": 0.5,
+    "visual_feedback_lambda": 1.0,
+    "nudenet_feedback_threshold": 0.6,
+    "guidance_scale": 7.5,
+    "image_size": 512,
+    "ddim_steps": 50,
+    "num_samples": 1,
+    "use_cuda_generator": false,
+    "use_safety_checker": false
+  },
+  "execution": {
+    "shards": 16,
+    "asset_cache": "/ceph/sagnihot/projects/safety_genAI/outputs/PUSH_FOR_ICLR/REPRODUCTIONS/ASSETS/semantic_surgery_table2_hf_cache",
+    "attempt_root": "/ceph/sagnihot/projects/safety_genAI/outputs/PUSH_FOR_ICLR/REPRODUCTIONS/semantic_surgery/table2_i2p_4703/ATTEMPT_001"
+  },
+  "paper_metrics": {
+    "detected_instances_total": 1,
+    "female_buttocks": 1,
+    "fid_coco30k": 12.2,
+    "clip_coco30k": 30.75
+  },
+  "tolerances": {
+    "detected_instances_total_absolute": 3,
+    "fid_absolute": 1.0,
+    "clip_absolute": 0.3
+  }
+}
