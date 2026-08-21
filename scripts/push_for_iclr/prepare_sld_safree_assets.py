@@ -2,20 +2,9 @@
 import argparse
 import os
 import shutil
-import ssl
-import urllib.request
 from pathlib import Path
 
 from paper_i2p_common import assert_git_commit, assert_sha256, atomic_json, load_json, sha256_file
-
-
-def download(url, destination):
-    request = urllib.request.Request(url, headers={"User-Agent": "PUSH_FOR_ICLR-exact-reproduction/1"})
-    context = ssl.create_default_context()
-    with urllib.request.urlopen(request, context=context, timeout=120) as response:
-        with Path(destination).open("wb") as handle:
-            shutil.copyfileobj(response, handle, length=1024 * 1024)
-
 
 def main():
     parser = argparse.ArgumentParser()
@@ -74,10 +63,16 @@ def main():
         (detector_root / "classes").mkdir(parents=True)
         checkpoint = detector_root / "detector_v2_base_checkpoint.onnx"
         classes = detector_root / "classes/detector_v2_base_classes"
-        download(sld["assets"]["nudenet_base_checkpoint_url"], checkpoint)
-        download(sld["assets"]["nudenet_base_classes_url"], classes)
-        if checkpoint.stat().st_size < 1024 * 1024 or classes.stat().st_size == 0:
-            raise RuntimeError("Downloaded NudeNet base assets are incomplete")
+        checkpoint_source = Path(sld["assets"]["nudenet_base_checkpoint_source"])
+        classes_source = Path(sld["assets"]["nudenet_base_classes_source"])
+        assert_sha256(checkpoint_source, sld["assets"]["nudenet_base_checkpoint_sha256"])
+        assert_sha256(classes_source, sld["assets"]["nudenet_base_classes_sha256"])
+        if checkpoint_source.stat().st_size != sld["assets"]["nudenet_base_checkpoint_bytes"]:
+            raise RuntimeError("Frozen NudeNet base checkpoint size mismatch")
+        if classes_source.stat().st_size != sld["assets"]["nudenet_base_classes_bytes"]:
+            raise RuntimeError("Frozen NudeNet base classes size mismatch")
+        shutil.copy2(checkpoint_source, checkpoint)
+        shutil.copy2(classes_source, classes)
 
         manifest = {
             "status": "assets_admitted_for_runtime",
@@ -85,8 +80,20 @@ def main():
             "q16_prompts": {"path": "eval/Q16_prompts.p", "sha256": sha256_file(temporary / "eval/Q16_prompts.p")},
             "safree_classifier": {"path": "safree/nudenet_classifier_model.onnx", "sha256": sha256_file(temporary / "safree/nudenet_classifier_model.onnx")},
             "safree_config": {"path": "safree/sd_config.json", "sha256": sha256_file(temporary / "safree/sd_config.json")},
-            "nudenet_base_checkpoint": {"url": sld["assets"]["nudenet_base_checkpoint_url"], "sha256": sha256_file(checkpoint), "bytes": checkpoint.stat().st_size},
-            "nudenet_base_classes": {"url": sld["assets"]["nudenet_base_classes_url"], "sha256": sha256_file(classes), "bytes": classes.stat().st_size},
+            "nudenet_base_checkpoint": {
+                "release_asset_id": sld["assets"]["nudenet_base_checkpoint_release_asset_id"],
+                "url": sld["assets"]["nudenet_base_checkpoint_url"],
+                "source": str(checkpoint_source),
+                "sha256": sha256_file(checkpoint),
+                "bytes": checkpoint.stat().st_size,
+            },
+            "nudenet_base_classes": {
+                "release_asset_id": sld["assets"]["nudenet_base_classes_release_asset_id"],
+                "url": sld["assets"]["nudenet_base_classes_url"],
+                "source": str(classes_source),
+                "sha256": sha256_file(classes),
+                "bytes": classes.stat().st_size,
+            },
             "clip_snapshot": str(clip_snapshot),
             "source_commits": {
                 "sld": sld["upstream"]["commit"],
