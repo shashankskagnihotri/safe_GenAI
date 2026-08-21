@@ -4,14 +4,19 @@ from __future__ import annotations
 import argparse
 import json
 import subprocess
+import sys
 from pathlib import Path
+
+
+REPOSITORY_ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(REPOSITORY_ROOT / "src"))
 
 from hierasafe_flow.campaigns.push_for_iclr.manifests import build_t2isafety_manifests
 
 
 def _parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Build immutable PUSH_FOR_ICLR manifests.")
-    parser.add_argument("--repository-root", type=Path, default=Path.cwd())
+    parser.add_argument("--repository-root", type=Path, default=REPOSITORY_ROOT)
     parser.add_argument("--output-root", type=Path, default=Path("outputs/PUSH_FOR_ICLR"))
     parser.add_argument("--code-commit", required=True)
     return parser.parse_args()
