@@ -23,7 +23,7 @@ def run(command, **kwargs):
 def package_versions(python):
     code = """
 import importlib.metadata, json, platform
-names = ['torch','torchvision','diffusers','transformers','accelerate','numpy','Pillow','huggingface-hub','albumentations','albucore','onnxruntime-gpu','nudenet','clip']
+names = ['torch','torchvision','diffusers','transformers','accelerate','numpy','Pillow','huggingface-hub','albumentations','albucore','onnxruntime','onnxruntime-gpu','nudenet','clip']
 out = {'python': platform.python_version(), 'packages': {}}
 for name in names:
     try: out['packages'][name] = importlib.metadata.version(name)
@@ -50,11 +50,11 @@ def build(task_id):
         repair_notes = (
             "The admitted author environment is cloned immutably. Albumentations "
             "1.4.14 declared albucore>=0.0.13 and resolved to incompatible 0.2.13; "
-            "albucore 0.0.16 restores the released API. The official I2P evaluator "
-            "hard-codes CUDAExecutionProvider, so CPU onnxruntime 1.18.1 is replaced "
-            "by the same-version CUDA-11.8-compatible onnxruntime-gpu 1.18.1. "
-            "NudeNet 2.0.9, the "
-            "contemporary v0 detector API, is added. No SAFREE method code changes."
+            "albucore 0.0.16 restores the released API. The author's exact CPU "
+            "onnxruntime 1.18.1 package and repository-vendored "
+            "nudenet/classify_pil.py implementation are preserved. Installing the "
+            "PyPI nudenet package would shadow that implicit namespace package and "
+            "is explicitly forbidden. No SAFREE method code changes."
         )
     else:
         raise ValueError("task-id must be 0 or 1")
@@ -98,16 +98,30 @@ def build(task_id):
             )
             run([python, "-c", probe])
         else:
-            run([python, "-m", "pip", "uninstall", "-y", "onnxruntime", "onnxruntime-gpu"])
             run([python, "-m", "pip", "install", "--no-deps", "--force-reinstall",
-                 "albucore==0.0.16", "onnxruntime-gpu==1.18.1", "nudenet==2.0.9"])
-            probe = (
-                "import albumentations, albucore, onnxruntime, nudenet, torch; "
-                "assert albucore.__version__=='0.0.16'; "
-                "assert 'CUDAExecutionProvider' in onnxruntime.get_available_providers(); "
-                "assert torch.arange(3).numpy().tolist()==[0,1,2]; "
-                "import generate_safree; print('SAFREE_COMPATIBILITY_OK')"
-            )
+                 "albucore==0.0.16"])
+            source = str(Path(config["upstream"]["repo"]).resolve())
+            probe = f"""
+import importlib.metadata as metadata
+from pathlib import Path
+import albumentations, albucore, onnxruntime, torch
+import nudenet.classify_pil as classify_pil
+assert albucore.__version__ == '0.0.16'
+assert metadata.version('onnxruntime') == '1.18.1'
+for forbidden in ('onnxruntime-gpu', 'nudenet'):
+    try:
+        metadata.version(forbidden)
+    except metadata.PackageNotFoundError:
+        pass
+    else:
+        raise AssertionError('Forbidden shadowing package installed: ' + forbidden)
+expected = Path({source!r}) / 'nudenet/classify_pil.py'
+assert Path(classify_pil.__file__).resolve() == expected.resolve()
+assert 'CPUExecutionProvider' in onnxruntime.get_available_providers()
+assert torch.arange(3).numpy().tolist() == [0, 1, 2]
+import generate_safree
+print('SAFREE_COMPATIBILITY_OK')
+"""
             environment = os.environ.copy()
             environment["PYTHONPATH"] = config["upstream"]["repo"]
             run([python, "-c", probe], cwd=config["upstream"]["repo"], env=environment)
