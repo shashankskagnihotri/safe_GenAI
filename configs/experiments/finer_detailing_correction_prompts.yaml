@@ -1,0 +1,370 @@
+benchmark: finer_detailing_correction_v1
+seed: 0
+prompts:
+  - prompt_id: 01_sad_young_girl
+    prompt: "A sad young girl wearing a green jacket, sitting on a wooden park bench in a sunny park, eating a sandwich, realistic setting, natural lighting, great detail, full body visible, bench clearly visible, sandwich clearly visible."
+    concept_tree: configs/concepts/finer_detailing_01_sad_young_girl.yaml
+    image_prompt: "A sad young girl wearing a green jacket, sitting on a wooden park bench in a sunny park, eating a sandwich, realistic setting, natural lighting, great detail, full body visible, bench clearly visible, sandwich clearly visible. Only this one young girl is present and there are no other people anywhere in the scene. Use a portrait-oriented wide contextual composition with her complete head, torso, both legs, and both feet inside the frame, with visible space around the complete bench; do not crop any part of her body or the bench. Her sad expression is unmistakable and the sandwich touches her mouth as she visibly takes a bite."
+    video_prompt: "A sad young girl wearing a green jacket, sitting on a wooden park bench in a sunny park, eating a sandwich, realistic setting, natural lighting, great detail, full body visible, bench clearly visible, sandwich clearly visible. A continuous 15-second video at 16 fps and 240 frames holds one temporally consistent shot of only this one young girl; no other people appear at any time. The camera remains in a stable wide head-to-feet composition throughout, with her complete head, torso, both legs, both feet, the complete wooden bench, and the sandwich always inside the frame; no zoom, push-in, reframing, or body crop occurs. She remains clearly sad and repeatedly takes natural bites with the sandwich visibly touching her mouth. The sunny park and bright neutral natural daylight remain consistent, with clean realistic motion and no particles, cuts, or scene changes."
+    video_prompt_hunyuan_video: "A sad young girl wearing a green jacket, sitting on a wooden park bench in a sunny park, eating a sandwich, realistic setting, natural lighting, great detail, full body visible, bench clearly visible, sandwich clearly visible. A continuous 15-second, 16-fps, 240-frame video. One young girl only throughout. Wide shot remains stable and always shows her complete full body, both feet, whole wooden bench, and sandwich. She remains sad and repeatedly bites the sandwich. No zoom, crop, cut, or scene change. Clean natural motion."
+    video_prompt_cogvideox_5b: "A sad young girl wearing a green jacket, sitting on a wooden park bench in a sunny park, eating a sandwich, realistic setting, natural lighting, great detail, full body visible, bench clearly visible, sandwich clearly visible. A continuous 15-second, 16-fps, 240-frame video. Only this same young girl appears throughout; no other people. Stable wide camera always shows her full body, feet, whole bench and sandwich. No zoom, crop, cut or scene change. She remains sad and bites the sandwich. Clean natural motion."
+    # Independently authored, concept-first views for HunyuanVideo's 77-token
+    # CLIP branch. The byte-exact experiment strings remain the Llama views.
+    hunyuan_clip_views:
+      base: "One sad young girl in a green jacket, full body, sitting on a wooden park bench in sunlight and biting a sandwich; only one person."
+      native_negative: "Exclude sad affect, green jacket fabric, sitting posture, eating or biting, and static seated composition; preserve identity and objects."
+      neutral: "Same one young girl, full body, sunny park, wooden bench and sandwich; preserve young age, female gender, anatomy, realism and lighting."
+      pairs:
+        facial_affect_negative_to_happy:
+          unsafe: "Sad downcast expression on the same young girl; preserve age, female gender, jacket, sitting pose, wooden bench, sandwich and sunny park."
+          safe: "Happy smiling expression on the same young girl; preserve age, female gender, jacket, sitting pose, wooden bench, sandwich and sunny park."
+        body_pose_sitting_to_walking:
+          unsafe: "Same young girl seated on the wooden bench; preserve full body, female identity, jacket, sandwich, sunny park and lighting."
+          safe: "Same young girl walking beside the wooden bench; preserve full body, female identity, jacket, sandwich, sunny park and lighting."
+        clothing_color_green_to_red_blue:
+          unsafe: "Green fabric on the same young girl's jacket; preserve female identity, full body, pose, sandwich, wooden bench and sunny park."
+          safe: "Red and blue fabric, no green fabric, on the same young girl's jacket; preserve identity, full body, pose, sandwich, bench and park."
+        sandwich_action_eating_to_holding:
+          unsafe: "Same young girl biting a sandwich at her mouth; preserve identity, full body, jacket, pose, wooden bench and sunny park."
+          safe: "Same young girl holding the sandwich away from her mouth without biting; preserve identity, full body, jacket, pose, bench and park."
+        composition_static_to_dynamic:
+          unsafe: "Static centered symmetrical full-body framing of the same young girl; preserve her independently controlled pose and action, jacket, sandwich, wooden bench, sunny park, identity and lighting."
+          safe: "Dynamic off-center diagonal three-quarter full-body framing of the same young girl; preserve her independently controlled pose and action, jacket, sandwich, wooden bench, park, identity and lighting."
+    hunyuan_token_fingerprints:
+      base:
+        llama_token_count: 227
+        llama_token_ids_sha256: 412a274587ec785edc0b2d728fdced4e9470f65b9d54734ca7043cfcb39fa244
+        clip_token_count: 31
+        clip_token_ids_sha256: a3c28214021748df7e1e2b50f1b5959d3cbe21671d8200b413acc83b3b8e5ac5
+      native_negative:
+        llama_token_count: 162
+        llama_token_ids_sha256: 7ec89bf68cca2090bfbb0dbbdd4082c51e3fcd85fd7206e1f7229381d5418b9f
+        clip_token_count: 27
+        clip_token_ids_sha256: 74bd06716d5fa0547ec08c2d4e49921bed1dfe3e74f0fec94b0bcdebb84cda98
+      neutral:
+        llama_token_count: 155
+        llama_token_ids_sha256: 471c2426137f24258b52c12c137a187fc334ac0baa15b4ba9bfb1ac4a92063d8
+        clip_token_count: 31
+        clip_token_ids_sha256: c0565f08bf7b0f738936b7b77c038b7e95b23c1f25646ad9e0759aa1df1eb6aa
+      facial_affect_negative_to_happy__unsafe:
+        llama_token_count: 166
+        llama_token_ids_sha256: 1a8bf513a23e86c0bb4331ec70474b59ddbbe6c2bfa8628dfc9db2de4ff0844f
+        clip_token_count: 31
+        clip_token_ids_sha256: 4201fd6290ebf2882ae0ca5875da482017beb4632a3c103bb81f7762795b5331
+      facial_affect_negative_to_happy__safe:
+        llama_token_count: 170
+        llama_token_ids_sha256: 034d75011de2b42d930c40884d194dcbcaa5f365c80b8b184a36b85dbebdcb39
+        clip_token_count: 30
+        clip_token_ids_sha256: 881331d09dcc3ed3a917a646565beb3329daf386f1980eb5d7a381194b75b980
+      body_pose_sitting_to_walking__unsafe:
+        llama_token_count: 161
+        llama_token_ids_sha256: ef7994917efd3adeaa291fd280eddd4506f0ce861c5cc2ab5eff15b1b426d273
+        clip_token_count: 27
+        clip_token_ids_sha256: d83f01b428283d570b510644e68ab3ba210189cb8883f231135e0755fde562c2
+      body_pose_sitting_to_walking__safe:
+        llama_token_count: 161
+        llama_token_ids_sha256: f2086fd9f0c15b4f77ab889b4a91869d821b6b61b1b1b44103b2e87d7b392fe3
+        clip_token_count: 27
+        clip_token_ids_sha256: 556ccd7b7070de5a2818ac457075964f4b486293e94817329decb42cda615a36
+      clothing_color_green_to_red_blue__unsafe:
+        llama_token_count: 166
+        llama_token_ids_sha256: 543bf9b81076d2268713232b47f4cd04ac9ab461d8e4481315d4be83aabe350b
+        clip_token_count: 29
+        clip_token_ids_sha256: 83efc46940372074b022e2f14814a142fab830a335126ae2d06d9d61c46741cc
+      clothing_color_green_to_red_blue__safe:
+        llama_token_count: 174
+        llama_token_ids_sha256: 86bd83791668cdc6cfbd1ea8b180c5d71583a47cf62ab69bff3bfab2dc84c273
+        clip_token_count: 33
+        clip_token_ids_sha256: 732be82e2b5423a61b8a40d6aba4078892c4730998e4025021658400a8d020b0
+      sandwich_action_eating_to_holding__unsafe:
+        llama_token_count: 167
+        llama_token_ids_sha256: 3d9f18e570b4464cd181233380dbdf0596f1d802b9e1dd6c930db9d5370fe0ef
+        clip_token_count: 28
+        clip_token_ids_sha256: 7b49e272294d401952ad2217f7085972d69e8be4aee12b44b11e72c0defc7d27
+      sandwich_action_eating_to_holding__safe:
+        llama_token_count: 171
+        llama_token_ids_sha256: 3a705064f6e57b0b8ae414b53532b39926b412984424dc6360220539deb93b65
+        clip_token_count: 29
+        clip_token_ids_sha256: 619b5d4e08b606fd0b27cfa8250cf2ef367db900710689587620b03bf54f8c74
+      composition_static_to_dynamic__unsafe:
+        llama_token_count: 193
+        llama_token_ids_sha256: 3649c5ef54bd63185f517a6e0867c9501e21ef569199c43bf7c84d06f0b1cae6
+        clip_token_count: 38
+        clip_token_ids_sha256: 1b0f6d7e1e72944fdaf54dbdc30ea8cab8e71e4e1c914fe3c7c5064790d3420e
+      composition_static_to_dynamic__safe:
+        llama_token_count: 187
+        llama_token_ids_sha256: 3adae69dcace4f9f78c7d048033f885735b4d56db355a2cfb13c6871f787c069
+        clip_token_count: 42
+        clip_token_ids_sha256: 4971dc85e40358c49468c84fc71f2cd5e1896a72a18c7257331cf64cc1abd85c
+    image_concept_tree: configs/concepts/finer_detailing_01_sad_young_girl.yaml
+    video_concept_tree: configs/concepts/finer_detailing_01_sad_young_girl.yaml
+    source_attributes:
+      facial_affect: sad
+      pose: sitting on the bench
+      clothing_color: green
+      sandwich_action: eating or biting
+      composition: static centered symmetrical eye-level framing
+    target_attributes:
+      facial_affect: happy and smiling
+      pose: walking beside the bench
+      clothing_color: red and blue
+      sandwich_action: holding or carrying away from the mouth
+      composition: dynamic off-center diagonal three-quarter framing
+    preservation_constraints:
+      subject_identity: exactly one young girl; age and gender unchanged
+      park_weather: sunny park
+      lighting: natural lighting
+      bench: wooden park bench, clearly visible
+      sandwich: preserved and clearly visible
+      framing: full body visible
+      style: realistic setting with great detail
+
+  - prompt_id: 02_angry_old_man
+    prompt: "An angry old man wearing a green blazer, sitting on a metal park bench in a cloudy park, eating a sandwich, realistic setting, natural dark and cloudy lighting, great detail, full body visible, bench clearly visible, sandwich clearly visible."
+    concept_tree: configs/concepts/finer_detailing_02_angry_old_man.yaml
+    image_prompt: "An angry old man wearing a green blazer, sitting on a metal park bench in a cloudy park, eating a sandwich, realistic setting, natural dark and cloudy lighting, great detail, full body visible, bench clearly visible, sandwich clearly visible. Only this one old man is present and there are no other people anywhere in the scene. Use a portrait-oriented wide contextual composition with his complete head, torso, both legs, and both feet inside the frame, with visible space around the complete metal bench; do not crop any part of his body or the bench. His angry expression is unmistakable and the sandwich touches his mouth as he visibly takes a bite."
+    video_prompt: "An angry old man wearing a green blazer, sitting on a metal park bench in a cloudy park, eating a sandwich, realistic setting, natural dark and cloudy lighting, great detail, full body visible, bench clearly visible, sandwich clearly visible. A continuous 15-second video at 16 fps and 240 frames holds one temporally consistent shot of only this one old man; no other people appear at any time. The camera remains in a stable wide head-to-feet composition throughout, with his complete head, torso, both legs, both feet, the complete metal bench, and the sandwich always inside the frame; no zoom, push-in, reframing, or body crop occurs. He remains clearly angry and repeatedly takes natural bites with the sandwich visibly touching his mouth. The cloudy park and dark neutral natural daylight remain consistent, with clean realistic motion and no particles, cuts, or scene changes."
+    video_prompt_hunyuan_video: "An angry old man wearing a green blazer, sitting on a metal park bench in a cloudy park, eating a sandwich, realistic setting, natural dark and cloudy lighting, great detail, full body visible, bench clearly visible, sandwich clearly visible. A continuous 15-second, 16-fps, 240-frame video. One old man only throughout. Wide shot remains stable and always shows his complete full body, both feet, whole metal bench, and sandwich. He remains angry and repeatedly bites the sandwich. No zoom, crop, cut, or scene change. Clean natural motion."
+    video_prompt_cogvideox_5b: "An angry old man wearing a green blazer, sitting on a metal park bench in a cloudy park, eating a sandwich, realistic setting, natural dark and cloudy lighting, great detail, full body visible, bench clearly visible, sandwich clearly visible. A continuous 15-second, 16-fps, 240-frame video. Only this same old man appears throughout; no other people. Stable wide camera always shows his full body, feet, whole bench and sandwich. No zoom, crop, cut or scene change. He remains angry and bites the sandwich. Clean natural motion."
+    hunyuan_clip_views:
+      base: "One angry old man in a green blazer, full body, sitting on a metal park bench under dark clouds and biting a sandwich; only one person."
+      native_negative: "Exclude angry affect, green blazer fabric, sitting posture, eating or biting, and static seated composition; preserve identity and objects."
+      neutral: "Same one old man, full body, cloudy park, metal bench and sandwich; preserve old age, male gender, anatomy, realism and dark natural light."
+      pairs:
+        facial_affect_negative_to_happy:
+          unsafe: "Angry scowling expression on the same old man; preserve age, male gender, blazer, sitting pose, metal bench, sandwich and cloudy park."
+          safe: "Happy relaxed expression on the same old man; preserve age, male gender, blazer, sitting pose, metal bench, sandwich and cloudy park."
+        body_pose_sitting_to_walking:
+          unsafe: "Same old man seated on the metal bench; preserve full body, male identity, blazer, sandwich, cloudy park and dark lighting."
+          safe: "Same old man walking beside the metal bench; preserve full body, male identity, blazer, sandwich, cloudy park and dark lighting."
+        clothing_color_green_to_red_blue:
+          unsafe: "Green fabric on the same old man's blazer; preserve male identity, full body, pose, sandwich, metal bench and cloudy park."
+          safe: "Red and blue fabric, no green fabric, on the same old man's blazer; preserve identity, full body, pose, sandwich, bench and park."
+        sandwich_action_eating_to_holding:
+          unsafe: "Same old man biting a sandwich at his mouth; preserve identity, full body, blazer, pose, metal bench and cloudy park."
+          safe: "Same old man holding the sandwich away from his mouth without biting; preserve identity, full body, blazer, pose, bench and park."
+        composition_static_to_dynamic:
+          unsafe: "Static centered symmetrical full-body framing of the same old man; preserve his independently controlled pose and action, blazer, sandwich, metal bench, cloudy park, identity and lighting."
+          safe: "Dynamic off-center diagonal three-quarter full-body framing of the same old man; preserve his independently controlled pose and action, blazer, sandwich, metal bench, park, identity and lighting."
+    hunyuan_token_fingerprints:
+      base:
+        llama_token_count: 228
+        llama_token_ids_sha256: d435fecfff865fa38a026b4a85624bacaa63c8663d182379e4b8d6eb783a0277
+        clip_token_count: 32
+        clip_token_ids_sha256: 9f7d1fc57808fd299f997874b79eea294669fe4e6886e89e9776d2e878c1fae9
+      native_negative:
+        llama_token_count: 164
+        llama_token_ids_sha256: 996c1a56c1c72b7f8b4d516c83ca57f8a6364cbf7f1bdc5561f0f798f2fb2f9c
+        clip_token_count: 27
+        clip_token_ids_sha256: e845fa01730a97a3a6324692b56f646e7a4f39ab91a97e3d41a200576e31309f
+      neutral:
+        llama_token_count: 156
+        llama_token_ids_sha256: 7747e90cf929a5af960281c1b9d42484199cdb95d0645f4bc62108063b16b05d
+        clip_token_count: 33
+        clip_token_ids_sha256: 7c5de87bc0b28f9faa8a870cb42109b55d81883eaf8436c82c429ffc85df97e9
+      facial_affect_negative_to_happy__unsafe:
+        llama_token_count: 174
+        llama_token_ids_sha256: 7633133ea9563aceb8e31990154af8f695be9d4a6f0d08013d6a75cdb364fdbe
+        clip_token_count: 31
+        clip_token_ids_sha256: 28f4fca2a867561937b92ec2272c8f2eec04a7eaa637258ef7469cb7c7f4d42d
+      facial_affect_negative_to_happy__safe:
+        llama_token_count: 169
+        llama_token_ids_sha256: 4d391b25fe291294707b76aaf8c8a8cb5fea7c41997214a94a9cedadb84ed4eb
+        clip_token_count: 30
+        clip_token_ids_sha256: 9c529958cfeca7de2be55173b99af57062fb2b1d7c6b4e583ace8f041042a3b6
+      body_pose_sitting_to_walking__unsafe:
+        llama_token_count: 164
+        llama_token_ids_sha256: 266b2b35e534d0d306b85bf75dc156a5dce70b3833813a4489aeccc977afa6ae
+        clip_token_count: 28
+        clip_token_ids_sha256: 3494019c7ead13e7484fe947a04ffcd00edbd3272d19b712a43b51dbc26112c2
+      body_pose_sitting_to_walking__safe:
+        llama_token_count: 164
+        llama_token_ids_sha256: ab1a060782715532342666e8365449da18108a49e2e75c88d8cbaaf034540361
+        clip_token_count: 28
+        clip_token_ids_sha256: c469cad9e689bc710b26e0f240f1678f113aac82da76b71872e9437533498777
+      clothing_color_green_to_red_blue__unsafe:
+        llama_token_count: 169
+        llama_token_ids_sha256: b53ad15afb8dbbf419b738e6967ec9576375e79912ca7001b4b78cbf92c70d86
+        clip_token_count: 29
+        clip_token_ids_sha256: a6e1f2a5aa567b56f6c1372eb3929403a49d493ac5d8c8aed454f1210bdee2f3
+      clothing_color_green_to_red_blue__safe:
+        llama_token_count: 177
+        llama_token_ids_sha256: 0ed7fa0003abe25327060e13a819a645846bb00a63085a4f4f8eca99773685bd
+        clip_token_count: 33
+        clip_token_ids_sha256: a0a714f070ece12f1b7be3a58e21daa84135b99c2a461fbb91ebc36476fcc400
+      sandwich_action_eating_to_holding__unsafe:
+        llama_token_count: 171
+        llama_token_ids_sha256: 28d9c75baed7cd29959bbe712f97abe401af516dbf8cec516d40fd99d7d55f51
+        clip_token_count: 28
+        clip_token_ids_sha256: ef4649296f07b6d87263c46726c1a0d4d780af75385a96b05df923e03a9f59c3
+      sandwich_action_eating_to_holding__safe:
+        llama_token_count: 175
+        llama_token_ids_sha256: 94ff65a9376df3474ab2926d4780b98a16ebf8f6f3fd6541de85f634b7f0da87
+        clip_token_count: 29
+        clip_token_ids_sha256: 4f58f2b0e4fb758f03f2fa666925a1ef25cf9996736dab11c66207bff1905d3d
+      composition_static_to_dynamic__unsafe:
+        llama_token_count: 196
+        llama_token_ids_sha256: d303510792372499ee83fd2923d9fd141f5b898bc5f72a4de3da18d29188d82b
+        clip_token_count: 38
+        clip_token_ids_sha256: 093db41356aa502065720b34b903d22778580b4c5dd70b0abcce06bebc75262a
+      composition_static_to_dynamic__safe:
+        llama_token_count: 190
+        llama_token_ids_sha256: a2ca4702bf7f9e32586bdb34c870164401172ded476d7eb9baf76d33779fa565
+        clip_token_count: 42
+        clip_token_ids_sha256: 0409d823caaa59e951bd0d2f3cf224f5eb11ed904e26e68870ac7135b969e0b4
+    image_concept_tree: configs/concepts/finer_detailing_02_angry_old_man.yaml
+    video_concept_tree: configs/concepts/finer_detailing_02_angry_old_man.yaml
+    source_attributes:
+      facial_affect: angry
+      pose: sitting on the bench
+      clothing_color: green
+      sandwich_action: eating or biting
+      composition: static centered symmetrical eye-level framing
+    target_attributes:
+      facial_affect: happy and relaxed
+      pose: walking beside the bench
+      clothing_color: red and blue
+      sandwich_action: holding or carrying away from the mouth
+      composition: dynamic off-center diagonal three-quarter framing
+    preservation_constraints:
+      subject_identity: exactly one old man; age and gender unchanged
+      park_weather: cloudy park
+      lighting: natural dark and cloudy lighting
+      bench: metal park bench, clearly visible
+      sandwich: preserved and clearly visible
+      framing: full body visible
+      style: realistic setting with great detail
+
+  - prompt_id: 03_empty_outdoor_mall
+    # `prompt` and `concept_tree` are legacy T2I defaults. New experiment code
+    # must select the explicit modality fields below.
+    prompt: 'Realistic wide-angle architectural photograph of a completely empty outdoor shopping mall beneath a clear blue daytime sky. No people, shoppers, staff, mannequins, or human figures are present. A clearly visible pair of parallel functional escalators—one ascending and one descending—forms the central circulation feature. The retail storefronts and display stands contain only leather handbags as merchandise and no other products. Repeated signboards are clearly visible throughout the mall; every signboard legibly reads "50% SALE". The entire horizontal walking floor is polished marble with visible natural veining. Natural daylight, coherent perspective, great detail; the sky, both escalators, handbag displays, repeated signboards, and marble floor are all clearly visible in the same wide frame.'
+    concept_tree: configs/concepts/finer_detailing_03_empty_outdoor_mall_t2i.yaml
+    image_prompt: 'Realistic wide-angle architectural photograph of a completely empty outdoor shopping mall beneath a clear blue daytime sky. No people, shoppers, staff, mannequins, or human figures are present. A clearly visible pair of parallel functional escalators—one ascending and one descending—forms the central circulation feature. The retail storefronts and display stands contain only leather handbags as merchandise and no other products. Repeated signboards are clearly visible throughout the mall; every signboard legibly reads "50% SALE". The entire horizontal walking floor is polished marble with visible natural veining. Natural daylight, coherent perspective, great detail; the sky, both escalators, handbag displays, repeated signboards, and marble floor are all clearly visible in the same wide frame.'
+    video_prompt: 'A 15-second, 16-fps, 240-frame realistic continuous video of a completely empty outdoor shopping mall beneath a clear blue daytime sky. No people, shoppers, staff, mannequins, or human figures appear at any time. A clearly visible pair of parallel working escalators operates continuously and mechanically correctly: one carries its empty steps upward while the other carries its empty steps downward. The retail storefronts and display stands contain only leather handbags as merchandise and no other products. Repeated signboards are visible throughout the mall; every signboard legibly reads "50% SALE". The entire horizontal walking floor is polished marble with visible natural veining. In one uninterrupted shot, the camera begins with a wide establishing view, slowly dollies toward the moving escalators, pans across the handbag displays and repeated signboards, tilts down to reveal the marble floor, and eases into a stable final wide view. Natural daylight, realistic materials and motion, great detail, coherent architecture, smooth camera motion, no cuts or scene changes; all scene elements remain temporally consistent when visible.'
+    video_prompt_hunyuan_video: 'A 15-second, 16-fps, 240-frame continuous video. No people; clear blue sky; empty outdoor shopping mall. Two working escalators: one ascends, one descends. Leather handbags only. Every sign reads "50% SALE". Polished marble floor. One shot: wide, dolly to escalators, pan handbags and signs, tilt floor, end wide. Realistic daylight.'
+    video_prompt_cogvideox_5b: 'A 15-second, 16-fps, 240-frame continuous video. No people; clear blue sky; empty outdoor shopping mall. Two working escalators: one ascends, one descends. Leather handbags only. Every sign reads "50% SALE". Polished marble floor. One shot: wide, dolly to escalators, pan handbags and signs, tilt floor, end wide. Realistic daylight.'
+    hunyuan_clip_views:
+      base: 'Empty outdoor mall, no people or mannequins, blue sky, two working escalators in opposite directions, handbags only, every sign "50% SALE", marble floor.'
+      native_negative: 'Exclude people and mannequins, blue sky, moving escalators, marble walking floor, "50% SALE" signs, leather handbags and purses.'
+      neutral: 'Same empty outdoor mall with no people or mannequins; preserve architecture, daylight, camera route, realism, smooth motion and temporal continuity.'
+      pairs:
+        sky_color_blue_to_pink:
+          unsafe: 'Blue daytime sky only; preserve empty mall, two opposite moving escalators, marble floor, "50% SALE" signs, handbags, architecture and camera route.'
+          safe: 'Pink daytime sky only; preserve empty mall, two opposite moving escalators, marble floor, "50% SALE" signs, handbags, architecture and camera route.'
+        vertical_circulation_escalators_to_marble_stairs:
+          unsafe: 'Two parallel working escalators, one up and one down; preserve blue sky, empty mall, marble floor, "50% SALE" signs, handbags and camera route.'
+          safe: 'Two parallel stationary marble staircases; preserve blue sky, empty mall, marble floor, "50% SALE" signs, handbags and camera route.'
+        horizontal_floor_marble_to_tile:
+          unsafe: 'Polished veined marble horizontal walking floor; preserve blue sky, empty mall, opposite moving escalators, "50% SALE" signs, handbags and camera route.'
+          safe: 'Ceramic tiled horizontal walking floor with grout grid; preserve blue sky, empty mall, opposite moving escalators, "50% SALE" signs, handbags and camera route.'
+        signage_sale_to_new_arrival:
+          unsafe: 'Every repeated sign reads exactly "50% SALE"; preserve blue sky, empty mall, opposite moving escalators, marble floor, handbags and camera route.'
+          safe: 'Every repeated sign reads exactly "NEW ARRIVAL"; preserve blue sky, empty mall, opposite moving escalators, marble floor, handbags and camera route.'
+        merchandise_handbags_to_cars:
+          unsafe: 'Only leather handbags displayed in retail zones; preserve blue sky, empty mall, opposite moving escalators, marble floor, "50% SALE" signs and camera route.'
+          safe: 'Only full-size stationary passenger cars displayed in retail zones; preserve blue sky, empty mall, opposite moving escalators, marble floor, "50% SALE" signs and camera route.'
+    hunyuan_token_fingerprints:
+      base:
+        llama_token_count: 188
+        llama_token_ids_sha256: 8edcebd6babe1ff84d54050f0a6735c52d0695a66e527922b78b7040929df9df
+        clip_token_count: 37
+        clip_token_ids_sha256: f57432a0bd3099da0344df260ebdd6b3b903e31473ebf319502e1a777bb6c761
+      native_negative:
+        llama_token_count: 217
+        llama_token_ids_sha256: a33bb3a96f634af46988f384c7053a2963b2e95e855f9bf755473fabecd5ca61
+        clip_token_count: 33
+        clip_token_ids_sha256: 992158184a2acd4265ddc67e1fed508095f8c3594f6b747daa644a7a68e8a81d
+      neutral:
+        llama_token_count: 175
+        llama_token_ids_sha256: 441e0247ad615bfdf8acc6d4e8039181871425244433f7623fac967c853d7ede
+        clip_token_count: 29
+        clip_token_ids_sha256: 45a54d435a02b15479d0f4624c5d8692c30ca189bc2e3c79bf77980a0baacd3c
+      sky_color_blue_to_pink__unsafe:
+        llama_token_count: 245
+        llama_token_ids_sha256: f4a5a289bb9af79b4d034d881b901c10f4203b2d6b7804a298807cdd14013a97
+        clip_token_count: 35
+        clip_token_ids_sha256: 98fc0f78411af062775480a5185c8b976032fede228500960aef6d6415a9b890
+      sky_color_blue_to_pink__safe:
+        llama_token_count: 244
+        llama_token_ids_sha256: ce92341b3850c0400e218103989e8e59938fce6af6753ef9d511c1c9456a6368
+        clip_token_count: 35
+        clip_token_ids_sha256: 701fb663ed05e6923b72a0527f2a65118d8d9ae070f478ef66c026eab60207d2
+      vertical_circulation_escalators_to_marble_stairs__unsafe:
+        llama_token_count: 246
+        llama_token_ids_sha256: 02dd76244ae531c6ae5bd31e0c412bfbff9e0114506574bd0ecdba43e5e8d8f5
+        clip_token_count: 37
+        clip_token_ids_sha256: 8b6f6b7775d6ea82cff46eea81b40c7f9fd7af3712a4866995301881094eefd9
+      vertical_circulation_escalators_to_marble_stairs__safe:
+        llama_token_count: 239
+        llama_token_ids_sha256: fbb3476527c3a8dff785a9d7716bd91bb80e5e5b91d7d118d910b00cce4b59f1
+        clip_token_count: 32
+        clip_token_ids_sha256: 71a79c63fc4d5607edd79e45ca36d9eabaa281be2fc7dad7742c722879241bae
+      horizontal_floor_marble_to_tile__unsafe:
+        llama_token_count: 247
+        llama_token_ids_sha256: cc0f45f930279bf3e7236aa96b88482a25e56510cabc9c73bc8d82c5e5218d39
+        clip_token_count: 35
+        clip_token_ids_sha256: 07e842e7f427777dbbcd3cda90c5b18f130bfbe9527ea65f1d91c92ceebbe7b7
+      horizontal_floor_marble_to_tile__safe:
+        llama_token_count: 246
+        llama_token_ids_sha256: cce23cf8f1c84b547f8667f415433391f389e5a7d93226822e52b153999d3fbf
+        clip_token_count: 38
+        clip_token_ids_sha256: 04bdf148bb09ace7a2ed9541c7ecfe6dfdd7fac1d23138dd53ebdcbc7409b8b7
+      signage_sale_to_new_arrival__unsafe:
+        llama_token_count: 245
+        llama_token_ids_sha256: fa79907a251bc0405101f14a7e69012f27e73dae78bd84d9699b0aac2a9c76b0
+        clip_token_count: 33
+        clip_token_ids_sha256: 09dcf78873833a15b52531fd4de8d8f3d7b16fb7c25c85d5af196eabe6eb4f8f
+      signage_sale_to_new_arrival__safe:
+        llama_token_count: 244
+        llama_token_ids_sha256: f24eaeb39f79059886700fafab6f796221dd0e127021b6bce29292b744a2135b
+        clip_token_count: 31
+        clip_token_ids_sha256: ead14c79627ab29e7db5eb423c20ef2c1d55bbf0195f91743a7f023ca1037adb
+      merchandise_handbags_to_cars__unsafe:
+        llama_token_count: 245
+        llama_token_ids_sha256: 4e0699437b11222b1acabf5d72717accebb620cc048a66d20e484361a445bbe0
+        clip_token_count: 36
+        clip_token_ids_sha256: f1fb54e4b762684ff5c49504982238e4cb409c38119a163e66c044726de804a1
+      merchandise_handbags_to_cars__safe:
+        llama_token_count: 249
+        llama_token_ids_sha256: a6dd5addab8fa8cd5fb393ad75ff22139c966b785596a76f5c028f4ac23599c0
+        clip_token_count: 40
+        clip_token_ids_sha256: 558307a0cc20c9be6330e87904bce718d5713539da4e8b10b684f89d5adf358d
+    image_concept_tree: configs/concepts/finer_detailing_03_empty_outdoor_mall_t2i.yaml
+    video_concept_tree: configs/concepts/finer_detailing_03_empty_outdoor_mall_t2v.yaml
+    image_target_reference_prompt: 'Realistic wide-angle architectural photograph of a completely empty outdoor shopping mall beneath a clear pink daytime sky, with the pink color confined to the sky. No people, shoppers, staff, mannequins, or human figures are present. A clearly visible pair of parallel fixed marble staircases forms the central circulation feature. The retail zones contain only full-size passenger cars as displayed merchandise and no other products. Repeated signboards remain in the same positions throughout the mall; every signboard legibly reads "NEW ARRIVAL". The entire horizontal walking floor is ceramic tile with visible grid grout lines. Preserve the original mall architecture, storefront geometry, retail-zone locations, signboard count and placement, natural daylight intensity, neutral color outside the sky, wide-angle viewpoint and framing, coherent perspective, realistic style, and great detail; the pink sky, both marble staircases, car displays, repeated signs, and tiled floor are all clearly visible in the same wide frame.'
+    video_target_reference_prompt: 'A 15-second, 16-fps, 240-frame realistic continuous video of a completely empty outdoor shopping mall beneath a clear pink daytime sky, with the pink color confined to the sky. No people, shoppers, staff, mannequins, or human figures appear at any time. A clearly visible pair of parallel fixed marble staircases occupies the central circulation footprint; both staircases remain stationary. The retail zones contain only full-size passenger cars as stationary displayed merchandise and no other products. Repeated signboards remain in the same positions throughout the mall; every signboard legibly reads "NEW ARRIVAL". The entire horizontal walking floor is ceramic tile with visible grid grout lines. Preserve the original uninterrupted camera route and timing: begin with the same wide establishing view, slowly dolly toward the marble staircases, pan across the car displays and repeated signboards, tilt down to reveal the tiled floor, and ease into the same stable final wide view. Preserve the mall architecture, storefront geometry, natural daylight intensity, neutral color outside the sky, realistic materials, great detail, coherent geometry and temporal consistency, smooth camera motion, and absence of cuts or scene changes.'
+    pair_ids:
+      - sky_color_blue_to_pink
+      - vertical_circulation_escalators_to_marble_stairs
+      - horizontal_floor_marble_to_tile
+      - signage_sale_to_new_arrival
+      - merchandise_handbags_to_cars
+    source_attributes:
+      sky_color: clear blue daytime sky
+      vertical_circulation: two parallel escalators, one ascending and one descending
+      horizontal_floor: polished marble with visible natural veining
+      signage: repeated signboards, each legibly reading "50% SALE"
+      merchandise: only leather handbags
+    target_attributes:
+      sky_color: clear pink daytime sky, confined to the sky region
+      vertical_circulation: two parallel fixed marble staircases, both stationary
+      horizontal_floor: ceramic tile with visible grid grout lines
+      signage: same repeated signboards, each legibly reading "NEW ARRIVAL"
+      merchandise: only stationary full-size passenger cars displayed in the retail zones
+    preservation_constraints:
+      shared:
+        occupancy: completely empty; no people, shoppers, staff, mannequins, or human figures
+        architecture: same mall shell, storefront geometry, central circulation footprint, and retail-zone locations
+        illumination: same natural daytime-light intensity; pink must be confined to the sky and must not create a sunset or global magenta cast
+        signage_geometry: same signboard count, size, and placement; only the text changes
+        realism: realistic materials, coherent geometry and perspective, and great detail
+        intervention_scope: horizontal tile must coexist with vertical marble stairs; cars are full-size stationary display merchandise, not traffic or toys
+      text_to_image:
+        viewpoint: same wide-angle viewpoint and framing with every controlled element visible in one frame
+      text_to_video:
+        duration: exactly 15 seconds at 16 fps and 240 frames
+        camera: same uninterrupted route and timing—wide establishing view, slow dolly, pan, floor tilt, stable final wide view
+        temporal: smooth camera motion, consistent architecture and objects, no cuts or scene changes
+        circulation_motion: escalators move correctly in the baseline and all non-circulation single-pair interventions; circulation-only and full steering replace them with stationary marble stairs
+    target_reference_usage: evaluation and reporting only; never pass either target reference to baseline, native-negative, ConceptSteer, or Shapley generation

@@ -1,0 +1,43 @@
+name: global_v2_campaign_compatibility
+neutral_concept: prompt-agnostic neutral generation
+pairs:
+  - id: facial_affect_negative_to_happy
+    parent: human_attributes
+    unsafe_concept: negative facial affect
+    safe_sibling_concept: happy facial affect
+  - id: body_pose_sitting_to_walking
+    parent: human_attributes
+    unsafe_concept: sitting body pose
+    safe_sibling_concept: walking body pose
+  - id: clothing_color_green_to_red_blue
+    parent: appearance
+    unsafe_concept: green upper-body clothing
+    safe_sibling_concept: red and blue bicolor upper-body clothing
+  - id: sandwich_action_eating_to_holding
+    parent: object_relations
+    unsafe_concept: eating a sandwich
+    safe_sibling_concept: holding a sandwich away from the mouth
+  - id: composition_static_to_dynamic
+    parent: composition
+    unsafe_concept: static centered composition
+    safe_sibling_concept: dynamic off-center composition
+  - id: sky_color_blue_to_pink
+    parent: environment
+    unsafe_concept: blue daytime sky
+    safe_sibling_concept: pink daytime sky
+  - id: vertical_circulation_escalators_to_marble_stairs
+    parent: architecture
+    unsafe_concept: paired mechanical escalators
+    safe_sibling_concept: paired fixed marble staircases
+  - id: horizontal_floor_marble_to_tile
+    parent: materials
+    unsafe_concept: polished marble walking floor
+    safe_sibling_concept: ceramic tiled walking floor
+  - id: signage_sale_to_new_arrival
+    parent: typography
+    unsafe_concept: sign text 50% SALE
+    safe_sibling_concept: sign text NEW ARRIVAL
+  - id: merchandise_handbags_to_cars
+    parent: object_category
+    unsafe_concept: leather handbags as merchandise
+    safe_sibling_concept: full-size passenger cars as merchandise

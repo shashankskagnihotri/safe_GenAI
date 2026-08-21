@@ -1,0 +1,19 @@
+id: merchandise_handbags_to_cars
+parent: object_category
+priority: 0.80
+source:
+  label: leather handbags as merchandise
+  prompt: A product display containing only leather handbags and purses.
+target:
+  label: full-size passenger cars as merchandise
+  prompt: A product display containing only stationary full-size passenger cars, not toys or traffic.
+calibration:
+  neutral:
+    - An empty product pedestal in a plain exhibition room.
+    - A vacant retail display zone without merchandise.
+  source:
+    - Several leather handbags arranged on clean product stands.
+    - A merchandise display containing purses and handbags only.
+  target:
+    - Several full-size passenger cars arranged as stationary exhibits.
+    - A merchandise display containing complete automobiles only.

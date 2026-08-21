@@ -1,59 +1,140 @@
-# Hierarchical Concept Vector-Field Bottleneck
+# HieraSafe-Flow / ConceptSteer
 
-Research code for inference-time safety steering of frozen text-to-image and text-to-video diffusion/flow generators. The method operates on the generator vector field itself: it compares base, unsafe-concept, neutral-concept, and safe-sibling vector fields at selected denoising steps, then replaces only locally unsafe vector components with safe sibling directions.
-
-This project intentionally does not use external safety classifiers, VLMs, decoded-image detectors, or negative-prompt-only fallbacks inside the generation loop.
-
-## Core Formula
-
-```text
-v_base = v_theta(z_t, t, prompt)
-b_unsafe = v_theta(z_t, t, prompt + unsafe_concept) - v_theta(z_t, t, prompt + neutral_concept)
-b_safe = v_theta(z_t, t, prompt + safe_sibling_concept) - v_theta(z_t, t, prompt + neutral_concept)
-activation = relu(cosine(v_base, b_unsafe) - cosine(v_base, b_safe) + margin)
-v_steered = v_base + lambda_t * mask * (b_safe - b_unsafe)
-```
-
-## Quick Start
+Inference-time concept steering for frozen text-to-image and text-to-video diffusion or flow generators. The consolidated project root is:
 
 ```bash
+cd /ceph/sagnihot/projects/safety_genAI
+```
+
+All commands below run from this repository only. The old overlay checkout is not a runtime dependency.
+
+## Conda-Only Setup
+
+Only conda is supported. Do not use `venv`, `virtualenv`, or `python -m venv`.
+
+```bash
+cd /ceph/sagnihot/projects/safety_genAI
+
 conda env create -f environment.yml
-conda activate hierasafe-flow
-pip install -e .
-pytest
+conda activate safe_genai_conceptsteer
+
+python -m pip install --no-deps -e .
+python -m compileall .
+python -c "import torch; print(torch.__version__); print(torch.cuda.is_available())"
+python -m pytest
 ```
 
-Run the dummy smoke path, which exercises the full steering loop without downloading model weights:
+The environment name is `safe_genai_conceptsteer`. Slurm scripts activate the same environment with:
 
 ```bash
-hierasafe-smoke --config configs/experiments/smoke_t2i.yaml
+source "$(conda info --base)/etc/profile.d/conda.sh"
+conda activate safe_genai_conceptsteer
 ```
 
-Run a real model only after accepting the relevant model licenses and ensuring the adapter can inspect the installed diffusers pipeline:
+PyTorch is provided by conda through `environment.yml`; pip must not install or upgrade it.
+
+## Repository Layout
+
+- `configs/models/`: model adapter configs.
+- `configs/concept_hierarchies/`: original safety concept hierarchies.
+- `configs/concepts/`: benign benchmark concept trees.
+- `configs/experiments/`: experiment, prompt-suite, and negative-prompt configs.
+- `src/hierasafe_flow/`: package code for adapters, steering, generation, benchmarks, and evaluation.
+- `scripts/`: local runner helpers.
+- `scripts/slurm/`: Slurm entrypoints for consolidated benchmark jobs.
+- `slurm/`: Slurm logs from repository-root jobs.
+- `outputs/`: generated media and per-sample reports.
+- `debugging/`: audits, environment notes, long-running reports, and result summaries.
+
+## Run One Model For All Variants
+
+The benign debugging benchmark is `benign_park_attribute_transfer_v1`. It uses seed `0` only.
+
+Current July 1 result: for `qwen_image_2512`, the strongest usable Stage 0 setting is
+`conceptsteer_full_strength_1p50` under
+`outputs/TRYING_ALL_BENIGN_SAFETY/qwen_image_2512/conceptsteer_full_strength_1p50/P0_all_sources_main`.
+It best transfers the stress-test prompt toward happy, red/blue clothing, walking beside the bench,
+and holding a sandwich-like object. The output is not perfect because the sandwich placement is odd,
+but it is the clearest completed ConceptSteer success in the final sweep.
+
+For 15-second video models, the final July 1 sweeps completed technically but should not be treated
+as semantic wins for this target. HunyuanVideo and Wan sparse steering produced valid 240-frame
+videos, but the subject generally stayed seated/eating and artifacts increased at stronger settings.
+LTX 2.3 stabilization variants also produced valid 240-frame videos, but low-strength variants stayed
+seated/eating while stronger or unnormalized variants introduced visible artifacts.
 
 ```bash
-hierasafe-generate \
-  --config configs/experiments/main_nudity_t2i.yaml \
-  --prompt "a documentary-style portrait in a studio"
+cd /ceph/sagnihot/projects/safety_genAI
+conda activate safe_genai_conceptsteer
+
+python scripts/run_benign_park_benchmark.py \
+  --model flux2_dev \
+  --benchmark benign_park_attribute_transfer_v1 \
+  --variants baseline,negativeprompt,negative_prompt_global,conceptsteer_color,conceptsteer_emotion,conceptsteer_pose,conceptsteer_action,conceptsteer_composition,conceptsteer_pose_action,conceptsteer_full \
+  --seed 0 \
+  --output-root outputs/benign_park_conceptsteer_debug
 ```
 
-## Adapter Mapping
+To prepare a Slurm array manifest instead of running locally:
 
-Tiny public Hugging Face metadata was inspected for `model_index.json` where available. The current workspace did not have diffusers installed, so runtime adapter inspection is still performed before generation.
+```bash
+cd /ceph/sagnihot/projects/safety_genAI
+conda activate safe_genai_conceptsteer
 
-| Model | Adapter | Pipeline class | Metadata status |
-| --- | --- | --- | --- |
-| `stabilityai/stable-diffusion-3.5-large` | `sd35` | `StableDiffusion3Pipeline` | verified `model_index.json` |
-| `black-forest-labs/FLUX.1-dev` | `flux` | `FluxPipeline` | verified `model_index.json` |
-| `black-forest-labs/FLUX.2-dev` | `flux2` | `Flux2Pipeline` | verified `model_index.json` |
-| `Qwen/Qwen-Image` | `qwen_image` | `QwenImagePipeline` | verified `model_index.json` |
-| `Qwen/Qwen-Image-2512` | `qwen_image` | `QwenImagePipeline` | verified `model_index.json` |
-| `zai-org/CogVideoX-5b` | `cogvideox` | `CogVideoXPipeline` | verified `model_index.json` |
-| `THUDM/CogVideoX-5b` | `cogvideox` | `CogVideoXPipeline` | verified `model_index.json` |
-| `Wan-AI/Wan2.2-T2V-A14B-Diffusers` | `wan` | `WanPipeline` | verified `model_index.json` |
-| `Wan-AI/Wan2.2-T2V-A14B` | `wan_native_alias` | n/a | native Wan repo, use diffusers repo for steering |
-| `Lightricks/LTX-2.3` | `ltx` | `LTXPipeline` expected | no public `model_index.json` found |
-| `tencent/HunyuanVideo` | `hunyuan_video` | `HunyuanVideoPipeline` expected | no public `model_index.json` found |
+python scripts/run_benign_park_benchmark.py \
+  --model flux2_dev \
+  --benchmark benign_park_attribute_transfer_v1 \
+  --stage 0 \
+  --seed 0 \
+  --output-root outputs/benign_park_conceptsteer_debug \
+  --write-manifest debugging/benign_stage0_manifest.json
+```
 
-Adapters fail with `NotImplementedError` when they cannot expose latents, timesteps, scheduler stepping, and model predictions through diffusers internals. They never call the standard pipeline as a steering fallback.
+## SLURM Usage
 
+Default Stage 0 smoke submission:
+
+```bash
+cd /ceph/sagnihot/projects/safety_genAI
+sbatch scripts/slurm/submit_benign_park_conceptsteer.sbatch
+```
+
+Array submission after manifest creation:
+
+```bash
+cd /ceph/sagnihot/projects/safety_genAI
+sbatch --array=0-2 scripts/slurm/submit_benign_park_conceptsteer.sbatch debugging/benign_stage0_manifest.json
+```
+
+Monitor:
+
+```bash
+squeue -u $USER
+tail -f slurm/safe_genai_benign_conceptsteer_<JOBID>_<ARRAYID>.out
+tail -f slurm/safe_genai_benign_conceptsteer_<JOBID>_<ARRAYID>.err
+```
+
+## Evaluation
+
+The evaluator uses CLIP image-text scores by default plus color statistics. It fails clearly if CLIP cannot load unless `--skip-clip` is explicitly passed.
+
+```bash
+cd /ceph/sagnihot/projects/safety_genAI
+conda activate safe_genai_conceptsteer
+
+python scripts/evaluate_benign_park_benchmark.py \
+  --input-root outputs/benign_park_conceptsteer_debug \
+  --benchmark benign_park_attribute_transfer_v1 \
+  --output-json outputs/benign_park_conceptsteer_debug/evaluation_summary.json \
+  --output-csv outputs/benign_park_conceptsteer_debug/evaluation_summary.csv
+```
+
+## Benchmark Files
+
+- Prompt suite: `configs/experiments/benign_park_attribute_transfer_v1_prompts.yaml`
+- Negative prompts: `configs/experiments/benign_park_attribute_transfer_v1_negative_prompts.yaml`
+- Concept tree: `configs/concepts/benign_park_concept_tree.yaml`
+- Stage/variant runner: `scripts/run_benign_park_benchmark.py`
+- Evaluation runner: `scripts/evaluate_benign_park_benchmark.py`
+
+Native negative-prompt variants run only when the selected diffusers pipeline exposes a real `negative_prompt` argument. Unsupported negative-prompt variants are recorded as `not_supported`; they are not faked with another method.

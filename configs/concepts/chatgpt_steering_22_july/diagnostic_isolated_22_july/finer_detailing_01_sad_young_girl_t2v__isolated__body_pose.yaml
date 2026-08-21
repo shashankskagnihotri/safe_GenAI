@@ -1,0 +1,34 @@
+name: finer_detailing_01_sad_young_girl_video_continuity_22_july__isolated__body_pose_sitting_to_walking
+neutral_concept: realistic full-body scene of exactly one young girl in a sunny park under natural lighting, age and female
+  gender unchanged, wooden park bench clearly visible, sandwich clearly visible, coherent anatomy, realistic setting and great
+  detail preserved. Only one young woman appears in a continuous wide head-to-toe tracking shot in a park; her face, the front
+  of her jacket, and her feet, the complete bench, and the same sandwich remain visible throughout.
+pairs:
+- id: body_pose_sitting_to_walking
+  parent: pose_attribute_control
+  unsafe_concept: seated body pose resting on the bench; exactly one same young girl, same young age and female gender, same
+    jacket type, full body visible, sunny park, natural lighting, same wooden park bench clearly visible, same sandwich clearly
+    visible, realistic setting and great detail preserved. Only one young woman appears in a continuous wide head-to-toe tracking
+    shot in a park; her face, the front of her jacket, and her feet, the complete bench, and the same sandwich remain visible
+    throughout.
+  safe_sibling_concept: full-body walking pose beside the bench; exactly one same young girl, same young age and female gender,
+    same jacket type, full body visible, sunny park, natural lighting, same wooden park bench clearly visible, same sandwich
+    clearly visible, realistic setting and great detail preserved. Only one young woman appears in a continuous wide head-to-toe
+    tracking shot in a park; her face, the front of her jacket, and her feet, the complete bench, and the same sandwich remain
+    visible throughout.
+  target_concept: full-body walking pose beside the bench; exactly one same young girl, same young age and female gender,
+    same jacket type, full body visible, sunny park, natural lighting, same wooden park bench clearly visible, same sandwich
+    clearly visible, realistic setting and great detail preserved. Only one young woman appears in a continuous wide head-to-toe
+    tracking shot in a park; her face, the front of her jacket, and her feet, the complete bench, and the same sandwich remain
+    visible throughout.
+  priority: high
+  description: Change only sitting to walking beside the same wooden bench.
+  intended_effect: Walking young girl while the wooden bench and all non-pose details remain intact.
+video_conditioning_22_july:
+  schema_version: 1
+  source_manifest: configs/concepts/historical_17_july/finer_detailing_01_sad_young_girl.yaml
+  source_sha256: 7af24606cc825cb403971652a910201f95ba62640d18781fd1be44f5706049da
+  temporal_anchor: Only one young woman appears in a continuous wide head-to-toe tracking shot in a park; her face, the front
+    of her jacket, and her feet, the complete bench, and the same sandwich remain visible throughout.
+  composition_mode: concept_only_with_temporal_preservation
+  prompt_01_color_binding: outer_jacket_shell_contrast_v1

@@ -1,0 +1,11 @@
+schema_version: 2
+kind: global_registry_selector
+legacy_prompt_id: 01_sad_young_girl
+registry: configs/concepts/global_v2/registry.yaml
+active_pair_ids:
+  - facial_affect_negative_to_happy
+  - body_pose_sitting_to_walking
+  - clothing_color_green_to_red_blue
+  - sandwich_action_eating_to_holding
+  - composition_static_to_dynamic
+inline_prompt_specific_endpoints: false

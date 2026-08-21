@@ -1,0 +1,19 @@
+id: composition_static_to_dynamic
+parent: composition
+priority: 0.70
+source:
+  label: static centered composition
+  prompt: A static centered symmetrical eye-level composition.
+target:
+  label: dynamic off-center composition
+  prompt: A dynamic off-center diagonal three-quarter composition with visual motion.
+calibration:
+  neutral:
+    - A balanced photographic study with an unspecified composition.
+    - A neutral camera study of simple geometric forms.
+  source:
+    - A perfectly centered symmetrical still-life photograph.
+    - A static eye-level composition with no diagonal lines.
+  target:
+    - An off-center three-quarter photograph with strong diagonal flow.
+    - A dynamic asymmetrical composition implying movement.

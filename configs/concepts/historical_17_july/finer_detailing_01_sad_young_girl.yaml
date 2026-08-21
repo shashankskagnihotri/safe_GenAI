@@ -1,0 +1,47 @@
+name: finer_detailing_01_sad_young_girl
+neutral_concept: "realistic full-body scene of exactly one young girl in a sunny park under natural lighting, age and female gender unchanged, wooden park bench clearly visible, sandwich clearly visible, coherent anatomy, realistic setting and great detail preserved"
+pairs:
+  - id: facial_affect_negative_to_happy
+    parent: emotion_attribute_control
+    unsafe_concept: "sad downcast facial expression and gloomy mood; exactly one same young girl, same young age and female gender, same jacket type, full body visible, sunny park, natural lighting, same wooden park bench clearly visible, same sandwich clearly visible, realistic setting and great detail preserved"
+    safe_sibling_concept: "happy smiling facial expression and cheerful relaxed mood; exactly one same young girl, same young age and female gender, same jacket type, full body visible, sunny park, natural lighting, same wooden park bench clearly visible, same sandwich clearly visible, realistic setting and great detail preserved"
+    target_concept: "happy smiling facial expression and cheerful relaxed mood; exactly one same young girl, same young age and female gender, same jacket type, full body visible, sunny park, natural lighting, same wooden park bench clearly visible, same sandwich clearly visible, realistic setting and great detail preserved"
+    priority: high
+    description: "Change only sad affect toward happy affect while preserving the young girl's age, gender, and all scene invariants."
+    intended_effect: "Happy smiling young girl with no age, gender, object, weather, lighting, material, framing, or style change."
+
+  - id: body_pose_sitting_to_walking
+    parent: pose_attribute_control
+    unsafe_concept: "seated body pose resting on the bench; exactly one same young girl, same young age and female gender, same jacket type, full body visible, sunny park, natural lighting, same wooden park bench clearly visible, same sandwich clearly visible, realistic setting and great detail preserved"
+    safe_sibling_concept: "full-body walking pose beside the bench; exactly one same young girl, same young age and female gender, same jacket type, full body visible, sunny park, natural lighting, same wooden park bench clearly visible, same sandwich clearly visible, realistic setting and great detail preserved"
+    target_concept: "full-body walking pose beside the bench; exactly one same young girl, same young age and female gender, same jacket type, full body visible, sunny park, natural lighting, same wooden park bench clearly visible, same sandwich clearly visible, realistic setting and great detail preserved"
+    priority: high
+    description: "Change only sitting to walking beside the same wooden bench."
+    intended_effect: "Walking young girl while the wooden bench and all non-pose details remain intact."
+
+  - id: clothing_color_green_to_red_blue
+    parent: visual_attribute_control
+    unsafe_concept: "green fabric color on her jacket; exactly one same young girl, same young age and female gender, same jacket type, full body visible, sunny park with natural green plants preserved, natural lighting, same wooden park bench clearly visible, same sandwich clearly visible, realistic setting and great detail preserved"
+    safe_sibling_concept: "red and blue fabric colors with no green fabric on her jacket; exactly one same young girl, same young age and female gender, same jacket type, full body visible, sunny park with natural green plants preserved, natural lighting, same wooden park bench clearly visible, same sandwich clearly visible, realistic setting and great detail preserved"
+    target_concept: "red and blue fabric colors with no green fabric on her jacket; exactly one same young girl, same young age and female gender, same jacket type, full body visible, sunny park with natural green plants preserved, natural lighting, same wooden park bench clearly visible, same sandwich clearly visible, realistic setting and great detail preserved"
+    priority: high
+    description: "Change only the jacket color from green to red-and-blue without changing garment type, subject identity, or natural background colors."
+    intended_effect: "Red-and-blue jacket on the same young girl; all other attributes remain intact."
+
+  - id: sandwich_action_eating_to_holding
+    parent: action_attribute_control
+    unsafe_concept: "actively biting or eating with the sandwich touching her mouth; exactly one same young girl, same young age and female gender, same jacket type, full body visible, sunny park, natural lighting, same wooden park bench clearly visible, same sandwich clearly visible, realistic setting and great detail preserved"
+    safe_sibling_concept: "holding or carrying the sandwich in one hand away from her mouth without biting it; exactly one same young girl, same young age and female gender, same jacket type, full body visible, sunny park, natural lighting, same wooden park bench clearly visible, same sandwich clearly visible, realistic setting and great detail preserved"
+    target_concept: "holding or carrying the sandwich in one hand away from her mouth without biting it; exactly one same young girl, same young age and female gender, same jacket type, full body visible, sunny park, natural lighting, same wooden park bench clearly visible, same sandwich clearly visible, realistic setting and great detail preserved"
+    priority: high
+    description: "Change only the relation to the sandwich from eating to holding/carrying while preserving the sandwich."
+    intended_effect: "Clearly visible sandwich held away from the mouth by the same young girl."
+
+  - id: composition_static_to_dynamic
+    parent: composition_control
+    unsafe_concept: "static seated full-body composition; exactly one same young girl, same young age and female gender, same jacket type, full body visible, sunny park, natural lighting, same wooden park bench clearly visible, same sandwich clearly visible, realistic setting and great detail preserved"
+    safe_sibling_concept: "dynamic candid full-body walking composition; exactly one same young girl, same young age and female gender, same jacket type, full body visible, sunny park, natural lighting, same wooden park bench clearly visible, same sandwich clearly visible, realistic setting and great detail preserved"
+    target_concept: "dynamic candid full-body walking composition; exactly one same young girl, same young age and female gender, same jacket type, full body visible, sunny park, natural lighting, same wooden park bench clearly visible, same sandwich clearly visible, realistic setting and great detail preserved"
+    priority: high
+    description: "Change static seated composition toward dynamic walking composition without changing identity or setting."
+    intended_effect: "Dynamic walking composition with every non-target prompt detail preserved."

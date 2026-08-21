@@ -1,0 +1,135 @@
+schema_version: 1
+calibration_id: flux1_native_negative_true_cfg_scale_v2
+benchmark: finer_detailing_correction_v1
+status: implementation_draft_do_not_generate
+preregistered_at: null
+
+# This block is deliberately incomplete.  The sealing change must replace it
+# with the paths and both raw/document SHA-256 values of the real, immutable
+# common-seed selection evidence.  Code refuses to build or publish a manifest
+# while any field remains null.
+# The selection receipt itself embeds and self-digests the complete reviewed
+# PNG ledger from common-seed v3; sealing reopens those files through the
+# common-seed-v3 validator.
+selected_common_seed_evidence:
+  selected_common_seed: null
+  selection_receipt:
+    path: null
+    sha256: null
+    document_sha256: null
+  selection_receipt_sidecar:
+    path: null
+    sha256: null
+  selection_publication_commit:
+    path: null
+    sha256: null
+    document_sha256: null
+  selection_publication_commit_sidecar:
+    path: null
+    sha256: null
+  authentication_report:
+    path: null
+    sha256: null
+    document_sha256: null
+  reviewer_manifest:
+    path: null
+    sha256: null
+    document_sha256: null
+  private_unblinding_map:
+    path: null
+    sha256: null
+    document_sha256: null
+  normalized_manual_review_ledger:
+    path: null
+    sha256: null
+    document_sha256: null
+
+# Sealing must replace every null SHA-256 below with the exact live file
+# digest. These are runner-affecting generation inputs, not descriptive hints.
+generation_inputs:
+  base_config: {path: configs/default.yaml, sha256: null}
+  model_config: {path: configs/models/t2i_flux1_dev_dual_view_v3.yaml, sha256: null}
+  prompt_suite: {path: configs/experiments/finer_detailing_correction_prompts.yaml, sha256: null}
+  negative_prompt_config: {path: configs/experiments/finer_detailing_correction_negative_prompts.yaml, sha256: null}
+  concept_tree_01_sad_young_girl: {path: configs/concepts/finer_detailing_01_sad_young_girl.yaml, sha256: null}
+  concept_tree_02_angry_old_man: {path: configs/concepts/finer_detailing_02_angry_old_man.yaml, sha256: null}
+  concept_tree_03_empty_outdoor_mall: {path: configs/concepts/finer_detailing_03_empty_outdoor_mall_t2i.yaml, sha256: null}
+
+scope:
+  model_name: flux1_dev
+  model_id: black-forest-labs/FLUX.1-dev
+  model_revision: 3de623fc3c33e44ffbe2bad470d0f45bccf2eb21
+  pipeline_class: FluxPipeline
+  prompt_ids:
+    - 01_sad_young_girl
+    - 02_angry_old_man
+    - 03_empty_outdoor_mall
+  seed_rule: exact_selected_common_seed_from_authenticated_receipt
+  attempt: 2
+  num_inference_steps: 28
+  embedded_guidance_scale: 3.5
+  num_outputs_per_prompt: 1
+  image_layout_by_prompt:
+    01_sad_young_girl: {width: 832, height: 1216}
+    02_angry_old_man: {width: 832, height: 1216}
+    03_empty_outdoor_mall: {width: 1216, height: 832}
+
+output_root: outputs/finer_detailing_flux1_native_negative_scale_calibration_v2
+
+review_blinding:
+  nonce_generation: secrets_token_hex_32_once_at_manifest_freeze
+  blind_id_derivation: hmac_sha256_nonce_over_seed_prompt_role_and_scale
+  nonce_excluded_from_reviewer_package: true
+  ladder_role_groups_excluded_from_reviewer_package: true
+  source_and_parity_reviewers_access_disjoint: true
+  objective_and_unblinding_evidence_kept_in_separate_private_root: true
+
+roles:
+  official_study_baseline:
+    count_per_prompt: 1
+    execution_path: GenerationRunner_flux_dual_view
+    negative_prompt_applied: false
+    eligible_for_scale_selection: false
+  native_no_negative_control:
+    count_per_prompt: 1
+    execution_path: FluxPipeline_flux_dual_view_native_call
+    negative_prompt: null
+    true_cfg_scale: 1.0
+    eligible_for_scale_selection: false
+  native_negative_scale_ladder:
+    count_per_prompt: 13
+    execution_path: FluxPipeline_flux_dual_view_native_call
+    negative_prompt: registered_paired_clip_t5_views
+    true_cfg_scales: [1.0, 1.25, 1.5, 1.75, 2.0, 2.25, 2.5, 2.75, 3.0, 3.25, 3.5, 3.75, 4.0]
+    ineligible_scales: [1.0]
+
+expected_rows:
+  official_study_baseline: 3
+  native_no_negative_control: 3
+  native_negative_scale_ladder: 39
+  total: 45
+
+evaluation_contract:
+  identical_to_v1_except_selected_common_seed_and_v2_provenance: true
+  native_call_scale_integrity: exact_executed_guidance_scale_and_true_cfg_scale
+  inert_negative_integrity: exact_decoded_rgb_equality
+  path_parity: both_controls_pass_full_source_fidelity_and_no_material_manual_difference
+  objective_noncollapse_thresholds_may_change: false
+  positive_target_concepts_must_not_be_scored: true
+  minimum_unambiguous_suppressed_source_concepts_per_prompt: 2
+
+selection_rule:
+  eligible_scales: [1.25, 1.5, 1.75, 2.0, 2.25, 2.5, 2.75, 3.0, 3.25, 3.5, 3.75, 4.0]
+  cross_prompt_requirement: one_global_scale_must_pass_every_gate_on_all_three_prompts
+  choice: smallest_eligible_scale
+  per_prompt_tuning_forbidden: true
+  averaging_across_prompts_forbidden: true
+  threshold_relaxation_after_viewing_forbidden: true
+  no_passing_scale_outcome: mark_flux1_native_negative_not_qualified_and_do_not_select
+
+reuse_prohibitions:
+  v1_manifest_or_media_may_be_reused: false
+  common_seed_candidate_media_may_be_reused: false
+  every_v2_row_must_have_a_fresh_output_path: true
+  every_v2_attempt_requires_authenticated_environment_preflight: true
+  every_result_must_bind_exact_manifest_index: true

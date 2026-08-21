@@ -1,0 +1,19 @@
+id: sky_color_blue_to_pink
+parent: environment
+priority: 1.0
+source:
+  label: blue daytime sky
+  prompt: An open daytime sky that is clearly blue, with neutral ground colors.
+target:
+  label: pink daytime sky
+  prompt: An open daytime sky that is clearly pink while all non-sky colors stay neutral.
+calibration:
+  neutral:
+    - A grayscale horizon study with an uncolored sky region.
+    - A neutral atmospheric gradient above a simple horizon.
+  source:
+    - A broad clear blue daytime sky above a colorless horizon.
+    - A blue sky color swatch confined to the upper half of an image.
+  target:
+    - A broad clear pink daytime sky above a colorless horizon.
+    - A pink sky color swatch confined to the upper half of an image.

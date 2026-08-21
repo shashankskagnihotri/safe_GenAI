@@ -1,0 +1,19 @@
+id: facial_affect_negative_to_happy
+parent: human_attributes
+priority: 1.0
+source:
+  label: negative facial affect
+  prompt: A close portrait with an unmistakably sad or angry negative facial expression.
+target:
+  label: happy facial affect
+  prompt: A close portrait with an unmistakably happy, relaxed smile.
+calibration:
+  neutral:
+    - A documentary portrait with a neutral facial expression against a plain background.
+    - A studio headshot with relaxed facial muscles and even illumination.
+  source:
+    - A solitary adult visibly frowning with a downcast, unhappy expression.
+    - A face showing clear anger and tightly furrowed brows.
+  target:
+    - A solitary adult smiling warmly with visibly happy eyes.
+    - A face showing calm joy and a relaxed open smile.

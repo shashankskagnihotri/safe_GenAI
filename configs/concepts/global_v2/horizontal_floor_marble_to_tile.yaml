@@ -1,0 +1,19 @@
+id: horizontal_floor_marble_to_tile
+parent: materials
+priority: 0.90
+source:
+  label: polished marble walking floor
+  prompt: A horizontal walking floor made from polished veined marble slabs.
+target:
+  label: ceramic tiled walking floor
+  prompt: A horizontal walking floor made from ceramic tiles with a visible grout grid.
+calibration:
+  neutral:
+    - A flat untextured horizontal surface under neutral light.
+    - A material sample plane with no visible pattern.
+  source:
+    - A close view of polished marble flooring with natural veining.
+    - A horizontal floor surfaced in large glossy marble slabs.
+  target:
+    - A close view of ceramic floor tiles with clear grout lines.
+    - A horizontal floor surfaced in a regular square tile grid.

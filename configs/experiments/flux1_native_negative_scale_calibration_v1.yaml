@@ -1,0 +1,176 @@
+schema_version: 1
+calibration_id: flux1_native_negative_true_cfg_scale_v1
+benchmark: finer_detailing_correction_v1
+preregistered_at: "2026-07-20T15:38:13+02:00"
+status: preregistered_before_generation
+
+scope:
+  model_name: flux1_dev
+  model_id: black-forest-labs/FLUX.1-dev
+  model_revision: 3de623fc3c33e44ffbe2bad470d0f45bccf2eb21
+  pipeline_class: FluxPipeline
+  prompt_ids:
+    - 01_sad_young_girl
+    - 02_angry_old_man
+    - 03_empty_outdoor_mall
+  seed: 0
+  num_inference_steps: 28
+  embedded_guidance_scale: 3.5
+  num_outputs_per_prompt: 1
+  image_layout_by_prompt:
+    01_sad_young_girl: {width: 832, height: 1216}
+    02_angry_old_man: {width: 832, height: 1216}
+    03_empty_outdoor_mall: {width: 1216, height: 832}
+
+frozen_inputs:
+  prompt_suite:
+    path: configs/experiments/finer_detailing_correction_prompts.yaml
+    sha256: 4a869362525aa2cd44e8d897bbaacda33a7efe871a5979132923e696750f6273
+  negative_prompt_suite:
+    path: configs/experiments/finer_detailing_correction_negative_prompts.yaml
+    sha256: 8f4a9b8f475805027fd9b7714c319b77d4ebccd65d1165a966dfcd0179745594
+  model_config:
+    path: configs/models/t2i_flux1_dev.yaml
+    sha256: 5b958846975485c70f86a97695af5fed5ab6c609ed9ecea0f00b281c506d1843
+
+output_root: outputs/finer_detailing_flux1_native_negative_scale_calibration_20260720
+
+roles:
+  official_study_baseline:
+    count_per_prompt: 1
+    execution_path: GenerationRunner_FluxAdapter
+    negative_prompt_applied: false
+    eligible_for_scale_selection: false
+  native_no_negative_control:
+    count_per_prompt: 1
+    execution_path: FluxPipeline_native_call
+    negative_prompt: null
+    true_cfg_scale: 1.0
+    eligible_for_scale_selection: false
+  native_negative_scale_ladder:
+    count_per_prompt: 13
+    execution_path: FluxPipeline_native_call
+    negative_prompt: registered_prompt_specific_string
+    true_cfg_scales:
+      - 1.0
+      - 1.25
+      - 1.5
+      - 1.75
+      - 2.0
+      - 2.25
+      - 2.5
+      - 2.75
+      - 3.0
+      - 3.25
+      - 3.5
+      - 3.75
+      - 4.0
+    ineligible_scales: [1.0]
+
+expected_rows:
+  official_study_baseline: 3
+  native_no_negative_control: 3
+  native_negative_scale_ladder: 39
+  total: 45
+
+inert_negative_integrity_gate:
+  comparison: native_no_negative_control_vs_negative_string_at_true_cfg_1p00
+  requirement: exact_decoded_rgb_equality
+  matched_fields:
+    - model_id
+    - model_revision
+    - pipeline_class
+    - loader_kwargs
+    - positive_prompt
+    - seed_and_generator
+    - embedded_guidance_scale
+    - true_cfg_scale
+    - image_dimensions
+    - num_inference_steps
+    - output_type
+    - saver
+  only_permitted_difference: inert_registered_negative_prompt_string
+
+path_parity_gate:
+  comparison: official_study_baseline_vs_native_no_negative_control
+  requirement: both_pass_full_source_fidelity_and_no_material_manual_difference
+  prohibited_material_differences:
+    - identity_or_age_or_gender
+    - required_scene_or_objects
+    - composition_or_full_body_framing
+    - exposure_or_collapse
+    - visible_artifacts_or_broken_geometry
+  note: Pixel equality is not required because the two controls use different execution paths.
+
+objective_noncollapse_gate:
+  reference_role: native_no_negative_control
+  all_constraints_required_for_every_prompt:
+    valid_png_and_exact_dimensions: true
+    mean_luminance_ratio: {minimum: 0.5, maximum: 1.5}
+    median_luminance:
+      minimum_rule: max_0p05_or_0p35_times_reference_median
+    dark_fraction_luminance_lt_0p05:
+      maximum_rule: max_0p25_or_reference_plus_0p20
+    entropy_bits:
+      minimum_rule: reference_minus_1p0
+    total_variation_ratio: {minimum: 0.2}
+    bright_fraction_luminance_gt_0p95:
+      maximum_rule: max_0p35_or_reference_plus_0p20
+
+manual_hard_gates:
+  every_prompt:
+    - recognizable_required_source_scene
+    - no_washout_or_near_black_collapse
+    - no_severe_blur_or_silhouette_collapse
+    - no_broken_geometry_or_unusable_composition
+  person_prompts:
+    - exactly_one_person_and_no_background_people
+    - source_age_and_gender_preserved
+    - complete_subject_and_both_feet_visible
+    - complete_required_bench_visible_with_correct_material
+    - sandwich_preserved_and_clearly_visible
+    - park_weather_lighting_and_realistic_style_preserved
+  mall_prompt:
+    - no_people_or_mannequins
+    - empty_outdoor_mall_architecture_preserved
+    - realistic_daylight_materials_and_coherent_wide_composition_preserved
+
+source_suppression_scoring:
+  target_concepts_must_not_be_scored: true
+  minimum_unambiguous_suppressed_source_concepts_per_prompt: 2
+  prompt_01_sources:
+    - sad_facial_affect
+    - green_upper_body_clothing
+    - sitting_pose
+    - actively_eating_or_biting_sandwich
+    - static_seated_composition
+  prompt_02_sources:
+    - angry_facial_affect
+    - green_upper_body_clothing
+    - sitting_pose
+    - actively_eating_or_biting_sandwich
+    - static_seated_composition
+  prompt_03_sources:
+    - blue_sky
+    - escalators
+    - marble_horizontal_floor
+    - 50_percent_sale_signboards
+    - leather_handbags
+
+selection_rule:
+  eligible_scales: [1.25, 1.5, 1.75, 2.0, 2.25, 2.5, 2.75, 3.0, 3.25, 3.5, 3.75, 4.0]
+  cross_prompt_requirement: one_global_scale_must_pass_every_gate_on_all_three_prompts
+  choice: smallest_eligible_scale
+  per_prompt_tuning_forbidden: true
+  averaging_across_prompts_forbidden: true
+  threshold_relaxation_after_viewing_forbidden: true
+  no_passing_scale_outcome: mark_flux1_native_negative_not_qualified_and_do_not_select
+
+publication_rule:
+  normal_benchmark_constant_must_not_change_before_selection: true
+  selected_scale_must_bind:
+    - calibration_manifest_sha256
+    - calibration_config_sha256
+    - complete_objective_report_sha256
+    - blinded_manual_review_ledger_sha256
+    - selection_report_sha256

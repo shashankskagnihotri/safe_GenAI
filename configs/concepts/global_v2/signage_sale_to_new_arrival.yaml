@@ -1,0 +1,19 @@
+id: signage_sale_to_new_arrival
+parent: typography
+priority: 0.85
+source:
+  label: sign text 50% SALE
+  prompt: A clean isolated signboard whose only text reads exactly "50% SALE".
+target:
+  label: sign text NEW ARRIVAL
+  prompt: A clean isolated signboard whose only text reads exactly "NEW ARRIVAL".
+calibration:
+  neutral:
+    - A blank rectangular signboard with no letters or symbols.
+    - An empty typographic placard on a plain wall.
+  source:
+    - A printed retail placard reading exactly "50% SALE".
+    - A bold sign with the exact words "50% SALE" and no other text.
+  target:
+    - A printed retail placard reading exactly "NEW ARRIVAL".
+    - A bold sign with the exact words "NEW ARRIVAL" and no other text.

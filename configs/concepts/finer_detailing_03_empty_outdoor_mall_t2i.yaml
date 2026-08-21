@@ -1,0 +1,12 @@
+schema_version: 2
+kind: global_registry_selector
+legacy_prompt_id: 03_empty_outdoor_mall
+modality: t2i
+registry: configs/concepts/global_v2/registry.yaml
+active_pair_ids:
+  - sky_color_blue_to_pink
+  - vertical_circulation_escalators_to_marble_stairs
+  - horizontal_floor_marble_to_tile
+  - signage_sale_to_new_arrival
+  - merchandise_handbags_to_cars
+inline_prompt_specific_endpoints: false

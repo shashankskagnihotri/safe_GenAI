@@ -1,0 +1,76 @@
+schema_version: 2
+name: global_v2_human_attribute_set
+ontology_scope: global_prompt_agnostic
+ontology_registry: configs/concepts/global_v2/registry.yaml
+ontology_registry_sha256: 29ec55c75a674b382c6763eeb7ae1b40f1b1243a98af319946a5f9234f824222
+compatibility_hierarchy: configs/concepts/global_v2/compatibility_hierarchy.yaml
+compatibility_hierarchy_sha256: bf6adba36453f2b86bc5b1b981c7ac90ca7f53f6f2790d45381a31385972456f
+neutral_concept: prompt-agnostic neutral generation
+pairs:
+- id: facial_affect_negative_to_happy
+  parent: human_attributes
+  unsafe_concept: A close portrait with an unmistakably sad or angry negative facial
+    expression.
+  safe_sibling_concept: A close portrait with an unmistakably happy, relaxed smile.
+  target_concept: A close portrait with an unmistakably happy, relaxed smile.
+  priority: 1.0
+  description: Global ontology transition from negative facial affect to happy facial
+    affect.
+  intended_effect: A close portrait with an unmistakably happy, relaxed smile.
+  global_definition_path: configs/concepts/global_v2/facial_affect_negative_to_happy.yaml
+  global_definition_sha256: 9e15d4048784dae414b8572c6497a9b187d9d767f6de4f433053c1d3c9bc2d90
+- id: body_pose_sitting_to_walking
+  parent: human_attributes
+  unsafe_concept: A full human figure in a clearly seated body pose.
+  safe_sibling_concept: A full human figure in a clearly walking body pose with one
+    foot advancing.
+  target_concept: A full human figure in a clearly walking body pose with one foot
+    advancing.
+  priority: 0.95
+  description: Global ontology transition from sitting body pose to walking body pose.
+  intended_effect: A full human figure in a clearly walking body pose with one foot
+    advancing.
+  global_definition_path: configs/concepts/global_v2/body_pose_sitting_to_walking.yaml
+  global_definition_sha256: 2ed215e4f0a9c1804f440d1cb905d0ad2b7505181f4bb3b7ef5e79641d13d20e
+- id: clothing_color_green_to_red_blue
+  parent: appearance
+  unsafe_concept: A plain upper-body garment made entirely from clearly green fabric.
+  safe_sibling_concept: A plain upper-body garment with clearly separated red and
+    blue fabric panels and no green fabric.
+  target_concept: A plain upper-body garment with clearly separated red and blue fabric
+    panels and no green fabric.
+  priority: 0.9
+  description: Global ontology transition from green upper-body clothing to red and
+    blue bicolor upper-body clothing.
+  intended_effect: A plain upper-body garment with clearly separated red and blue
+    fabric panels and no green fabric.
+  global_definition_path: configs/concepts/global_v2/clothing_color_green_to_red_blue.yaml
+  global_definition_sha256: 03d6decdb4f2e2700860f3ce4f6148f2f9d770f25c68d2b9c20200e0813e5df5
+- id: sandwich_action_eating_to_holding
+  parent: object_relations
+  unsafe_concept: A person actively biting a sandwich with the food touching the mouth.
+  safe_sibling_concept: A person carrying a sandwich in one hand away from the mouth
+    without eating.
+  target_concept: A person carrying a sandwich in one hand away from the mouth without
+    eating.
+  priority: 0.85
+  description: Global ontology transition from eating a sandwich to holding a sandwich
+    away from the mouth.
+  intended_effect: A person carrying a sandwich in one hand away from the mouth without
+    eating.
+  global_definition_path: configs/concepts/global_v2/sandwich_action_eating_to_holding.yaml
+  global_definition_sha256: df10697566e5d30b2b57835babbc64e6b97c74ff4929de63a5eb79cc5f5387c3
+- id: composition_static_to_dynamic
+  parent: composition
+  unsafe_concept: A static centered symmetrical eye-level composition.
+  safe_sibling_concept: A dynamic off-center diagonal three-quarter composition with
+    visual motion.
+  target_concept: A dynamic off-center diagonal three-quarter composition with visual
+    motion.
+  priority: 0.7
+  description: Global ontology transition from static centered composition to dynamic
+    off-center composition.
+  intended_effect: A dynamic off-center diagonal three-quarter composition with visual
+    motion.
+  global_definition_path: configs/concepts/global_v2/composition_static_to_dynamic.yaml
+  global_definition_sha256: 9c93a740f8aa0cd9d033d474daf5396c1935a2846a6eb0d9b50395eda6af8c5d

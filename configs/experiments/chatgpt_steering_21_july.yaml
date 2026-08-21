@@ -1,0 +1,184 @@
+campaign:
+  id: chatgpt_steering_21_july_2026
+  seed: 0
+  sealed_prompt_source: configs/experiments/finer_detailing_correction_prompts.yaml
+  negative_prompt_source: configs/experiments/finer_detailing_correction_negative_prompts.yaml
+  ontology_registry: configs/concepts/global_v2/registry.yaml
+  compatibility_hierarchy: configs/concepts/global_v2/compatibility_hierarchy.yaml
+  state_root: debugging/chatgpt_steering
+  calibration_root: debugging/chatgpt_steering/calibration
+  output_root: outputs/chatgpt_steering_21_july
+  variants:
+    - baseline
+    - native_negative_prompt
+    - conceptsteer_current_repaired
+    - hierasafe_chs_v2
+    - midsteer
+    - sgf_switch_adapted
+    - safe_denoiser_switch_adapted
+  active_pairs_by_prompt:
+    01_sad_young_girl:
+      - facial_affect_negative_to_happy
+      - body_pose_sitting_to_walking
+      - clothing_color_green_to_red_blue
+      - sandwich_action_eating_to_holding
+      - composition_static_to_dynamic
+    02_angry_old_man:
+      - facial_affect_negative_to_happy
+      - body_pose_sitting_to_walking
+      - clothing_color_green_to_red_blue
+      - sandwich_action_eating_to_holding
+      - composition_static_to_dynamic
+    03_empty_outdoor_mall:
+      - sky_color_blue_to_pink
+      - vertical_circulation_escalators_to_marble_stairs
+      - horizontal_floor_marble_to_tile
+      - signage_sale_to_new_arrival
+      - merchandise_handbags_to_cars
+
+models:
+  - id: cosmos3_super_text2image
+    display_name: Cosmos3 Super Text2Image
+    modality: t2i
+    config: configs/models/t2i_cosmos3_super_text2image.yaml
+    native_negative_supported: false
+  - id: flux1_dev
+    display_name: FLUX.1-dev
+    modality: t2i
+    config: configs/models/t2i_flux1_dev.yaml
+    native_negative_supported: true
+  - id: flux2_dev
+    display_name: FLUX.2-dev
+    modality: t2i
+    config: configs/models/t2i_flux2_dev.yaml
+    native_negative_supported: false
+  - id: ideogram4_nf4
+    display_name: Ideogram 4 NF4
+    modality: t2i
+    config: configs/models/t2i_ideogram4_nf4.yaml
+    native_negative_supported: false
+  - id: qwen_image
+    display_name: Qwen Image
+    modality: t2i
+    config: configs/models/t2i_qwen_image.yaml
+    native_negative_supported: true
+  - id: qwen_image_2512
+    display_name: Qwen Image 2512
+    modality: t2i
+    config: configs/models/t2i_qwen_image_2512.yaml
+    native_negative_supported: true
+  - id: sd35_large
+    display_name: Stable Diffusion 3.5 Large
+    modality: t2i
+    config: configs/models/t2i_sd35_large.yaml
+    native_negative_supported: true
+  - id: cogvideox_5b
+    display_name: CogVideoX-5B
+    modality: t2v
+    config: configs/models/t2v_cogvideox_5b.yaml
+    native_negative_supported: true
+    native_video: {num_frames: 49, fps: 8, duration_seconds: 6.125}
+  - id: hunyuan_video
+    display_name: HunyuanVideo
+    modality: t2v
+    config: configs/models/t2v_hunyuan_video.yaml
+    native_negative_supported: true
+    native_video: {num_frames: 121, fps: 24, duration_seconds: 5.0416666667}
+  - id: joyai_echo
+    display_name: JoyAI Echo
+    modality: t2v
+    config: configs/models/t2v_joyai_echo.yaml
+    native_negative_supported: false
+    native_video: {num_frames: 121, fps: 24, duration_seconds: 5.0416666667}
+  - id: ltx_23
+    display_name: LTX-2.3 distilled
+    modality: t2v
+    config: configs/models/t2v_ltx_23.yaml
+    native_negative_supported: false
+    native_video: {num_frames: 121, fps: 24, duration_seconds: 5.0416666667}
+  - id: wan22_t2v_a14b
+    display_name: Wan 2.2 T2V A14B
+    modality: t2v
+    config: configs/models/t2v_wan22_t2v_a14b.yaml
+    native_negative_supported: true
+    native_video: {num_frames: 81, fps: 16, duration_seconds: 5.0625}
+
+methods:
+  conceptsteer_current_repaired:
+    implementation: hierasafe_flow.steering.conceptsteer_repaired
+    strength: 0.55
+    window: [0.02, 0.68]
+    max_relative_norm: 0.18
+  hierasafe_chs_v2:
+    implementation: hierasafe_flow.steering.chs_v2
+    strength: 0.62
+    window: [0.02, 0.72]
+    max_relative_norm: 0.20
+  midsteer:
+    implementation: hierasafe_flow.steering.related_work.midsteer
+    strength: 0.80
+    window: [0.05, 0.62]
+    covariance: diagonal
+  sgf_switch_adapted:
+    implementation: hierasafe_flow.steering.related_work.sgf
+    strength: 0.075
+    bandwidth: 1.0
+    window: [0.00, 0.42]
+    max_relative_norm: 0.12
+  safe_denoiser_switch_adapted:
+    implementation: hierasafe_flow.steering.related_work.safe_denoiser
+    eta: 0.22
+    bandwidth: 1.0
+    window: [0.00, 0.42]
+    max_relative_norm: 0.12
+
+calibration:
+  seed: 271828
+  denoising_step_index: 0
+  final_prompt_access: forbidden
+  prototype_reduction: channel_centroid
+  midsteer_covariance: diagonal
+  expected_prototype_features:
+    cosmos3_super_text2image: 48
+    flux1_dev: 64
+    flux2_dev: 128
+    ideogram4_nf4: 128
+    qwen_image: 64
+    qwen_image_2512: 64
+    sd35_large: 16
+    cogvideox_5b: 16
+    hunyuan_video: 16
+    joyai_echo: 16
+    ltx_23: 128
+    wan22_t2v_a14b: 16
+
+upstreams:
+  midsteer:
+    repository: https://github.com/Atmyre/MidSteer
+    commit: 0f3b31e15cdda6ad0d46167e10319e896d6f1541
+    paper: https://arxiv.org/pdf/2605.05220
+  sgf:
+    repository: https://github.com/MingyuKim87/SGF
+    commit: 4bdd287475672c608eadfe32d466cf62b3a527fe
+    paper: https://arxiv.org/pdf/2603.13300
+  safe_denoiser:
+    repository: https://github.com/MingyuKim87/Safe_Denoiser
+    commit: 223415b2739de049969c8188e8c6c331ae3531b3
+    paper: https://arxiv.org/pdf/2502.08011
+
+slurm:
+  python: /ceph/sagnihot/miniconda3/envs/safe_genai_conceptsteer/bin/python
+  gpu_partition: gpu-vram-94gb
+  cpu_partition: cpu
+  account: ml-staff
+  qos: walltime5d
+  gpu_gres: gpu:nvidia_h100_nvl:1
+  calibration_concurrency: 2
+  baseline_concurrency: 3
+  steering_concurrency: 3
+  cpus_per_task: 16
+  memory: 300G
+  calibration_time: "12:00:00"
+  generation_time: "12:00:00"
+  validation_time: "02:00:00"
+  review_time: "24:00:00"

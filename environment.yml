@@ -1,17 +1,18 @@
-name: hierasafe-flow
+name: safe_genai_conceptsteer
 channels:
   - pytorch
   - nvidia
   - conda-forge
 dependencies:
-  - python=3.11
+  - python=3.10
   - pip
-  - pytorch>=2.4
-  - torchvision
+  - pytorch=2.5.1
+  - torchvision=0.20.1
   - pytorch-cuda=12.4
   - numpy
+  - pandas
   - pillow
+  - pyarrow
   - pyyaml
   - pip:
       - -r requirements.txt
-

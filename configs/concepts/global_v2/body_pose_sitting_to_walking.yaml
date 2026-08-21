@@ -1,0 +1,19 @@
+id: body_pose_sitting_to_walking
+parent: human_attributes
+priority: 0.95
+source:
+  label: sitting body pose
+  prompt: A full human figure in a clearly seated body pose.
+target:
+  label: walking body pose
+  prompt: A full human figure in a clearly walking body pose with one foot advancing.
+calibration:
+  neutral:
+    - A full-body anatomy study in a neutral standing pose on a seamless backdrop.
+    - A human silhouette shown without a specified action.
+  source:
+    - One person seated upright on a simple chair in a blank studio.
+    - A full figure resting in a clearly sitting posture.
+  target:
+    - One person walking naturally across a blank studio floor.
+    - A full figure captured mid-stride with natural arm swing.

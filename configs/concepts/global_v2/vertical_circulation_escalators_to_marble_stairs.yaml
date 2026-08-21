@@ -1,0 +1,19 @@
+id: vertical_circulation_escalators_to_marble_stairs
+parent: architecture
+priority: 0.95
+source:
+  label: paired mechanical escalators
+  prompt: Two parallel mechanical escalators with visible moving steps and handrails.
+target:
+  label: paired fixed marble staircases
+  prompt: Two parallel stationary staircases made from solid marble, without escalator machinery.
+calibration:
+  neutral:
+    - An abstract vertical circulation opening without stairs or machinery.
+    - A sectional architectural void connecting two levels.
+  source:
+    - Two parallel working escalators photographed against a blank interior.
+    - A paired up-and-down escalator mechanism with moving treads.
+  target:
+    - Two parallel fixed marble staircases photographed against a blank interior.
+    - A paired set of stationary stone stairs with marble veining.

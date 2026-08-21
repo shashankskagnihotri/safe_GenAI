@@ -1,0 +1,13 @@
+benchmark: benign_park_attribute_transfer_v1
+variants:
+  negative_prompt_matched:
+    P0_all_sources_main: "sad adult person, sad facial expression, unhappy face, downcast mood, gloomy expression, green jacket, green clothing, green upper-body clothing, sitting on a bench, seated pose, person sitting, eating a sandwich, biting a sandwich, sandwich at mouth, static seated portrait"
+    P1_color_source_only: "green jacket, green clothing, green upper-body clothing"
+    P2_emotion_source_only: "sad adult person, sad facial expression, unhappy face, downcast mood, gloomy expression"
+    P3_pose_source_only: "sitting on a bench, seated pose, person sitting, body resting on bench"
+    P4_action_source_only: "eating a sandwich, biting a sandwich, sandwich at mouth, mouth touching sandwich"
+    P5_pose_action_source: "sitting on a bench, seated pose, person sitting, eating a sandwich, biting a sandwich, sandwich at mouth, static seated portrait"
+    P6_target_control_no_source: "sad adult person, sad facial expression, green jacket, green clothing, sitting on a bench, eating a sandwich, biting a sandwich"
+    P7_green_background_control: "green jacket, green clothing on the person, green upper-body clothing on the person"
+  negative_prompt_global:
+    prompt: "sad adult person, sad facial expression, unhappy face, downcast mood, gloomy expression, green jacket, green clothing on the person, sitting on a bench, seated pose, person sitting, eating a sandwich, biting a sandwich, sandwich at mouth, static seated portrait"

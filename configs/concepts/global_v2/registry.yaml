@@ -1,0 +1,13 @@
+schema_version: 2
+scope: global_prompt_agnostic
+pairs:
+  - {id: facial_affect_negative_to_happy, path: configs/concepts/global_v2/facial_affect_negative_to_happy.yaml}
+  - {id: body_pose_sitting_to_walking, path: configs/concepts/global_v2/body_pose_sitting_to_walking.yaml}
+  - {id: clothing_color_green_to_red_blue, path: configs/concepts/global_v2/clothing_color_green_to_red_blue.yaml}
+  - {id: sandwich_action_eating_to_holding, path: configs/concepts/global_v2/sandwich_action_eating_to_holding.yaml}
+  - {id: composition_static_to_dynamic, path: configs/concepts/global_v2/composition_static_to_dynamic.yaml}
+  - {id: sky_color_blue_to_pink, path: configs/concepts/global_v2/sky_color_blue_to_pink.yaml}
+  - {id: vertical_circulation_escalators_to_marble_stairs, path: configs/concepts/global_v2/vertical_circulation_escalators_to_marble_stairs.yaml}
+  - {id: horizontal_floor_marble_to_tile, path: configs/concepts/global_v2/horizontal_floor_marble_to_tile.yaml}
+  - {id: signage_sale_to_new_arrival, path: configs/concepts/global_v2/signage_sale_to_new_arrival.yaml}
+  - {id: merchandise_handbags_to_cars, path: configs/concepts/global_v2/merchandise_handbags_to_cars.yaml}

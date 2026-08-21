@@ -1,0 +1,101 @@
+name: finer_detailing_02_angry_old_man_video_continuity_22_july
+neutral_concept: realistic full-body scene of exactly one old man in a cloudy park under natural dark and cloudy lighting,
+  old age and male gender unchanged, metal park bench clearly visible, sandwich clearly visible, coherent anatomy, realistic
+  setting and great detail preserved. Same old man, full body, feet and named objects remain visible; no other person, cut,
+  crop, exit, identity swap or object loss.
+pairs:
+- id: facial_affect_negative_to_happy
+  parent: emotion_attribute_control
+  unsafe_concept: angry scowling facial expression, tense frown, and furious mood; exactly one same old man, same old age
+    and male gender, same blazer type, full body visible, cloudy park, natural dark and cloudy lighting, same metal park bench
+    clearly visible, same sandwich clearly visible, realistic setting and great detail preserved. Same old man, full body,
+    feet and named objects remain visible; no other person, cut, crop, exit, identity swap or object loss.
+  safe_sibling_concept: happy relaxed facial expression and warm pleasant smile; exactly one same old man, same old age and
+    male gender, same blazer type, full body visible, cloudy park, natural dark and cloudy lighting, same metal park bench
+    clearly visible, same sandwich clearly visible, realistic setting and great detail preserved. Same old man, full body,
+    feet and named objects remain visible; no other person, cut, crop, exit, identity swap or object loss.
+  target_concept: happy relaxed facial expression and warm pleasant smile; exactly one same old man, same old age and male
+    gender, same blazer type, full body visible, cloudy park, natural dark and cloudy lighting, same metal park bench clearly
+    visible, same sandwich clearly visible, realistic setting and great detail preserved. Same old man, full body, feet and
+    named objects remain visible; no other person, cut, crop, exit, identity swap or object loss.
+  priority: high
+  description: Change only angry affect toward happy affect while preserving the old man's age, gender, and all scene invariants.
+  intended_effect: Happy relaxed old man with no age, gender, object, weather, lighting, material, framing, or style change.
+- id: body_pose_sitting_to_walking
+  parent: pose_attribute_control
+  unsafe_concept: seated body pose resting on the bench; exactly one same old man, same old age and male gender, same blazer
+    type, full body visible, cloudy park, natural dark and cloudy lighting, same metal park bench clearly visible, same sandwich
+    clearly visible, realistic setting and great detail preserved. Same old man, full body, feet and named objects remain
+    visible; no other person, cut, crop, exit, identity swap or object loss.
+  safe_sibling_concept: full-body walking pose beside the bench; exactly one same old man, same old age and male gender, same
+    blazer type, full body visible, cloudy park, natural dark and cloudy lighting, same metal park bench clearly visible,
+    same sandwich clearly visible, realistic setting and great detail preserved. Same old man, full body, feet and named objects
+    remain visible; no other person, cut, crop, exit, identity swap or object loss.
+  target_concept: full-body walking pose beside the bench; exactly one same old man, same old age and male gender, same blazer
+    type, full body visible, cloudy park, natural dark and cloudy lighting, same metal park bench clearly visible, same sandwich
+    clearly visible, realistic setting and great detail preserved. Same old man, full body, feet and named objects remain
+    visible; no other person, cut, crop, exit, identity swap or object loss.
+  priority: high
+  description: Change only sitting to walking beside the same metal bench.
+  intended_effect: Walking old man while the metal bench and all non-pose details remain intact.
+- id: clothing_color_green_to_red_blue
+  parent: visual_attribute_control
+  unsafe_concept: green fabric color on his blazer; exactly one same old man, same old age and male gender, same blazer type,
+    full body visible, cloudy park with natural green plants preserved, natural dark and cloudy lighting, same metal park
+    bench clearly visible, same sandwich clearly visible, realistic setting and great detail preserved. Same old man, full
+    body, feet and named objects remain visible; no other person, cut, crop, exit, identity swap or object loss.
+  safe_sibling_concept: red and blue fabric colors with no green fabric on his blazer; exactly one same old man, same old
+    age and male gender, same blazer type, full body visible, cloudy park with natural green plants preserved, natural dark
+    and cloudy lighting, same metal park bench clearly visible, same sandwich clearly visible, realistic setting and great
+    detail preserved. Same old man, full body, feet and named objects remain visible; no other person, cut, crop, exit, identity
+    swap or object loss.
+  target_concept: red and blue fabric colors with no green fabric on his blazer; exactly one same old man, same old age and
+    male gender, same blazer type, full body visible, cloudy park with natural green plants preserved, natural dark and cloudy
+    lighting, same metal park bench clearly visible, same sandwich clearly visible, realistic setting and great detail preserved.
+    Same old man, full body, feet and named objects remain visible; no other person, cut, crop, exit, identity swap or object
+    loss.
+  priority: high
+  description: Change only the blazer color from green to red-and-blue without changing garment type, subject identity, or
+    natural background colors.
+  intended_effect: Red-and-blue blazer on the same old man; all other attributes remain intact.
+- id: sandwich_action_eating_to_holding
+  parent: action_attribute_control
+  unsafe_concept: actively biting or eating with the sandwich touching his mouth; exactly one same old man, same old age and
+    male gender, same blazer type, full body visible, cloudy park, natural dark and cloudy lighting, same metal park bench
+    clearly visible, same sandwich clearly visible, realistic setting and great detail preserved. Same old man, full body,
+    feet and named objects remain visible; no other person, cut, crop, exit, identity swap or object loss.
+  safe_sibling_concept: holding or carrying the sandwich in one hand away from his mouth without biting it; exactly one same
+    old man, same old age and male gender, same blazer type, full body visible, cloudy park, natural dark and cloudy lighting,
+    same metal park bench clearly visible, same sandwich clearly visible, realistic setting and great detail preserved. Same
+    old man, full body, feet and named objects remain visible; no other person, cut, crop, exit, identity swap or object loss.
+  target_concept: holding or carrying the sandwich in one hand away from his mouth without biting it; exactly one same old
+    man, same old age and male gender, same blazer type, full body visible, cloudy park, natural dark and cloudy lighting,
+    same metal park bench clearly visible, same sandwich clearly visible, realistic setting and great detail preserved. Same
+    old man, full body, feet and named objects remain visible; no other person, cut, crop, exit, identity swap or object loss.
+  priority: high
+  description: Change only the relation to the sandwich from eating to holding/carrying while preserving the sandwich.
+  intended_effect: Clearly visible sandwich held away from the mouth by the same old man.
+- id: composition_static_to_dynamic
+  parent: composition_control
+  unsafe_concept: static seated full-body composition; exactly one same old man, same old age and male gender, same blazer
+    type, full body visible, cloudy park, natural dark and cloudy lighting, same metal park bench clearly visible, same sandwich
+    clearly visible, realistic setting and great detail preserved. Same old man, full body, feet and named objects remain
+    visible; no other person, cut, crop, exit, identity swap or object loss.
+  safe_sibling_concept: dynamic candid full-body walking composition; exactly one same old man, same old age and male gender,
+    same blazer type, full body visible, cloudy park, natural dark and cloudy lighting, same metal park bench clearly visible,
+    same sandwich clearly visible, realistic setting and great detail preserved. Same old man, full body, feet and named objects
+    remain visible; no other person, cut, crop, exit, identity swap or object loss.
+  target_concept: dynamic candid full-body walking composition; exactly one same old man, same old age and male gender, same
+    blazer type, full body visible, cloudy park, natural dark and cloudy lighting, same metal park bench clearly visible,
+    same sandwich clearly visible, realistic setting and great detail preserved. Same old man, full body, feet and named objects
+    remain visible; no other person, cut, crop, exit, identity swap or object loss.
+  priority: high
+  description: Change static seated composition toward dynamic walking composition without changing identity or setting.
+  intended_effect: Dynamic walking composition with every non-target prompt detail preserved.
+video_conditioning_22_july:
+  schema_version: 1
+  source_manifest: configs/concepts/historical_17_july/finer_detailing_02_angry_old_man.yaml
+  source_sha256: a45a7744189258454cc8a6ed2337561825966a57e5401b9c6b1f35c65b8104ff
+  temporal_anchor: Same old man, full body, feet and named objects remain visible; no other person, cut, crop, exit, identity
+    swap or object loss.
+  composition_mode: concept_only_with_temporal_preservation

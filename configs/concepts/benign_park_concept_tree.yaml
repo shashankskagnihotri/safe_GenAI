@@ -1,0 +1,43 @@
+name: benign_park_attribute_transfer_v1
+neutral_concept: "ordinary realistic sunny park scene with one adult person, natural lighting, coherent composition, prompt context preserved, adult person preserved, park preserved, wooden bench preserved, sandwich preserved, realistic photo style preserved"
+pairs:
+  - id: facial_affect_sad_to_happy
+    parent: emotion_attribute_control
+    unsafe_concept: "sad adult person, sad facial expression, unhappy face, downcast mood, gloomy expression, serious unhappy appearance"
+    safe_sibling_concept: "happy adult person, happy smiling facial expression, cheerful relaxed mood, pleasant smile, positive expression"
+    target_concept: "happy adult person, happy smiling facial expression, cheerful relaxed mood, pleasant smile, positive expression"
+    priority: high
+    description: "Shift the person's facial expression and mood from sad to happy while preserving adult person, scene, clothing structure, bench, sandwich, realism, and natural lighting."
+    intended_effect: "Shift the person's facial expression and mood from sad to happy while preserving adult person, scene, clothing structure, bench, sandwich, realism, and natural lighting."
+  - id: body_pose_sitting_to_walking
+    parent: pose_attribute_control
+    unsafe_concept: "sitting on a wooden park bench, seated pose on bench, body resting on bench, person sitting"
+    safe_sibling_concept: "walking beside the wooden park bench, standing and walking posture near the bench, full-body walking pose, bench still visible nearby"
+    target_concept: "walking beside the wooden park bench, standing and walking posture near the bench, full-body walking pose, bench still visible nearby"
+    priority: high
+    description: "Shift pose from sitting on the bench to walking beside the bench. The bench should remain visible because it is part of prompt preservation."
+    intended_effect: "Shift pose from sitting on the bench to walking beside the bench. The bench should remain visible because it is part of prompt preservation."
+  - id: clothing_color_green_to_red_blue
+    parent: visual_attribute_control
+    unsafe_concept: "dominant green clothing on the person, green jacket, green coat, green shirt, green upper-body clothing"
+    safe_sibling_concept: "red and blue clothing on the person, red-blue jacket, red and blue upper-body clothing, no green clothing on the person"
+    target_concept: "red and blue clothing on the person, red-blue jacket, red and blue upper-body clothing, no green clothing on the person"
+    priority: high
+    description: "Reduce green clothing on the person and replace it with red-blue clothing. Do not remove natural green trees or grass in the background."
+    intended_effect: "Reduce green clothing on the person and replace it with red-blue clothing. Do not remove natural green trees or grass in the background."
+  - id: sandwich_action_eating_to_holding
+    parent: action_attribute_control
+    unsafe_concept: "actively eating a sandwich, biting a sandwich, sandwich at mouth, eating while seated, mouth touching sandwich"
+    safe_sibling_concept: "holding a sandwich casually in one hand, sandwich visible but not being bitten, carrying a sandwich while walking, sandwich away from mouth"
+    target_concept: "holding a sandwich casually in one hand, sandwich visible but not being bitten, carrying a sandwich while walking, sandwich away from mouth"
+    priority: high
+    description: "Shift the action from eating or biting the sandwich to holding or carrying it. The sandwich must remain visible."
+    intended_effect: "Shift the action from eating or biting the sandwich to holding or carrying it. The sandwich must remain visible."
+  - id: composition_static_to_dynamic
+    parent: composition_control
+    unsafe_concept: "static seated portrait composition, centered seated person, still bench portrait, low-motion seated scene"
+    safe_sibling_concept: "dynamic candid walking park snapshot, full-body walking composition, natural movement beside the bench, active outdoor snapshot"
+    target_concept: "dynamic candid walking park snapshot, full-body walking composition, natural movement beside the bench, active outdoor snapshot"
+    priority: high
+    description: "Encourage dynamic walking composition while preserving the adult person, sunny park, wooden bench, sandwich, realistic photo style, and natural lighting."
+    intended_effect: "Encourage dynamic walking composition while preserving the adult person, sunny park, wooden bench, sandwich, realistic photo style, and natural lighting."

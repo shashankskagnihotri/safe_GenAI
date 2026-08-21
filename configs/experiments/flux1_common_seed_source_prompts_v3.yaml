@@ -1,0 +1,111 @@
+schema_version: 1
+contract_id: flux1_common_seed_source_prompts_v3
+status: preregistered_before_generation
+preregistered_at: '2026-07-21T02:28:32+02:00'
+
+model:
+  model_name: flux1_dev
+  model_id: black-forest-labs/FLUX.1-dev
+  revision: 3de623fc3c33e44ffbe2bad470d0f45bccf2eb21
+  pipeline_class: FluxPipeline
+
+conditioning_contract:
+  schema_version: 1
+  primary_argument: prompt
+  primary_encoder: CLIPTextModel
+  primary_tokenizer_subfolder: tokenizer
+  primary_max_tokens_including_special_tokens: 77
+  secondary_argument: prompt_2
+  secondary_encoder: T5EncoderModel
+  secondary_tokenizer_subfolder: tokenizer_2
+  secondary_max_tokens_including_special_tokens: 512
+  require_independent_prompt_views: true
+  require_no_primary_or_secondary_truncation: true
+  token_ids_hash_encoding: compact_json_integer_array_utf8
+  native_equivalence_required_before_manifest_publication: true
+  steering_concept_prompt_behavior: legacy_same_text_for_prompt_and_prompt_2
+  native_negative_conditioning_requires_paired_negative_prompt_views: true
+  negative_views_must_not_contain_target_positive_terms: true
+
+tokenizer_file_sha256:
+  tokenizer/merges.txt: 9fd691f7c8039210e0fced15865466c65820d09b63988b0174bfe25de299051a
+  tokenizer/special_tokens_map.json: 2cdb3b8331a60c92fc1e55a13e9fd61fd2293c5a51275fdcccd62b780052530e
+  tokenizer/tokenizer_config.json: 6bdcee9ccce2a16ca2b4c0c5ed00b42c50ea225f4472a8c4c1e963a2902c2881
+  tokenizer/vocab.json: e089ad92ba36837a0d31433e555c8f45fe601ab5c221d4f607ded32d9f7a4349
+  tokenizer_2/special_tokens_map.json: 7a1985a994c41886db38c719d2a3d2f40606663cc19d7c5d6a85d349320e06d2
+  tokenizer_2/spiece.model: d60acb128cf7b7f2536e8f38a5b18a05535c9e14c7a355904270e15b0945ea86
+  tokenizer_2/tokenizer.json: f5dfec163765e18e270537fe896c49f5fad74db1525641d9b255a3008b999596
+  tokenizer_2/tokenizer_config.json: 1a3d2db64215ed77854dd4208aac5f8361c1b5471cabd19c0ef1472d1a895eb0
+
+prompts:
+  - prompt_id: 01_sad_young_girl
+    clip_prompt: 'Distant realistic photo with wide margins. Complete wooden park bench and exactly one visibly sad young girl fully inside frame. Entire girl and bench visible including head torso both legs both feet and both bench ends. Green jacket, seated, biting visible sandwich at mouth. Empty sunny park, no other people. Bright natural light, great detail, normal anatomy, no watermark.'
+    t5_prompt_2: 'A sad young girl wearing a green jacket, sitting on a wooden park bench in a sunny park, eating a sandwich, realistic setting, natural lighting, great detail, full body visible, bench clearly visible, sandwich clearly visible. Only this one young girl is present and there are no other people anywhere in the scene. Use a portrait-oriented wide contextual composition with her complete head, torso, both legs, and both feet inside the frame, with visible space around the complete bench; do not crop any part of her body or the bench. Her sad expression is unmistakable and the sandwich touches her mouth as she visibly takes a bite.'
+    clip_string_sha256: 36fb6512f7e7dc86686ca2d3d6cf611848ec8837f40db1c04611ad9167db6baf
+    clip_token_count: 76
+    clip_token_ids_sha256: 7c4c247a098add5267bb24d4b322fe2efda5b7b38c454ff73c5784e098be3cd0
+    t5_string_sha256: c9bb1cd52f027be0327dffa271c86b56d7868c865bd48585e26a5c93c517bead
+    t5_token_count: 140
+    t5_token_ids_sha256: a4a1957b130a7aae06fdebc0e34fa022bb384727e0f72238308cf7bc1b848819
+    t5_source_contract: byte_identical_to_registered_image_prompt
+    negative_clip_prompt: 'sad expression, unhappy face, gloomy mood, green upper clothing, green garment, seated posture, sitting, bent seated legs, biting or chewing, food touching mouth, static seated composition'
+    negative_t5_prompt_2: 'sad facial expression, unhappy expression, downcast face, gloomy mood, green color on upper-body clothing, green-colored garment fabric, seated body posture, sitting pose, bent seated legs, actively biting or chewing food, food touching the mouth, static seated body composition'
+    negative_clip_string_sha256: b5dbfea431d2721356ff5a2cb75ee0737e0a179f4a862d21e39a2dcbc2c9c3cf
+    negative_clip_token_count: 38
+    negative_clip_token_ids_sha256: ceefc9a4a5acf8609eb8c88496b295bb2870e1a4ecaeb0fbd1269efae80215fa
+    negative_t5_string_sha256: 1ce3be1f92e903b16ecd34149ef49cf5fc94fc2811abdbd65c7437a98c12a41f
+    negative_t5_token_count: 63
+    negative_t5_token_ids_sha256: c4202d95d6e16ed0e767cbeb17b8e0df2fa979d1c8ab483e7a4a5d3e1018d6f8
+    negative_t5_source_contract: byte_identical_to_registered_image_negative_prompt
+
+  - prompt_id: 02_angry_old_man
+    clip_prompt: 'Distant realistic photo with wide margins. Complete metal park bench and exactly one visibly angry old man fully inside frame. Entire man and bench visible including head torso both legs both feet and both bench ends. Green blazer, seated, biting visible sandwich at mouth. Empty cloudy park, no other people. Dark natural light, great detail, normal anatomy, no watermark.'
+    t5_prompt_2: 'An angry old man wearing a green blazer, sitting on a metal park bench in a cloudy park, eating a sandwich, realistic setting, natural dark and cloudy lighting, great detail, full body visible, bench clearly visible, sandwich clearly visible. Only this one old man is present and there are no other people anywhere in the scene. Use a portrait-oriented wide contextual composition with his complete head, torso, both legs, and both feet inside the frame, with visible space around the complete metal bench; do not crop any part of his body or the bench. His angry expression is unmistakable and the sandwich touches his mouth as he visibly takes a bite.'
+    clip_string_sha256: 61dd230d864c479f605342f984398a88a733f10796f64a22745addcfe1f3a5cc
+    clip_token_count: 76
+    clip_token_ids_sha256: fc1f729fd26b67dab7fde5e7d214219e786d157042d02a5ecdc73d1f7690dbc4
+    t5_string_sha256: 60533c5de9024ca58ef0e2e774fb612c2b85ac43ee3bb23b84017acf1fb54a88
+    t5_token_count: 149
+    t5_token_ids_sha256: d02e2672f6cd928093f2f9ef8d9aa975c079b5d52dc0b63d3ee1eef7336dd347
+    t5_source_contract: byte_identical_to_registered_image_prompt
+    negative_clip_prompt: 'angry expression, hostile scowl, furious mood, green upper clothing, green garment, seated posture, sitting, bent seated legs, biting or chewing, food touching mouth, static seated composition'
+    negative_t5_prompt_2: 'angry facial expression, hostile scowl, tense frown, furious mood, green color on upper-body clothing, green-colored garment fabric, seated body posture, sitting pose, bent seated legs, actively biting or chewing food, food touching the mouth, static seated body composition'
+    negative_clip_string_sha256: d7268b13037a24fbc2a480b3b8dd0689bbd291bf9a6150a5820d624654c09615
+    negative_clip_token_count: 39
+    negative_clip_token_ids_sha256: 5de44e6de8645b651c6e0cfc89a06de216e347ca26600e7977adb702f95db671
+    negative_t5_string_sha256: 09e87fe0e31e10e907b091cf6b640c6442040332a9d051c94f77266623f0a2b5
+    negative_t5_token_count: 66
+    negative_t5_token_ids_sha256: 8ce3d3bb42f3d9b411341af09479067e943efe54de416a15189605d01d5313d3
+    negative_t5_source_contract: byte_identical_to_registered_image_negative_prompt
+
+  - prompt_id: 03_empty_outdoor_mall
+    clip_prompt: 'Wide realistic empty outdoor mall. Repeated promotional signs all read exactly 50% SALE. No people, mannequins or human figures. Two parallel complete mechanical escalators: attached direction indicator on left says UP, attached direction indicator on right says DOWN. Stores display only leather handbags. Clear blue sky, polished veined marble floor, natural daylight, great detail, all elements visible.'
+    t5_prompt_2: 'Realistic wide-angle architectural photograph of a completely empty outdoor shopping mall beneath a clear blue daytime sky. No people, shoppers, staff, mannequins, human figures, or human images are present. A clearly visible pair of parallel, mechanically complete escalators forms the central circulation feature. At the visible newels, manufacturer-integrated illuminated direction panels are unambiguous and attached to their respective escalators: the left escalator shows an UP arrow and the right escalator shows a DOWN arrow. These small equipment-status panels are not retail promotional signboards. The retail storefronts and display stands contain only leather handbags as merchandise and no other products. Repeated promotional signboards are clearly visible throughout the mall; every promotional signboard legibly reads exactly "50% SALE". The entire horizontal walking floor is polished marble with visible natural veining. Natural daylight, coherent perspective, great detail; the sky, both escalators, both equipment direction indicators, handbag displays, repeated promotional signboards, and marble floor are all clearly visible in the same wide frame.'
+    clip_string_sha256: 0854102a6b4a09db227d77139843d4df7ce86f28d971d31b309768ff89e20154
+    clip_token_count: 77
+    clip_token_ids_sha256: 30be0f20684c2fae8c45d4398ba992e21c0821a5179e05b3a4d524a6b52d7a05
+    t5_string_sha256: 94f3b4568829573e5ccfb07ca497919a400d97d3055832366f84b93b144584f7
+    t5_token_count: 248
+    t5_token_ids_sha256: 9916ae89a074fcb26ade075b5c54dbacce2126f32da2b1197a968ae2fb1a37b0
+    t5_source_contract: freshly_preregistered_static_observability_repair
+    negative_clip_prompt: 'people, shoppers, staff, crowd, human figures, mannequins, blue sky, escalators, escalator machinery and handrails, marble walking floor, veined marble floor, 50% SALE signs, sale signage, leather handbags, purses'
+    negative_t5_prompt_2: 'people, person, shoppers, staff, crowd, human figure, mannequin, blue-colored sky, clear blue sky, mechanical escalators, escalator machinery, escalator steps, escalator handrails, polished marble on the horizontal walking floor, marble floor slabs, veined marble floor, signboard text reading "50% SALE", 50 percent discount signboard, sale signage, leather handbag merchandise, handbags, purses'
+    negative_clip_string_sha256: 7937795755760565c30d31e75b6d3a239a0ce8093bf2e46241aec4a8990ce224
+    negative_clip_token_count: 52
+    negative_clip_token_ids_sha256: e36671262e179f506b7b3fbed77af9c6516e720761c64efee5af010ac715e13e
+    negative_t5_string_sha256: 8a91b6bd0e490903fd32fe26b11d0273922be1b86db80e9eb818ce974a388ddc
+    negative_t5_token_count: 104
+    negative_t5_token_ids_sha256: 59799a45c72475b582019778bf152783bec174bf7cf506d7ca659e3421e790d2
+    negative_t5_source_contract: byte_identical_to_registered_image_negative_prompt
+
+static_prompt3_claim_boundary:
+  image_can_establish:
+    - two_parallel_mechanically_complete_escalators
+    - attached_equipment_direction_indicator_on_left_escalator_reads_up
+    - attached_equipment_direction_indicator_on_right_escalator_reads_down
+  image_cannot_establish:
+    - actual_operation
+    - actual_step_motion
+    - temporal_direction_of_motion
+  video_contract_unchanged:
+    actual_continuous_opposing_upward_and_downward_escalator_motion_required: true

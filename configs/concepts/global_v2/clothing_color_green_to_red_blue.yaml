@@ -1,0 +1,19 @@
+id: clothing_color_green_to_red_blue
+parent: appearance
+priority: 0.90
+source:
+  label: green upper-body clothing
+  prompt: A plain upper-body garment made entirely from clearly green fabric.
+target:
+  label: red and blue bicolor upper-body clothing
+  prompt: A plain upper-body garment with clearly separated red and blue fabric panels and no green fabric.
+calibration:
+  neutral:
+    - A colorless garment catalog silhouette under neutral light.
+    - An uncolored jacket shape photographed against gray.
+  source:
+    - A catalog photograph of a solid green jacket.
+    - A studio photograph of a green blazer with no other colors.
+  target:
+    - A catalog photograph of a red-and-blue bicolor jacket.
+    - A studio photograph of a blazer split into red and blue fabric panels.

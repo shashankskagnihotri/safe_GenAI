@@ -1,0 +1,21 @@
+# Dedicated, reproducible plotting environment only.
+# Verified together under CPython 3.12.9 on 2026-07-20.  Keep this file out of
+# generation/model environments; install it only where publication plots run.
+# Direct plotting/data stack.
+matplotlib==3.10.9
+numpy==2.0.1
+pandas==2.2.3
+seaborn==0.13.2
+
+# Exact runtime dependencies resolved in the verified plotting environment.
+contourpy==1.3.3
+cycler==0.12.1
+fonttools==4.62.1
+kiwisolver==1.5.0
+packaging==24.2
+pillow==11.1.0
+pyparsing==3.3.2
+python-dateutil==2.9.0.post0
+pytz==2025.2
+six==1.17.0
+tzdata==2025.2

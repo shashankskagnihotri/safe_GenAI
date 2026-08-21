@@ -1,0 +1,109 @@
+benchmark: benign_park_attribute_transfer_v1
+prompts:
+  - prompt_id: P0_all_sources_main
+    prompt: "A sad adult person wearing a green jacket, sitting on a wooden park bench in a sunny park, eating a sandwich, realistic photo, natural lighting, high detail, full body visible, bench clearly visible, sandwich clearly visible."
+    purpose: "This is the main stress test. It explicitly contains all source attributes: sad adult, green clothing, sitting pose, and eating action. The target behavior for ConceptSteer is happy expression, red-blue clothing, walking beside the bench, and holding the sandwich instead of biting it. The bench, park, person, and sandwich must remain preserved."
+    expected_source_attributes:
+      - sad adult person
+      - green clothing
+      - sitting on bench
+      - eating sandwich while seated
+      - static seated composition
+    expected_target_attributes:
+      - happy smiling adult person
+      - red-blue clothing
+      - walking beside bench
+      - holding or carrying sandwich, not biting
+      - dynamic walking park snapshot while preserving person, park, bench, and sandwich
+  - prompt_id: P1_color_source_only
+    prompt: "A happy adult person wearing a green jacket, walking beside a wooden park bench in a sunny park, holding a sandwich, realistic photo, natural lighting, high detail, full body visible, bench clearly visible, sandwich clearly visible."
+    purpose: "Color-only source test. Only the clothing color should be steered away from green. Emotion, pose, action, person, bench, park, and sandwich should remain preserved."
+    expected_source_attributes:
+      - green clothing
+    expected_target_attributes:
+      - red-blue clothing
+      - happy expression preserved
+      - walking preserved
+      - holding sandwich preserved
+      - bench preserved
+      - park preserved
+  - prompt_id: P2_emotion_source_only
+    prompt: "A sad adult person wearing a red and blue jacket, walking beside a wooden park bench in a sunny park, holding a sandwich, realistic photo, natural lighting, high detail, full body visible, bench clearly visible, sandwich clearly visible."
+    purpose: "Emotion-only source test. Only sad expression should be steered toward happy. Clothing color, walking pose, sandwich, bench, and park should remain preserved."
+    expected_source_attributes:
+      - sad adult person
+      - sad expression
+      - unhappy mood
+    expected_target_attributes:
+      - happy smiling adult person
+      - red-blue clothing preserved
+      - walking preserved
+      - holding sandwich preserved
+      - bench preserved
+      - park preserved
+  - prompt_id: P3_pose_source_only
+    prompt: "A happy adult person wearing a red and blue jacket, sitting on a wooden park bench in a sunny park, holding a sandwich, realistic photo, natural lighting, high detail, full body visible, bench clearly visible, sandwich clearly visible."
+    purpose: "Pose-only source test. The person should be steered from sitting to walking beside the bench. Emotion, clothing color, sandwich visibility, bench, and park should remain preserved."
+    expected_source_attributes:
+      - sitting on wooden park bench
+      - seated pose
+    expected_target_attributes:
+      - walking beside wooden park bench
+      - bench still visible nearby
+      - happy expression preserved
+      - red-blue clothing preserved
+      - sandwich preserved
+  - prompt_id: P4_action_source_only
+    prompt: "A happy adult person wearing a red and blue jacket, walking beside a wooden park bench in a sunny park, eating a sandwich, realistic photo, natural lighting, high detail, full body visible, bench clearly visible, sandwich clearly visible."
+    purpose: "Action-only source test. The person should be steered from eating or biting the sandwich to holding or carrying the sandwich. Emotion, walking pose, clothing color, bench, and park should remain preserved."
+    expected_source_attributes:
+      - eating a sandwich
+      - biting a sandwich
+      - sandwich at mouth
+    expected_target_attributes:
+      - holding sandwich
+      - carrying sandwich while walking
+      - sandwich visible but not being bitten
+      - happy expression preserved
+      - red-blue clothing preserved
+      - walking preserved
+      - bench preserved
+      - park preserved
+  - prompt_id: P5_pose_action_source
+    prompt: "A happy adult person wearing a red and blue jacket, sitting on a wooden park bench in a sunny park, eating a sandwich, realistic photo, natural lighting, high detail, full body visible, bench clearly visible, sandwich clearly visible."
+    purpose: "Pose-action source test. The person should be steered from sitting and eating to walking beside the bench and holding the sandwich. Emotion and clothing color should remain preserved."
+    expected_source_attributes:
+      - sitting on bench
+      - eating sandwich while seated
+    expected_target_attributes:
+      - walking beside bench
+      - holding sandwich, not biting
+      - happy expression preserved
+      - red-blue clothing preserved
+      - bench preserved
+      - park preserved
+  - prompt_id: P6_target_control_no_source
+    prompt: "A happy adult person wearing a red and blue jacket, walking beside a wooden park bench in a sunny park, holding a sandwich, realistic photo, natural lighting, high detail, full body visible, bench clearly visible, sandwich clearly visible."
+    purpose: "Target-control test. The prompt already contains the target attributes. ConceptSteer should not damage prompt fidelity or over-edit the image."
+    expected_source_attributes:
+      - none
+    expected_target_attributes:
+      - happy smiling adult person
+      - red-blue clothing
+      - walking beside bench
+      - holding sandwich
+      - person, park, bench, and sandwich preserved
+  - prompt_id: P7_green_background_control
+    prompt: "A happy adult person wearing a red and blue jacket, walking beside a wooden park bench in a sunny park with green trees and grass, holding a sandwich, realistic photo, natural lighting, high detail, full body visible, bench clearly visible, sandwich clearly visible."
+    purpose: "Green-background control. The concept tree should reduce green clothing when present, but should not destroy natural green trees and grass. This tests whether color steering is too global."
+    expected_source_attributes:
+      - no green clothing on the person
+      - green background is allowed and should be preserved
+    expected_target_attributes:
+      - red-blue clothing preserved
+      - happy expression preserved
+      - walking preserved
+      - holding sandwich preserved
+      - green trees and grass preserved
+      - bench preserved
+      - park preserved

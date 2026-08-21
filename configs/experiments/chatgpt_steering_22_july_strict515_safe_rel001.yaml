@@ -1,0 +1,266 @@
+campaign:
+  id: chatgpt_steering_22_july
+  seed: 0
+  sealed_prompt_source: configs/experiments/finer_detailing_correction_prompts.yaml
+  negative_prompt_source: configs/experiments/finer_detailing_correction_negative_prompts.yaml
+  ontology_registry: configs/concepts/global_v2/registry.yaml
+  compatibility_hierarchy: configs/concepts/global_v2/compatibility_hierarchy.yaml
+  state_root: debugging/chatgpt_steering_22_july
+  calibration_root: debugging/chatgpt_steering_22_july/calibration
+  output_root: outputs/chatgpt_steering_22_july
+  variants:
+  - baseline
+  - native_negative_prompt
+  - current_conceptsteer
+  - hierasafe_chs_v2
+  - midsteer
+  - sgf_switch_adaptation
+  - safe_denoiser_switch_adaptation
+  active_pairs_by_prompt:
+    01_sad_young_girl:
+    - facial_affect_negative_to_happy
+    - body_pose_sitting_to_walking
+    - clothing_color_green_to_red_blue
+    - sandwich_action_eating_to_holding
+    - composition_static_to_dynamic
+    02_angry_old_man:
+    - facial_affect_negative_to_happy
+    - body_pose_sitting_to_walking
+    - clothing_color_green_to_red_blue
+    - sandwich_action_eating_to_holding
+    - composition_static_to_dynamic
+    03_empty_outdoor_mall:
+    - sky_color_blue_to_pink
+    - vertical_circulation_escalators_to_marble_stairs
+    - horizontal_floor_marble_to_tile
+    - signage_sale_to_new_arrival
+    - merchandise_handbags_to_cars
+  historical_concepts:
+    01_sad_young_girl:
+      t2i: configs/concepts/chatgpt_steering_22_july/finer_detailing_01_sad_young_girl_t2i.yaml
+      t2v: configs/concepts/chatgpt_steering_22_july/finer_detailing_01_sad_young_girl_t2v.yaml
+    02_angry_old_man:
+      t2i: configs/concepts/historical_17_july/finer_detailing_02_angry_old_man.yaml
+      t2v: configs/concepts/video_22_july/finer_detailing_02_angry_old_man_t2v.yaml
+    03_empty_outdoor_mall:
+      t2i: configs/concepts/historical_17_july/finer_detailing_03_empty_outdoor_mall_t2i.yaml
+      t2v: configs/concepts/video_22_july/finer_detailing_03_empty_outdoor_mall_t2v.yaml
+  pilot_concepts:
+    01_sad_young_girl:
+      t2i: configs/concepts/historical_17_july/finer_detailing_01_sad_young_girl.yaml
+      t2v: configs/concepts/historical_17_july/finer_detailing_01_sad_young_girl.yaml
+    02_angry_old_man:
+      t2i: configs/concepts/historical_17_july/finer_detailing_02_angry_old_man.yaml
+      t2v: configs/concepts/historical_17_july/finer_detailing_02_angry_old_man.yaml
+    03_empty_outdoor_mall:
+      t2i: configs/concepts/historical_17_july/finer_detailing_03_empty_outdoor_mall_t2i.yaml
+      t2v: configs/concepts/historical_17_july/finer_detailing_03_empty_outdoor_mall_t2v.yaml
+models:
+- id: cosmos3_super_text2image
+  display_name: Cosmos3 Super Text2Image
+  modality: t2i
+  config: configs/models/t2i_cosmos3_super_text2image.yaml
+  native_negative_supported: false
+- id: flux1_dev
+  display_name: FLUX.1-dev
+  modality: t2i
+  config: configs/models/t2i_flux1_dev.yaml
+  native_negative_supported: true
+- id: flux2_dev
+  display_name: FLUX.2-dev
+  modality: t2i
+  config: configs/models/t2i_flux2_dev.yaml
+  native_negative_supported: false
+- id: ideogram4_nf4
+  display_name: Ideogram 4 NF4
+  modality: t2i
+  config: configs/models/t2i_ideogram4_nf4.yaml
+  native_negative_supported: false
+- id: qwen_image
+  display_name: Qwen Image
+  modality: t2i
+  config: configs/models/t2i_qwen_image.yaml
+  native_negative_supported: true
+- id: qwen_image_2512
+  display_name: Qwen Image 2512
+  modality: t2i
+  config: configs/models/t2i_qwen_image_2512.yaml
+  native_negative_supported: true
+- id: sd35_large
+  display_name: Stable Diffusion 3.5 Large
+  modality: t2i
+  config: configs/models/t2i_sd35_large.yaml
+  native_negative_supported: true
+- id: cogvideox_5b
+  display_name: CogVideoX-5B
+  modality: t2v
+  config: configs/models/t2v_cogvideox_5b.yaml
+  native_negative_supported: true
+- id: hunyuan_video
+  display_name: HunyuanVideo
+  modality: t2v
+  config: configs/models/t2v_hunyuan_video.yaml
+  native_negative_supported: true
+- id: joyai_echo
+  display_name: JoyAI Echo
+  modality: t2v
+  config: configs/models/t2v_joyai_echo.yaml
+  native_negative_supported: false
+- id: ltx_23
+  display_name: LTX-2.3 distilled
+  modality: t2v
+  config: configs/models/t2v_ltx_23.yaml
+  native_negative_supported: true
+- id: wan22_t2v_a14b
+  display_name: Wan 2.2 T2V A14B
+  modality: t2v
+  config: configs/models/t2v_wan22_t2v_a14b.yaml
+  native_negative_supported: true
+methods:
+  hierasafe_chs_v2:
+    implementation: hierasafe_flow.steering.chs_v2
+    strength: 1.0
+    window:
+    - 0.0
+    - 1.0
+    temporal_profile: rectangular
+    max_relative_norm: 1.0
+    concept_scope: prompt_local_historical_endpoints
+  midsteer:
+    implementation: hierasafe_flow.steering.related_work.midsteer_attn_output
+    strength: 1.0
+    window:
+    - 0.0
+    - 1.0
+    covariance: full
+    control_mode: attn_output_post_projection
+    step_policy: first_diffusion_step_reused_at_constant_beta_every_step
+    intermediate_clipping: false
+  sgf_switch_adaptation:
+    implementation: hierasafe_flow.steering.related_work.distribution_switch_v3.sgf_switch_x0
+    reference_artifact: switch_references_full_trajectory_515_strict_clothing.pt
+    reference_construction: full_source_conditioned_trajectory
+    reference_population: 515
+    strength: 0.03
+    unified_timestep_window:
+    - 1000.0
+    - 800.0
+    top_k: 3
+    epsilon: 0.05
+    force_policy: paper_negative_raw_kernel_sum_repulsive
+    adaptation: source_negative_guidance
+    gradient_convention: paper_negative_raw_kernel_sum_repulsive
+    bandwidth_neighbour_policy: paper_skip_first_then_next_k
+    temporal_policy: constant_rectangular_unified_diffusion_time
+    precision_policy: float32_through_native_schedule_conversion
+  safe_denoiser_switch_adaptation:
+    implementation: hierasafe_flow.steering.related_work.distribution_switch_v3.safe_denoiser_switch_x0
+    reference_artifact: switch_references_full_trajectory_515_strict_clothing.pt
+    reference_construction: full_source_conditioned_trajectory
+    reference_population: 515
+    sigma: 2.75
+    kernel_distance_policy: released_unsquared_l2
+    correction_policy: released_sd3_direct_unsafe_subtraction
+    scale: 0.0375007
+    unified_timestep_window:
+    - 1000.0
+    - 800.0
+    beta_threshold_margin: 0.0
+    official_reference_population: 515
+    threshold_quantile: 0.0
+    adaptation: source_negative_guidance
+    kernel_space: l2_normalized_model_feature_axis_unsquared_l2_rbf
+    direction_space: raw_canonical_predicted_x0
+    temporal_policy: constant_rectangular_unified_diffusion_time
+    threshold_policy: disabled_released_sd3_beta_threshold_false
+    precision_policy: float32_through_native_schedule_conversion
+calibration:
+  reference_seeds:
+  - 31001
+  - 31002
+  - 31003
+  midsteer_calibration_seed: 31001
+  representation: canonical_predicted_x0
+  midsteer_covariance: full
+  midsteer_scope: complete_attention_outputs_first_local_diffusion_step_reused
+upstreams:
+  midsteer:
+    repository: https://github.com/Atmyre/MidSteer
+    commit: 0f3b31e15cdda6ad0d46167e10319e896d6f1541
+    paper: https://arxiv.org/pdf/2605.05220
+  sgf:
+    repository: https://github.com/MingyuKim87/SGF
+    commit: 4bdd287475672c608eadfe32d466cf62b3a527fe
+    paper: https://arxiv.org/pdf/2603.13300
+  safe_denoiser:
+    repository: https://github.com/MingyuKim87/Safe_Denoiser
+    commit: 223415b2739de049969c8188e8c6c331ae3531b3
+    paper: https://arxiv.org/pdf/2502.08011
+slurm:
+  environments:
+    default: safe_genai_conceptsteer
+    by_model:
+      ltx_23: safe_genai_ltx23
+  defaults:
+    partition: gpu-vram-94gb
+    gres: gpu:1
+    cpus: 16
+    memory_gb: 192
+    time: 1-00:00:00
+  by_model:
+    cosmos3_super_text2image:
+      memory_gb: 192
+      time: 1-00:00:00
+    flux1_dev:
+      memory_gb: 192
+      time: 1-00:00:00
+    flux2_dev:
+      memory_gb: 192
+      time: 1-00:00:00
+    ideogram4_nf4:
+      memory_gb: 192
+      time: 1-00:00:00
+    qwen_image:
+      memory_gb: 192
+      time: 1-00:00:00
+    qwen_image_2512:
+      memory_gb: 192
+      time: 1-00:00:00
+    sd35_large:
+      memory_gb: 192
+      time: 1-00:00:00
+    cogvideox_5b:
+      memory_gb: 256
+      time: 2-00:00:00
+    hunyuan_video:
+      memory_gb: 256
+      time: 2-00:00:00
+    joyai_echo:
+      memory_gb: 256
+      time: 2-00:00:00
+    ltx_23:
+      memory_gb: 256
+      time: 2-00:00:00
+    wan22_t2v_a14b:
+      memory_gb: 256
+      time: 2-00:00:00
+  array_throttles: false
+  gemini_stage: false
+generation:
+  steps_by_modality:
+    t2i: 50
+    t2v: 50
+  image_height: 1216
+  image_width: 832
+  video_duration_seconds: 15
+  video_frames: 240
+  video_fps: 16
+native_negative_options:
+  flux1_dev:
+    true_cfg_scale: 4.0
+  hunyuan_video:
+    true_cfg_scale: 4.0
+  qwen_image:
+    true_cfg_scale: 4.0
+  qwen_image_2512:
+    true_cfg_scale: 4.0

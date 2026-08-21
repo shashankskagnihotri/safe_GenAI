@@ -54,3 +54,6 @@ hf_cache/
 wandb/
 runs/
 tensorboard/
+
+# Local research tests and generated test artifacts
+/tests/

@@ -1,0 +1,64 @@
+{
+  "schema_version": 1,
+  "scientific_identity": "cogvideox_5b_official_family_t2v_to_i2v_segmented_temporal_v2",
+  "authentication_source": {
+    "path": "debugging/audits/finer_detailing_20260719/checkpoint_authentication_cogvideox_hunyuan_i2v_20260719_131956_CEST.md",
+    "sha256": "adb6036e8f962c79c975375de8e3c81ce2ae0e2e801f77cd1b6cd2dc320a221d"
+  },
+  "checkpoints": [
+    {
+      "role": "primary",
+      "model_id": "zai-org/CogVideoX-5b",
+      "revision": "8fc5b281006c82b82d34fd2543d2f0ebb4e7e321",
+      "pipeline_class": "CogVideoXPipeline",
+      "files": [
+        {"path": "model_index.json", "size_bytes": 411, "sha256": "d4be34e2c745652d7adb1cb33915fae09910d3f76b5debfeb171905286c6e928"},
+        {"path": "scheduler/scheduler_config.json", "size_bytes": 482, "sha256": "247ecd6635dae7bf889a7ec69ba951c44d746cb4edef13b9c3b1b16bfeeedba5"},
+        {"path": "text_encoder/config.json", "size_bytes": 809, "sha256": "8279686dc669876076c2e1c8e7b4094874bed9eef8434b2edfb6e642f1ccc0ef"},
+        {"path": "text_encoder/model-00001-of-00002.safetensors", "size_bytes": 4994582224, "sha256": "9162b8ae9152e7a8e3bbebc535c8692783f50aec8cd3bb8ef6a751c432dd6392"},
+        {"path": "text_encoder/model-00002-of-00002.safetensors", "size_bytes": 4530066360, "sha256": "d3edef29693d52402b1cc7c362f031e052f2e9482ed0c765c6351950434349b0"},
+        {"path": "text_encoder/model.safetensors.index.json", "size_bytes": 19885, "sha256": "3bacec0f0cf392399d4a385908f67dd73df99c9e9cfee669f148858ba9fbdb0a"},
+        {"path": "tokenizer/added_tokens.json", "size_bytes": 2593, "sha256": "ea5a91a3234f66ea642c8e672d67f0f493759a9bee6910ae304ea9b9492118b5"},
+        {"path": "tokenizer/special_tokens_map.json", "size_bytes": 2543, "sha256": "7a1985a994c41886db38c719d2a3d2f40606663cc19d7c5d6a85d349320e06d2"},
+        {"path": "tokenizer/spiece.model", "size_bytes": 791656, "sha256": "d60acb128cf7b7f2536e8f38a5b18a05535c9e14c7a355904270e15b0945ea86"},
+        {"path": "tokenizer/tokenizer_config.json", "size_bytes": 20617, "sha256": "9c4f8a92630f7c6cc082831b291d6f46f18455d69d1a2a52c9b5f5303ab01469"},
+        {"path": "transformer/config.json", "size_bytes": 757, "sha256": "19180879f7424eb188a5ece3f222ed3d3fe2b47dacd830e788ef50fec44fa52f"},
+        {"path": "transformer/diffusion_pytorch_model-00001-of-00002.safetensors", "size_bytes": 9925342208, "sha256": "b7101be7e75631130cdf4a63ad798452bdce29716aaa47829e882dd384c398bf"},
+        {"path": "transformer/diffusion_pytorch_model-00002-of-00002.safetensors", "size_bytes": 1215340384, "sha256": "ebe6c0e34a52c89f8ea8032a3a8a278a9ff1880dc70e1e6f3b840bcfd0396647"},
+        {"path": "transformer/diffusion_pytorch_model.safetensors.index.json", "size_bytes": 103074, "sha256": "2a29295c2fc61908c0d7522311f42cd7aeab78319255e022b530c747ae6bd24a"},
+        {"path": "vae/config.json", "size_bytes": 872, "sha256": "fe8805ed9e30af09fecf04f870a2f11391cea21ddf1446fe22ba220fa4538238"},
+        {"path": "vae/diffusion_pytorch_model.safetensors", "size_bytes": 862388596, "sha256": "a410e48d988c8224cef392b68db0654485cfd41f345f4a3a81d3e6b765bb995e"}
+      ]
+    },
+    {
+      "role": "continuation",
+      "model_id": "zai-org/CogVideoX-5b-I2V",
+      "revision": "a6f0f4858a8395e7429d82493864ce92bf73af11",
+      "pipeline_class": "CogVideoXImageToVideoPipeline",
+      "files": [
+        {"path": ".gitattributes", "size_bytes": 1519, "sha256": "11ad7efa24975ee4b0c3c3a38ed18737f0658a5f75a0a96787b576a78a023361"},
+        {"path": "LICENSE", "size_bytes": 5704, "sha256": "f1702a540abe80caa3458a4eb539d8a138ffeab99d971d14a99083726814037e"},
+        {"path": "README.md", "size_bytes": 12139, "sha256": "42844f7f7bd984c72ae6721962b7e4c6e4aaa967e29c6695ecc048b7ff632887"},
+        {"path": "README_zh.md", "size_bytes": 11212, "sha256": "1206cee58d362344aca6f132d5f87f0c2808593eddfd60e449fb16d9bf25639e"},
+        {"path": "configuration.json", "size_bytes": 47, "sha256": "5d1cc0f912402522f05f12a681278da402004ad37006c72ecbb461c50065ec6c"},
+        {"path": "model_index.json", "size_bytes": 423, "sha256": "dc7e10203a3d10307e19d35026fd8d52b78fe52c0b0d770fe710e17441affd29"},
+        {"path": "scheduler/scheduler_config.json", "size_bytes": 482, "sha256": "247ecd6635dae7bf889a7ec69ba951c44d746cb4edef13b9c3b1b16bfeeedba5"},
+        {"path": "text_encoder/config.json", "size_bytes": 782, "sha256": "fd42789863fc8c15b592f0ff1aec684cf5d7aaabcdce50f43a447aeaac2491e3"},
+        {"path": "text_encoder/model-00001-of-00002.safetensors", "size_bytes": 4994582224, "sha256": "9162b8ae9152e7a8e3bbebc535c8692783f50aec8cd3bb8ef6a751c432dd6392"},
+        {"path": "text_encoder/model-00002-of-00002.safetensors", "size_bytes": 4530066360, "sha256": "d3edef29693d52402b1cc7c362f031e052f2e9482ed0c765c6351950434349b0"},
+        {"path": "text_encoder/model.safetensors.index.json", "size_bytes": 19885, "sha256": "3bacec0f0cf392399d4a385908f67dd73df99c9e9cfee669f148858ba9fbdb0a"},
+        {"path": "tokenizer/added_tokens.json", "size_bytes": 2593, "sha256": "ea5a91a3234f66ea642c8e672d67f0f493759a9bee6910ae304ea9b9492118b5"},
+        {"path": "tokenizer/special_tokens_map.json", "size_bytes": 2543, "sha256": "7a1985a994c41886db38c719d2a3d2f40606663cc19d7c5d6a85d349320e06d2"},
+        {"path": "tokenizer/spiece.model", "size_bytes": 791656, "sha256": "d60acb128cf7b7f2536e8f38a5b18a05535c9e14c7a355904270e15b0945ea86"},
+        {"path": "tokenizer/tokenizer_config.json", "size_bytes": 20617, "sha256": "9c4f8a92630f7c6cc082831b291d6f46f18455d69d1a2a52c9b5f5303ab01469"},
+        {"path": "transformer/config.json", "size_bytes": 802, "sha256": "c99b9c27aba51f362f6195652eedb2576fa6cc5b9fceaedc00028a4a1679f1d2"},
+        {"path": "transformer/diffusion_pytorch_model-00001-of-00003.safetensors", "size_bytes": 4992465072, "sha256": "f2e3060199c34a0d18892a19d687455f938b0ac3d2ea7d48f37cb4090e141965"},
+        {"path": "transformer/diffusion_pytorch_model-00002-of-00003.safetensors", "size_bytes": 4985800640, "sha256": "1e8d0c62d366b0d9cc3476d2b21ca54afbecea154d54d923da120b2ec174c7e7"},
+        {"path": "transformer/diffusion_pytorch_model-00003-of-00003.safetensors", "size_bytes": 1272025856, "sha256": "da91a0051da3f39caf10944b7c9aa66b14ddeffb37a25b087c49fc1692c1a361"},
+        {"path": "transformer/diffusion_pytorch_model.safetensors.index.json", "size_bytes": 103161, "sha256": "ebf7640e8e1f2cb6610b04bf7de1ffea8a890e2c75fc3ab351d11b17ccf05d34"},
+        {"path": "vae/config.json", "size_bytes": 872, "sha256": "fe8805ed9e30af09fecf04f870a2f11391cea21ddf1446fe22ba220fa4538238"},
+        {"path": "vae/diffusion_pytorch_model.safetensors", "size_bytes": 862388596, "sha256": "a410e48d988c8224cef392b68db0654485cfd41f345f4a3a81d3e6b765bb995e"}
+      ]
+    }
+  ]
+}

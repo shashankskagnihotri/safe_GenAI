@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "scientific_identity": "joyai_echo_reference_conditioned_multishot_segmented_temporal_v2",
+  "scientific_label": "JoyAI-Echo reference-conditioned multishot (not hard I2V continuation)",
+  "checkpoint": {
+    "role": "primary",
+    "model_id": "jdopensource/JoyAI-Echo",
+    "revision": "4187f9a53c6eff3a76c51e79bd27f70d10f7591b",
+    "filename": "JoyAI-Echo-release.safetensors",
+    "sha256": "0df52a16eb328bcc9d903bbfa32aecf7b98e354503d095c235f9183b049b9d7c"
+  },
+  "text_encoder": {
+    "model_id": "google/gemma-3-12b-it",
+    "revision": "96b6f1eccf38110c56df3a15bffe176da04bfd80"
+  },
+  "route_source": {
+    "root": "/ceph/sagnihot/projects/JoyAI-Echo",
+    "revision": "bdd3ec9ecad0bbbfc006cf5288709cb744c00b01",
+    "status_porcelain_v1_z_sha256": "abef36c4d7b59ae4100c8d5c628ff6350ae88bc54df57504d6084e473d116e2a",
+    "tracked_binary_diff_size_bytes": 4515,
+    "tracked_binary_diff_sha256": "fa783e1f63be60d87014e5a0f8f4ef8cf020d27aa4583ab1cf7378d4c3129ae0",
+    "permitted_overrides": [
+      {
+        "path": "ltx-core/src/ltx_core/text_encoders/gemma/encoders/encoder_configurator.py",
+        "size_bytes": 10499,
+        "sha256": "b65fe8d97097e5e87eeb5fb3c1587661c9e735b65b2c19f9e98a0ae210975985"
+      }
+    ],
+    "required_files": [
+      {"path": "inference.py", "size_bytes": 28250, "sha256": "aececd8f5dae94be8a8dfb48a622f7bf0ae99be72a7636877119acd9e7412f7b"},
+      {"path": "configs/inference.yaml", "size_bytes": 2687, "sha256": "8a99dd3ef224adfb3e94585d137d2b6dbc43fd69a0855d5007ad01e10124f11d"},
+      {"path": "ltx-distillation/src/ltx_distillation/inference/memory_multishot.py", "size_bytes": 18324, "sha256": "3b28cbce3aff3707c5000c9e0b46fc93b9a678c60717810e02e956d3181a51ba"},
+      {"path": "ltx-distillation/src/ltx_distillation/inference/memory_bidirectional_pipeline.py", "size_bytes": 15596, "sha256": "917b3376e4b9c669b503f85d0712387910bfb49df7226544310b5e5261bc633f"},
+      {"path": "ltx-distillation/src/ltx_distillation/inference/bidirectional_pipeline.py", "size_bytes": 7796, "sha256": "f5c7a3ed6e105506c79f4608bd517d6e451bbba56b5c9681465924616e984c9e"},
+      {"path": "ltx-distillation/src/ltx_distillation/models/ltx_wrapper.py", "size_bytes": 32727, "sha256": "18fa0450bc906660c4e0038ff4c88a933be2c9147ef587d3204180ab17f4b358"},
+      {"path": "ltx-distillation/src/ltx_distillation/models/vae_wrapper.py", "size_bytes": 10233, "sha256": "aadf55fd2a7db686d66aab727a3c92437e15c4d28403bd45ab1ed89830097133"},
+      {"path": "ltx-distillation/src/ltx_distillation/utils.py", "size_bytes": 8174, "sha256": "1e7acd78840a4f39cc64081ad5cce946b11d8cae2695248cdd2f88c40ccf6669"}
+    ],
+    "callables": [
+      {
+        "qualified_name": "BidirectionalAVInferencePipeline.generate",
+        "source_path": "ltx-distillation/src/ltx_distillation/inference/bidirectional_pipeline.py",
+        "signature": "self, video_shape: Tuple[int, ...], audio_shape: Tuple[int, ...], conditional_dict: Dict[str, Any], seed: Optional[int]=None",
+        "signature_sha256": "636d471d178e43d9b9ebf201ab4f02b56e7678e399d5a27e0bb37a46b22f3364"
+      },
+      {
+        "qualified_name": "BidirectionalMemoryAVInferencePipeline.generate",
+        "source_path": "ltx-distillation/src/ltx_distillation/inference/memory_bidirectional_pipeline.py",
+        "signature": "self, video_shape: Tuple[int, ...], audio_shape: Tuple[int, ...], conditional_dict: Dict[str, Any], memory_video: torch.Tensor, memory_audio: Optional[torch.Tensor]=None, memory_audio_timestep: Optional[torch.Tensor]=None, memory_audio_segment_lengths: tuple[tuple[int, ...], ...] | None=None, paired_audio_memory: bool=False, v2a_grad_scale: float=1.0, memory_position_mode: str='reference', seed: Optional[int]=None",
+        "signature_sha256": "49da8c57d9e235b4a8bd69f8c62ca605d342eef431c1157018ebd43b95fc921c"
+      },
+      {
+        "qualified_name": "PairedAudioVideoMemoryBank.save_memory_slot",
+        "source_path": "ltx-distillation/src/ltx_distillation/inference/memory_multishot.py",
+        "signature": "self, frames: list[Image.Image], audio_latent: torch.Tensor, *, audio_window_size: int, video_clip_num_frames: int, audio_waveform: Optional[torch.Tensor]=None, audio_sample_rate: int=16000, video_fps: float=24.0, audio_window_selection_mode: str='center', video_frame_selection_mode: str='center', audio_memory_mel_bins: int=128, audio_memory_mel_hop_length: int=160, audio_memory_n_fft: int=1024, audio_memory_downsample_factor: int=4, audio_memory_is_causal: bool=True",
+        "signature_sha256": "479b00ecf914c8825b02aa9ee90f919ae8b9a934a33a84a748b43858b594fd6b"
+      },
+      {
+        "qualified_name": "encode_memory_frames_batch",
+        "source_path": "ltx-distillation/src/ltx_distillation/utils.py",
+        "signature": "*, video_vae, batch_memory_frames, target_h: int, target_w: int, device: torch.device, dtype: torch.dtype",
+        "signature_sha256": "a84ed533637347f0a8b0e7a186ca2e58051f1154cd7306b4058ccb87d77f02a6"
+      }
+    ]
+  }
+}

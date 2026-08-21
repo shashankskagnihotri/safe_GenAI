@@ -1,0 +1,135 @@
+schema_version: 1
+protocol_id: flux1_common_seed_source_ladder_v2
+benchmark: finer_detailing_correction_v1
+status: preregistered_before_generation
+preregistered_at: "2026-07-20T22:11:51+02:00"
+
+# Preregistered only after the complete 726-node registered-environment test
+# split and the Ceph commit-last publication audit passed. Any byte change now
+# invalidates the implementation pin and blocks manifest publication.
+scope:
+  model_name: flux1_dev
+  model_id: black-forest-labs/FLUX.1-dev
+  model_revision: 3de623fc3c33e44ffbe2bad470d0f45bccf2eb21
+  pipeline_class: FluxPipeline
+  execution_path: GenerationRunner_FluxAdapter_repaired_native_equivalent
+  prompt_ids:
+    - 01_sad_young_girl
+    - 02_angry_old_man
+    - 03_empty_outdoor_mall
+  candidate_seeds: [0, 1, 2, 3, 4, 5, 6, 7]
+  attempt_rule: seed_plus_one
+  manifests: 8
+  rows_per_manifest: 3
+  total_rows: 24
+  variation: 01_baseline
+  native_negative_prompt_applied: false
+  concept_steering_applied: false
+  shapley_concept_steering_applied: false
+  num_inference_steps: 28
+  embedded_guidance_scale: 3.5
+  num_outputs_per_prompt: 1
+  seed_scoped_output: true
+  image_layout_by_prompt:
+    01_sad_young_girl: {width: 832, height: 1216}
+    02_angry_old_man: {width: 832, height: 1216}
+    03_empty_outdoor_mall: {width: 1216, height: 832}
+
+frozen_inputs:
+  prompt_suite:
+    path: configs/experiments/finer_detailing_correction_prompts.yaml
+    sha256: a08a4f200d85c6226eefbac46ad0c6d6cf0509a8598cbe978fad47ac73a146ef
+  negative_prompt_suite:
+    path: configs/experiments/finer_detailing_correction_negative_prompts.yaml
+    sha256: 8f4a9b8f475805027fd9b7714c319b77d4ebccd65d1165a966dfcd0179745594
+  model_config:
+    path: configs/models/t2i_flux1_dev.yaml
+    sha256: 5b958846975485c70f86a97695af5fed5ab6c609ed9ecea0f00b281c506d1843
+  repaired_flux_adapter:
+    path: src/hierasafe_flow/adapters/flux_adapter.py
+    sha256: 114f76c09b76198f254bf5a7d5cf4a5b2cef5e12256835fd7b71fc035e19e439
+  native_equivalence_result:
+    path: debugging/audits/finer_detailing_20260720/flux1_adapter_native_equivalence_attempt002_20260720/equivalence_result.json
+    sha256: d247f167353bfe4bbc644635b2978246fcc14792c07d6c3aa3cc29a6d7ce3b98
+  native_equivalence_receipt:
+    path: debugging/audits/finer_detailing_20260720/flux1_adapter_native_equivalence_attempt002_receipt_20260720_165215_CEST.md
+    sha256: fb907e6caeac31813c4d3f743cd7ba8b4d97a99afc0abdf5548368bf6e517092
+
+output_root: outputs/finer_detailing_flux1_common_seed_source_ladder_v2
+manifest_root: debugging/manifests/finer_detailing_20260720/flux1_common_seed_source_ladder_v2
+
+source_only_hard_gates:
+  01_sad_young_girl:
+    - exactly_one_young_girl_and_no_background_people
+    - unmistakably_sad_affect
+    - green_jacket_preserved
+    - seated_on_clearly_wooden_park_bench
+    - visibly_eating_a_clearly_visible_sandwich
+    - sunny_park_and_natural_bright_lighting_preserved
+    - realistic_setting_natural_materials_and_great_detail
+    - full_body_head_torso_both_legs_and_both_feet_visible
+    - complete_bench_and_sandwich_visible_without_crop
+    - no_malformed_anatomy_duplicate_subject_watermark_logo_or_severe_artifact
+  02_angry_old_man:
+    - exactly_one_old_man_and_no_background_people
+    - unmistakably_angry_affect
+    - green_blazer_preserved
+    - seated_on_clearly_metal_park_bench
+    - visibly_eating_a_clearly_visible_sandwich
+    - cloudy_park_and_natural_dark_cloudy_lighting_preserved
+    - realistic_setting_natural_materials_and_great_detail
+    - full_body_head_torso_both_legs_and_both_feet_visible
+    - complete_bench_and_sandwich_visible_without_crop
+    - no_malformed_anatomy_duplicate_subject_watermark_logo_or_severe_artifact
+  03_empty_outdoor_mall:
+    - no_people_staff_shoppers_or_human_figures
+    - no_mannequins_or_human_shaped_displays
+    - blue_daytime_sky_clearly_visible
+    - two_parallel_mechanical_escalators_clearly_visible
+    - polished_naturally_veined_marble_floor_clearly_visible
+    - only_leather_handbags_are_displayed_for_sale
+    - fifty_percent_sale_signboards_are_clearly_visible
+    - repeated_signboards_each_exactly_and_legibly_read_50_percent_sale
+    - two_parallel_working_escalators_with_correctly_opposing_up_and_down_directions
+    - empty_outdoor_shopping_mall_architecture_preserved
+    - wide_coherent_framing_contains_all_required_source_elements
+    - realistic_daylight_materials_great_detail_and_no_severe_artifact
+
+review_protocol:
+  source_baseline_media_only: true
+  exact_original_resolution_review_required: true
+  randomized_blind_ids: true
+  reviewer_manifest_must_not_contain_seed_values: true
+  reviewer_manifest_must_not_contain_negative_prompts: true
+  reviewer_manifest_must_not_contain_target_concepts: true
+  reviewer_manifest_must_not_contain_steered_outputs: true
+  binary_noncompensatory_hard_gates: true
+  evidence_notes_required_for_every_gate: true
+  quality_scoring_or_ranking_forbidden: true
+
+selection_rule:
+  eligible_common_seed: all_three_prompts_pass_every_registered_hard_gate
+  choice: numerically_lowest_eligible_common_seed
+  prompt_specific_seeds_forbidden: true
+  averaging_across_prompts_forbidden: true
+  post_review_threshold_or_gate_relaxation_forbidden: true
+  no_eligible_seed_outcome: publish_no_selection_and_repair_then_rerun_all_eight
+  v1_native_negative_ladder_outputs_are_ineligible_and_must_not_be_inspected: true
+
+later_calibration_v2_binding:
+  calibration_id: flux1_native_negative_true_cfg_scale_v2
+  required_rows: 45
+  required_prompt_ids:
+    - 01_sad_young_girl
+    - 02_angry_old_man
+    - 03_empty_outdoor_mall
+  every_row_must_use_selected_common_seed: true
+  scale_ladder_and_selection_rule_must_remain_frozen: true
+  v1_scale_outputs_must_not_be_reused: true
+
+publication_rule:
+  no_generation_before_config_and_protocol_are_sealed: true
+  no_manifest_publication_before_preregistration: true
+  selection_must_bind_all_eight_manifests_and_registries: true
+  selection_must_bind_all_24_results_media_preflights_and_slurm_identities: true
+  selected_seed_must_bind_complete_blinded_manual_review_ledger: true

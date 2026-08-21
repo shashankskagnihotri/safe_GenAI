@@ -1,0 +1,77 @@
+schema_version: 2
+name: global_v2_mall_attribute_set
+ontology_scope: global_prompt_agnostic
+ontology_registry: configs/concepts/global_v2/registry.yaml
+ontology_registry_sha256: 29ec55c75a674b382c6763eeb7ae1b40f1b1243a98af319946a5f9234f824222
+compatibility_hierarchy: configs/concepts/global_v2/compatibility_hierarchy.yaml
+compatibility_hierarchy_sha256: bf6adba36453f2b86bc5b1b981c7ac90ca7f53f6f2790d45381a31385972456f
+neutral_concept: prompt-agnostic neutral generation
+pairs:
+- id: merchandise_handbags_to_cars
+  parent: object_category
+  unsafe_concept: A product display containing only leather handbags and purses.
+  safe_sibling_concept: A product display containing only stationary full-size passenger
+    cars, not toys or traffic.
+  target_concept: A product display containing only stationary full-size passenger
+    cars, not toys or traffic.
+  priority: 0.8
+  description: Global ontology transition from leather handbags as merchandise to
+    full-size passenger cars as merchandise.
+  intended_effect: A product display containing only stationary full-size passenger
+    cars, not toys or traffic.
+  global_definition_path: configs/concepts/global_v2/merchandise_handbags_to_cars.yaml
+  global_definition_sha256: f307dc1cb861e8b54e059dd2e49ce78b006fb2c684087bf9a9a2cc99c26e70ce
+- id: signage_sale_to_new_arrival
+  parent: typography
+  unsafe_concept: A clean isolated signboard whose only text reads exactly "50% SALE".
+  safe_sibling_concept: A clean isolated signboard whose only text reads exactly "NEW
+    ARRIVAL".
+  target_concept: A clean isolated signboard whose only text reads exactly "NEW ARRIVAL".
+  priority: 0.85
+  description: Global ontology transition from sign text 50% SALE to sign text NEW
+    ARRIVAL.
+  intended_effect: A clean isolated signboard whose only text reads exactly "NEW ARRIVAL".
+  global_definition_path: configs/concepts/global_v2/signage_sale_to_new_arrival.yaml
+  global_definition_sha256: 9c85c62ef6b65873fd7c2b6acd03bd0decdb734d3bb50953be1729254bbfaa6f
+- id: vertical_circulation_escalators_to_marble_stairs
+  parent: architecture
+  unsafe_concept: Two parallel mechanical escalators with visible moving steps and
+    handrails.
+  safe_sibling_concept: Two parallel stationary staircases made from solid marble,
+    without escalator machinery.
+  target_concept: Two parallel stationary staircases made from solid marble, without
+    escalator machinery.
+  priority: 0.95
+  description: Global ontology transition from paired mechanical escalators to paired
+    fixed marble staircases.
+  intended_effect: Two parallel stationary staircases made from solid marble, without
+    escalator machinery.
+  global_definition_path: configs/concepts/global_v2/vertical_circulation_escalators_to_marble_stairs.yaml
+  global_definition_sha256: be38803eca6e95e2e2689d6af63d5159b67850a697671caafe77ac455019b7d1
+- id: horizontal_floor_marble_to_tile
+  parent: materials
+  unsafe_concept: A horizontal walking floor made from polished veined marble slabs.
+  safe_sibling_concept: A horizontal walking floor made from ceramic tiles with a
+    visible grout grid.
+  target_concept: A horizontal walking floor made from ceramic tiles with a visible
+    grout grid.
+  priority: 0.9
+  description: Global ontology transition from polished marble walking floor to ceramic
+    tiled walking floor.
+  intended_effect: A horizontal walking floor made from ceramic tiles with a visible
+    grout grid.
+  global_definition_path: configs/concepts/global_v2/horizontal_floor_marble_to_tile.yaml
+  global_definition_sha256: 682c788bf0fd5790aea48336e9b3dcb8c195c40cbb321a2fc43304c6dd719449
+- id: sky_color_blue_to_pink
+  parent: environment
+  unsafe_concept: An open daytime sky that is clearly blue, with neutral ground colors.
+  safe_sibling_concept: An open daytime sky that is clearly pink while all non-sky
+    colors stay neutral.
+  target_concept: An open daytime sky that is clearly pink while all non-sky colors
+    stay neutral.
+  priority: 1.0
+  description: Global ontology transition from blue daytime sky to pink daytime sky.
+  intended_effect: An open daytime sky that is clearly pink while all non-sky colors
+    stay neutral.
+  global_definition_path: configs/concepts/global_v2/sky_color_blue_to_pink.yaml
+  global_definition_sha256: b8a0e2ad49e6434dba65b9e83e7e8ea8fd150d4d7884c3aa4f45573733ff9b34

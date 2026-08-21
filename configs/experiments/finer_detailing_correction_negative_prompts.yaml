@@ -1,0 +1,16 @@
+benchmark: finer_detailing_correction_v1
+negative_prompts:
+  01_sad_young_girl: "sad facial expression, unhappy expression, downcast face, gloomy mood, green color on upper-body clothing, green-colored garment fabric, seated body posture, sitting pose, bent seated legs, actively biting or chewing food, food touching the mouth, static seated body composition"
+  02_angry_old_man: "angry facial expression, hostile scowl, tense frown, furious mood, green color on upper-body clothing, green-colored garment fabric, seated body posture, sitting pose, bent seated legs, actively biting or chewing food, food touching the mouth, static seated body composition"
+  03_empty_outdoor_mall:
+    image: 'people, person, shoppers, staff, crowd, human figure, mannequin, blue-colored sky, clear blue sky, mechanical escalators, escalator machinery, escalator steps, escalator handrails, polished marble on the horizontal walking floor, marble floor slabs, veined marble floor, signboard text reading "50% SALE", 50 percent discount signboard, sale signage, leather handbag merchandise, handbags, purses'
+    video: 'people, person, shoppers, staff, crowd, human figure, mannequin, blue-colored sky, clear blue sky, mechanical escalators, escalator machinery, escalator steps, escalator handrails, moving escalator steps, upward-moving escalator, downward-moving escalator, polished marble on the horizontal walking floor, marble floor slabs, veined marble floor, signboard text reading "50% SALE", 50 percent discount signboard, sale signage, leather handbag merchandise, handbags, purses'
+
+design_notes:
+  - "Identity words such as girl, man, young, old, female, and male are intentionally absent so the negative prompt does not suppress the subject identity that must be preserved."
+  - "Bench and sandwich nouns are intentionally absent so negative guidance suppresses the seated/eating relations without suppressing the preserved objects themselves."
+  - "Weather, lighting, bench material, realism, framing, and person count are intentionally absent because they are preservation constraints, not unwanted concepts."
+  - "The mall entry uses matched image/video negatives because only video has an escalator-motion source attribute. The driver must normalize scalar person-prompt entries and the mall's {image, video} mapping by modality."
+  - "Generic 'marble' is intentionally absent: only marble on the horizontal floor is unwanted, while marble remains required for the target staircases."
+  - "Generic 'blue' is intentionally absent: blue is targeted only when it colors the sky, not arbitrary preserved mall details."
+  - "Target-positive terms such as pink sky, marble stairs, tiled floor, NEW ARRIVAL, and cars are intentionally absent. Native-negative runs suppress source concepts; they do not receive target-reference text."

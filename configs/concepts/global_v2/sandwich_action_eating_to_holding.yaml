@@ -1,0 +1,19 @@
+id: sandwich_action_eating_to_holding
+parent: object_relations
+priority: 0.85
+source:
+  label: eating a sandwich
+  prompt: A person actively biting a sandwich with the food touching the mouth.
+target:
+  label: holding a sandwich away from the mouth
+  prompt: A person carrying a sandwich in one hand away from the mouth without eating.
+calibration:
+  neutral:
+    - A sandwich placed alone on a plain plate.
+    - A person and a wrapped sandwich shown without an action relationship.
+  source:
+    - A diner visibly taking a bite from a sandwich.
+    - A person chewing while a sandwich touches the mouth.
+  target:
+    - A person holding a sandwich at waist height without biting it.
+    - A diner carrying an uneaten sandwich away from the face.
