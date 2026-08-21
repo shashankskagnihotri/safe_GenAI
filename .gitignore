@@ -48,7 +48,7 @@ Thumbs.db
 
 # Large model/runtime caches that should not live in git
 checkpoints/
-models/
+/models/
 model_cache/
 hf_cache/
 wandb/

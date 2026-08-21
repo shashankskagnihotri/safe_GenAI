@@ -1,0 +1,252 @@
+schema_version: push-for-iclr.upstreams-lock.v1
+campaign_id: push_for_iclr_global_safety_v1
+frozen_date: "2026-08-21"
+
+policy:
+  immutable_git_revision_required: true
+  detached_checkout_required: true
+  vendor_upstream_source: false
+  wrappers_must_record_upstream_revision: true
+  paper_baseline_and_local_adaptation_must_have_distinct_method_ids: true
+  unsupported_architectures_must_fail_closed: true
+  missing_assets_must_be_reported_as_blocked_upstream_asset: true
+  no_fallback_substitution: true
+
+baselines_without_external_repository:
+  RW00_NATIVE_NEGATIVE:
+    scientific_label: Native negative prompt
+    implementation_source: pinned_diffusers_pipeline_interface
+    diffusers_revision: 2f7e0154a9db246e95c9ede43edba7db5b130805
+
+upstreams:
+  RW01_SAFE_LATENT_DIFFUSION:
+    scientific_label: Safe Latent Diffusion
+    paper: https://arxiv.org/abs/2211.05105
+    repository: https://github.com/ml-research/safe-latent-diffusion.git
+    revision: a42923c3de0e4346bee3f61891a510bdcc2aedd2
+    tree: d41a35e7acdc35266c8b220a077cccf4e6912d25
+    commit_date: "2023-04-21T11:49:45+02:00"
+    license: MIT
+    license_file: LICENSE
+    checkout_path_hint: debugging/t2i_safety_27_july/upstream/repos/safe-latent-diffusion
+    authoritative_entrypoints:
+      - src/sld/sld_pipeline.py
+    required_assets: []
+
+  RW02_SAFREE:
+    scientific_label: SAFREE
+    paper: https://arxiv.org/abs/2410.12761
+    repository: https://github.com/jaehong31/SAFREE.git
+    revision: b8b2c3fa9d7f51c46f5a570170503fc98bd9c7ec
+    tree: 3206d10459d89acae684bca11d5ce37953e071ba
+    commit_date: "2025-01-23T02:51:34+09:00"
+    license: NO_ROOT_LICENSE_FILE
+    license_note: zeroscopeT2V/LICENSE does not license the repository root
+    checkout_path_hint: /ceph/sagnihot/projects/safety_genAI_upstreams/PUSH_FOR_ICLR/SAFREE
+    authoritative_entrypoints:
+      - generate_safree.py
+      - models/modified_stable_diffusion_pipeline.py
+      - models/modified_stable_diffusion_xl_pipeline.py
+      - sdv3/sdv3_pipeline.py
+    required_assets:
+      - NudeNet detector checkpoint for official self-validation
+
+  RW03_STG:
+    scientific_label: Training-Free Safe Text Embedding Guidance
+    paper: https://arxiv.org/abs/2510.24012
+    repository: https://github.com/aailab-kaist/STG.git
+    revision: 8b0a8fd2a75f66e19fd80b2d221f7a62ffee0d8d
+    tree: 9294af48cb6b412dc3e320738a7567fce2c05c58
+    commit_date: "2025-12-25T00:57:02+09:00"
+    license: Apache-2.0
+    license_file: LICENSE
+    checkout_path_hint: /ceph/sagnihot/projects/safety_genAI_upstreams/PUSH_FOR_ICLR/STG
+    authoritative_entrypoints:
+      - generate_duo_stg.py
+      - pipelines/pipeline_stable_diffusion_stg.py
+    required_assets:
+      - NudeNet YOLO checkpoint used as the differentiable-step acceptance evaluator
+
+  RW04_NAG:
+    scientific_label: Normalized Attention Guidance
+    paper: https://arxiv.org/abs/2505.21179
+    repository: https://github.com/ChenDarYen/Normalized-Attention-Guidance.git
+    revision: 8bb34a16e517692743fab99bc60838c20f975ded
+    tree: 7fb36dd84eba29ab165e2096f40d905c289967ce
+    commit_date: "2025-07-01T16:12:10+01:00"
+    license: MIT
+    license_file: LICENSE
+    checkout_path_hint: /ceph/sagnihot/projects/safety_genAI_upstreams/PUSH_FOR_ICLR/NAG
+    authoritative_entrypoints:
+      - nag/attention_flux_nag.py
+      - nag/attention_joint_nag.py
+      - nag/attention_nag.py
+      - nag/pipeline_flux_nag.py
+      - nag/pipeline_sd3_nag.py
+      - nag/pipeline_sdxl_nag.py
+    required_assets: []
+
+  RW05_SEMANTIC_SURGERY:
+    scientific_label: Semantic Surgery
+    paper: https://arxiv.org/abs/2510.22851
+    repository: https://github.com/Lexiang-Xiong/Semantic-Surgery.git
+    revision: 816dc9e973e21ca610fb3db6549a6d261e79dc90
+    tree: 8ed6bcece2dbc5bbdb2021d2ee33265e6cc6c324
+    commit_date: "2026-08-02T04:16:31+08:00"
+    license: MIT
+    license_file: LICENSE
+    checkout_path_hint: /ceph/sagnihot/projects/safety_genAI_upstreams/PUSH_FOR_ICLR/SEMANTIC_SURGERY
+    authoritative_entrypoints:
+      - src/utils.py
+      - src/SS_inference.py
+      - config/i2p.json
+      - config/i2p_no_visual.json
+    required_assets:
+      - NudeNet detector for the official I2P visual-feedback configuration
+
+  RW06_SGF_SOURCE_ONLY:
+    scientific_label: Safety-Guided Flow source-only baseline
+    paper: https://openreview.net/forum?id=EA80Zib9UI
+    repository: https://github.com/MingyuKim87/SGF.git
+    revision: 4bdd287475672c608eadfe32d466cf62b3a527fe
+    tree: 983d526b97324cbe1697d59ad77021800ba3b21e
+    commit_date: "2026-02-26T02:55:09+09:00"
+    license: NO_ROOT_LICENSE_FILE
+    license_note: memorized_sdv21/LICENSE does not license the repository root
+    checkout_path_hint: debugging/t2i_safety_27_july/upstream/repos/SGF
+    authoritative_entrypoints:
+      - nudity_sdv1/generate_unsafe_sgf.py
+      - nudity_sdv1/repellency/repellency_methods_sgf.py
+      - diversity_sdv3/models/sdv3/safer_pipeline.py
+    required_assets:
+      - official released unsafe reference population
+
+  RW07_SAFE_DENOISER_SOURCE_ONLY:
+    scientific_label: Training-Free Safe Denoisers source-only baseline
+    paper: https://arxiv.org/abs/2502.08011
+    repository: https://github.com/MingyuKim87/Safe_Denoiser.git
+    revision: 223415b2739de049969c8188e8c6c331ae3531b3
+    tree: 9c7feda3faf42f137a4c6b74f09be5ed908d338b
+    commit_date: "2026-02-24T02:19:10+09:00"
+    license: NO_LICENSE_FILE
+    checkout_path_hint: debugging/t2i_safety_27_july/upstream/repos/Safe_Denoiser
+    authoritative_entrypoints:
+      - run_nudity.py
+      - run_nudity_sdv3.py
+      - models/sdv3/safe_denoiser_pipeline.py
+    required_assets:
+      - official 1000-point negative reference population
+      - official released checkpoint and cache
+
+  RW08_MIDSTEER:
+    scientific_label: MidSteer
+    paper: https://arxiv.org/abs/2605.05220
+    repository: https://github.com/Atmyre/MidSteer.git
+    revision: 0f3b31e15cdda6ad0d46167e10319e896d6f1541
+    tree: 74e9b9f97c76f5991900966bd36763a68519f836
+    commit_date: "2026-05-18T19:36:35+01:00"
+    license: MIT
+    license_file: LICENSE
+    checkout_path_hint: debugging/t2i_safety_27_july/upstream/repos/MidSteer
+    authoritative_entrypoints:
+      - core/diffusion_steering.py
+      - scripts/diffusion/estimate_steering_vectors.py
+      - scripts/diffusion/run_i2p_eval.py
+      - scripts/diffusion/run_with_steering.py
+    required_assets:
+      - exact ReLAION calibration corpus used by the paper
+
+  RW09_GLOCE:
+    scientific_label: GLoCE
+    paper: https://arxiv.org/abs/2503.12356
+    repository: https://github.com/Hyun1A/GLoCE.git
+    revision: c7615cc899f9ebae0635c226de40798c421fc864
+    tree: cb2f77264153eb6bd70837d5d6eb41db2dd619fd
+    commit_date: "2026-07-10T06:50:04-06:00"
+    license: NO_LICENSE_FILE
+    checkout_path_hint: /ceph/sagnihot/projects/safety_genAI_upstreams/PUSH_FOR_ICLR/GLOCE
+    authoritative_entrypoints:
+      - src/models/gloce.py
+      - src/models/gloce_sd3.py
+      - update/update_gloce.py
+      - update/update_gloce_sd3.py
+      - generate/generate_by_gloce.py
+      - generate/generate_by_gloce_sd3.py
+    required_assets:
+      - model-specific calibration checkpoints produced by the official update procedure
+
+  RW10_ADAVD:
+    scientific_label: Adaptive Value Decomposer
+    paper: https://arxiv.org/abs/2412.06143
+    repository: https://github.com/WYuan1001/AdaVD.git
+    revision: 1f3148e33c750ea80030bb138aadca5ab8486360
+    tree: e006a24ef0219e92a3bbf2a3664e867f0c1e3c5b
+    commit_date: "2025-03-11T11:47:41+08:00"
+    license: Apache-2.0
+    license_file: LICENSE
+    checkout_path_hint: /ceph/sagnihot/projects/safety_genAI_upstreams/PUSH_FOR_ICLR/ADAVD
+    authoritative_entrypoints:
+      - src/main.py
+      - src/main_multi.py
+    required_assets: []
+
+  RW11_GROCE:
+    scientific_label: Graph-Guided Online Concept Erasure
+    paper: https://arxiv.org/abs/2511.12968
+    repository: https://github.com/MagicCat-AI/GrOCE.git
+    revision: 970ea07eb7ed07e9f3fc89a72edffa5a95aa42c8
+    tree: 71500bf90d83749558b69a8a3277924f1732304b
+    commit_date: "2026-06-11T18:53:11+08:00"
+    license: NO_LICENSE_FILE
+    checkout_path_hint: /ceph/sagnihot/projects/safety_genAI_upstreams/PUSH_FOR_ICLR/GROCE
+    authoritative_entrypoints:
+      - knowledge.py
+      - sample_erase.py
+    required_assets:
+      - tokenizer-specific semantic concept network generated by knowledge.py
+
+  RW12_NLCE:
+    scientific_label: Neighbor-Aware Localized Concept Erasure
+    paper: https://arxiv.org/abs/2603.25994
+    repository: https://github.com/alirezafarashah/NLCE.git
+    revision: 41b22be603abebadad5b0e8ad3fb7e29ef37ff8c
+    tree: 0bb86c6c9c7b467f35f2bba4ac71cd222375f531
+    commit_date: "2026-03-31T01:56:39-04:00"
+    license: NO_ROOT_LICENSE_FILE
+    license_note: licenses are present only inside bundled baseline subtrees
+    checkout_path_hint: /ceph/sagnihot/projects/safety_genAI_upstreams/PUSH_FOR_ICLR/NLCE
+    authoritative_entrypoints:
+      - I2P_generation.py
+      - object_erasure.py
+      - celebrity_erasure.py
+      - artist_erasure.py
+    required_assets:
+      - optional 19 GB dual_embedding_index_with_scores.pt for automatic neighborhoods
+    asset_scope_note: official I2P_generation.py instead uses five embedded manual preservation neighbors
+
+  RW13_DES:
+    scientific_label: Distorting Embedding Space
+    paper: https://arxiv.org/abs/2501.18877
+    repository: https://github.com/amoeba04/des.git
+    revision: 1d77e0a2a72023470f201d3149e80429f7b60e15
+    tree: 9f5820741f593a62af1b61e448a8901080ec3e72
+    commit_date: "2025-12-16T10:12:57+09:00"
+    license: CC-BY-NC-4.0
+    license_file: LICENSE
+    checkout_path_hint: /ceph/sagnihot/projects/safety_genAI_upstreams/PUSH_FOR_ICLR/DES
+    authoritative_entrypoints:
+      - save_codebook.py
+      - train_des.py
+      - generate.py
+    required_assets:
+      - safe-prompt embedding codebook
+      - learned text-encoder checkpoint per encoder and concept set
+      - published Dropbox checkpoints where model and concept coverage match
+
+local_adaptations_not_paper_baselines:
+  ADAPT_SGF_SOURCE_TARGET_SWITCH:
+    source_module: src/hierasafe_flow/steering/related_work/distribution_switch_v3.py
+  ADAPT_SAFE_DENOISER_SOURCE_TARGET_SWITCH:
+    source_module: src/hierasafe_flow/steering/related_work/distribution_switch_v3.py
+  ADAPT_MIDSTEER_JOINT_MULTI_CATEGORY:
+    source_module: src/hierasafe_flow/steering/related_work/midsteer_attn_output.py

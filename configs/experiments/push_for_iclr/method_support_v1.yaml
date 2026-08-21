@@ -1,0 +1,110 @@
+schema_version: push-for-iclr.method-support.v1
+campaign_id: push_for_iclr_global_safety_v1
+upstream_lock: third_party/PUSH_FOR_ICLR_UPSTREAMS.lock.yaml
+
+status_vocabulary:
+  EXACT_NATIVE_INTERFACE: pinned production pipeline exposes the method's native interface
+  EXACT_RELEASE_ARCHITECTURE: pinned upstream ships the matching architecture implementation
+  FAITHFUL_PORT_REQUIRED: paper equations can be mapped, but a reviewed architecture port is required
+  REPRODUCTION_REQUIRED: implementation is not admitted until at least one paper result is reproduced
+  BLOCKED_UPSTREAM_ASSET: a named paper asset is unavailable and cannot be substituted
+  NOT_IN_RELEASE_SCOPE: upstream does not support this architecture
+  NOT_SUPPORTED_BY_PINNED_INTERFACE: the pinned production pipeline lacks the required native interface
+
+models:
+  - cosmos3_super_text2image
+  - flux1_dev
+  - flux2_dev
+  - qwen_image
+  - qwen_image_2512
+  - sd35_large
+
+methods:
+  RW00_NATIVE_NEGATIVE:
+    cosmos3_super_text2image: EXACT_NATIVE_INTERFACE
+    flux1_dev: EXACT_NATIVE_INTERFACE
+    flux2_dev: NOT_SUPPORTED_BY_PINNED_INTERFACE
+    qwen_image: EXACT_NATIVE_INTERFACE
+    qwen_image_2512: EXACT_NATIVE_INTERFACE
+    sd35_large: EXACT_NATIVE_INTERFACE
+    evidence:
+      diffusers_version: 0.39.0.dev0
+      flux1_argument: negative_prompt plus true_cfg_scale
+      flux2_argument: no negative_prompt argument
+      qwen_argument: negative_prompt plus true_cfg_scale
+      sd35_argument: negative_prompt and negative_prompt_2 and negative_prompt_3
+      cosmos_argument: custom tokenize_prompt negative condition
+
+  RW01_SAFE_LATENT_DIFFUSION:
+    default: FAITHFUL_PORT_REQUIRED
+    release_scope: Stable Diffusion 1.x SafeStableDiffusionPipeline
+
+  RW02_SAFREE:
+    sd35_large: FAITHFUL_PORT_REQUIRED
+    default: NOT_IN_RELEASE_SCOPE
+    release_scope: Stable Diffusion 1.x, SDXL, repository SD3 path
+
+  RW03_STG:
+    default: FAITHFUL_PORT_REQUIRED
+    release_scope: Stable Diffusion 1.4 and 1.5
+
+  RW04_NAG:
+    flux1_dev: EXACT_RELEASE_ARCHITECTURE
+    sd35_large: EXACT_RELEASE_ARCHITECTURE
+    flux2_dev: NOT_IN_RELEASE_SCOPE
+    qwen_image: NOT_IN_RELEASE_SCOPE
+    qwen_image_2512: NOT_IN_RELEASE_SCOPE
+    cosmos3_super_text2image: NOT_IN_RELEASE_SCOPE
+    release_scope: FLUX.1, SD3.5, SDXL, and separately released video pipelines
+
+  RW05_SEMANTIC_SURGERY:
+    default: FAITHFUL_PORT_REQUIRED
+    release_scope: Stable Diffusion 1.4
+
+  RW06_SGF_SOURCE_ONLY:
+    default: REPRODUCTION_REQUIRED
+    label_guard: never label the paired source-target switch adaptation as paper SGF
+
+  RW07_SAFE_DENOISER_SOURCE_ONLY:
+    default: REPRODUCTION_REQUIRED
+    label_guard: never label the paired source-target switch adaptation as paper Safe Denoiser
+
+  RW08_MIDSTEER:
+    default: BLOCKED_UPSTREAM_ASSET
+    blocking_asset: exact ReLAION calibration corpus used by the paper
+    label_guard: diagonal covariance and joint multi-category ports remain adaptations
+
+  RW09_GLOCE:
+    sd35_large: FAITHFUL_PORT_REQUIRED
+    default: NOT_IN_RELEASE_SCOPE
+    release_scope: Stable Diffusion 1.4 and repository SD3-medium port
+
+  RW10_ADAVD:
+    default: FAITHFUL_PORT_REQUIRED
+    release_scope: Stable Diffusion 1.4 UNet cross-attention value space
+
+  RW11_GROCE:
+    default: FAITHFUL_PORT_REQUIRED
+    prerequisite: rebuild and freeze the semantic graph for each tokenizer/text encoder
+    release_scope: Stable Diffusion 1.4 CLIP vocabulary
+
+  RW12_NLCE:
+    default: FAITHFUL_PORT_REQUIRED
+    release_scope: Stable Diffusion 1.4 cross-attention
+    i2p_note: official nudity path uses manual preservation neighbors and does not require the 19 GB index
+
+  RW13_DES:
+    flux1_dev: REPRODUCTION_REQUIRED
+    sd35_large: REPRODUCTION_REQUIRED
+    default: NOT_IN_RELEASE_SCOPE
+    release_scope: Stable Diffusion 1.x/2.x/XL/3.x and FLUX.1
+    concept_scope_note: published campaign-relevant checkpoints are sexual-only; the multi-concept checkpoint is SD1.x-only
+
+admission_rules:
+  - Reproduce at least one reported upstream result before campaign admission.
+  - Tune only on the frozen 20-prompt development split.
+  - Freeze one model-specific configuration artifact before locked evaluation.
+  - Never tune per prompt.
+  - Preserve the exact baseline latent or generator seed within a comparison cell.
+  - Record method revision, wrapper commit, asset hashes, hyperparameters, and intervention trace.
+  - A missing architecture or asset is a structured blocked result, never a substitute method.

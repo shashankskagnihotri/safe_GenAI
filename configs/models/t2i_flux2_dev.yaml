@@ -1,0 +1,22 @@
+model:
+  adapter: flux2
+  model_id: black-forest-labs/FLUX.2-dev
+  revision: 26afe3a78bb242c0a8bb181dcc8937bb16e5c66c
+  diffusers_pipeline_class: Flux2Pipeline
+  verified_model_index: true
+  # FLUX.2-dev at 1024px overflows a 94 GB H100 when fully resident, and
+  # model/group offload is killed as sampling starts. Sequential offload is
+  # slow but is the validated profile for this benchmark and hardware class.
+  cpu_offload: sequential
+  components:
+    - scheduler
+    - text_encoder
+    - tokenizer
+    - transformer
+    - vae
+generation:
+  task: text_to_image
+  height: 1024
+  width: 1024
+  num_inference_steps: 50
+  guidance_scale: 4.0

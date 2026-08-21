@@ -1,0 +1,22 @@
+model:
+  adapter: sd35
+  model_id: stabilityai/stable-diffusion-3.5-large
+  revision: ceddf0a7fdf2064ea28e2213e3b84e4afa170a0f
+  diffusers_pipeline_class: StableDiffusion3Pipeline
+  verified_model_index: true
+  components:
+    - scheduler
+    - text_encoder
+    - text_encoder_2
+    - text_encoder_3
+    - tokenizer
+    - tokenizer_2
+    - tokenizer_3
+    - transformer
+    - vae
+generation:
+  task: text_to_image
+  height: 1024
+  width: 1024
+  num_inference_steps: 28
+  guidance_scale: 7.0

@@ -1,0 +1,18 @@
+model:
+  adapter: qwen_image
+  model_id: Qwen/Qwen-Image-2512
+  revision: 25468b98e3276ca6700de15c6628e51b7de54a26
+  diffusers_pipeline_class: QwenImagePipeline
+  verified_model_index: true
+  components:
+    - scheduler
+    - text_encoder
+    - tokenizer
+    - transformer
+    - vae
+generation:
+  task: text_to_image
+  height: 1024
+  width: 1024
+  num_inference_steps: 50
+  guidance_scale: 4.0
