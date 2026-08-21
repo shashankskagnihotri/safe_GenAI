@@ -1,0 +1,83 @@
+schema_version: push-for-iclr.ablation-stage2.v1
+campaign_id: push_for_iclr_global_safety_v1
+stage: 2
+seed: 0
+source_manifest:
+  path: outputs/PUSH_FOR_ICLR/MANIFESTS/ablation_30_all.jsonl
+  row_count: 30
+  manifest_sha256: 7be833cf437db61b8b42b39eb3f7dfad6bf2999b0ddc4bdff903c2d57b16e3fa
+  file_sha256: 6467b04ba9c0722154734ea0d40c520f29342b73cb1e15b161e3a4e7af2f0efa
+
+models:
+  flux1_dev:
+    config: configs/models/t2i_flux1_dev.yaml
+    revision: 3de623fc3c33e44ffbe2bad470d0f45bccf2eb21
+    relative_rms_strength: 0.18
+    strength_provenance: admitted_historical_conceptsteer_max_relative_norm
+    margin: 0.08
+    mask:
+      enabled: true
+      mode: max_normalized
+      threshold: 0.05
+      percentile: 0.85
+      eps: 1.0e-6
+  sd35_large:
+    config: configs/models/t2i_sd35_large.yaml
+    revision: ceddf0a7fdf2064ea28e2213e3b84e4afa170a0f
+    relative_rms_strength: 0.18
+    strength_provenance: admitted_historical_conceptsteer_max_relative_norm
+    margin: 0.04
+    mask:
+      enabled: true
+      mode: max_normalized
+      threshold: 0.08
+      percentile: 0.85
+      eps: 1.0e-6
+
+ablations:
+  - A00_BASELINE
+  - A01_GENERIC_POSITIVE_SUFFIX
+  - A02_CONFIG_POSITIVE_SUFFIX
+  - A03_NO_NEUTRAL_ALL_STEP_RECOMPUTE
+  - A04_SINGLE_PULSE_K0
+  - A05_SINGLE_PULSE_K2
+  - A06_SINGLE_PULSE_K5
+  - A07_FROZEN_TAIL_K0
+  - A08_FROZEN_TAIL_K2
+  - A09_FROZEN_TAIL_K5
+  - A10_EARLY_SCHEDULE_STOP
+  - A11_EARLY_SCHEDULE_FROZEN_TAIL
+  - A12_ALL_STEP_RECOMPUTE
+
+schedule:
+  early_window_unified_diffusion_time: [1000.0, 800.0]
+  temporal_profile: constant_rectangular
+  acquisition_steps: [0, 2, 5]
+  frozen_direction_normalization: rms_float32
+
+generation:
+  use_model_native_resolution: true
+  use_model_native_step_count: true
+  one_image_per_cell: true
+  preserve_exact_original_prompt: true
+  preserve_initial_latent_across_ablations: true
+  dtype: bfloat16
+  device: cuda
+
+output:
+  root: outputs/PUSH_FOR_ICLR
+  stage_directory: 01_ABLATIONS
+  never_overwrite_completed_cell: true
+  same_directory_atomic_partial_writes: true
+
+slurm:
+  partition: gpu-vram-94gb
+  gres: gpu:nvidia_h100_nvl:1
+  account: ml-staff
+  qos: walltime5d
+  cpus_per_task: 16
+  memory: 300G
+  walltime: 1-00:00:00
+  array_count: 780
+  array_throttle: null
+  user_hold: false
