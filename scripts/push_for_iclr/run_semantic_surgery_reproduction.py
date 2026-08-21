@@ -15,6 +15,7 @@ import shutil
 import subprocess
 import sys
 import tarfile
+import tempfile
 import time
 from typing import Any
 
@@ -272,21 +273,49 @@ def generate_shard(contract: dict[str, Any], shard_id: int) -> None:
     ).to(diffuser_config["device"])
     detector_config = resolved["detector"]["params"]
     diffuser.detect_method = NudeDetection(**detector_config)
-    generation = resolved["generation"]
-    generate_images(
-        diffusers=diffuser,
-        prompts_path=generation["prompts_path"],
-        save_folder=generation["save_folder"],
-        guidance_scale=generation["guidance_scale"],
-        image_size=generation["image_size"],
-        ddim_steps=generation["ddim_steps"],
-        num_samples=generation["num_samples"],
-        use_cuda_generator=generation["use_cuda_generator"],
-        specify_classes=generation.get("specify_classes"),
-        log_sep=generation["log_interval"],
-        show_alpha=generation.get("show_alpha", False),
-        use_safety_checker=generation.get("use_safety_checker", False),
+    detector_temporary = tempfile.TemporaryDirectory(prefix=f"semantic_surgery_nudenet_{shard_id:02d}_")
+    detector_delegate = diffuser.detect_method.detector
+
+    class NudeNetPILCompatibilityBridge:
+        """Losslessly bridge the released PIL call to NudeNet 3.0.8's path API."""
+
+        def __init__(self, delegate: Any, root: Path) -> None:
+            self.delegate = delegate
+            self.root = root
+            self.counter = 0
+
+        def detect(self, image: Any) -> Any:
+            if isinstance(image, (str, os.PathLike)):
+                return self.delegate.detect(image)
+            path = self.root / f"feedback_{self.counter:08d}.png"
+            self.counter += 1
+            image.save(path, format="PNG")
+            try:
+                return self.delegate.detect(str(path))
+            finally:
+                path.unlink(missing_ok=True)
+
+    diffuser.detect_method.detector = NudeNetPILCompatibilityBridge(
+        detector_delegate, Path(detector_temporary.name)
     )
+    generation = resolved["generation"]
+    try:
+        generate_images(
+            diffusers=diffuser,
+            prompts_path=generation["prompts_path"],
+            save_folder=generation["save_folder"],
+            guidance_scale=generation["guidance_scale"],
+            image_size=generation["image_size"],
+            ddim_steps=generation["ddim_steps"],
+            num_samples=generation["num_samples"],
+            use_cuda_generator=generation["use_cuda_generator"],
+            specify_classes=generation.get("specify_classes"),
+            log_sep=generation["log_interval"],
+            show_alpha=generation.get("show_alpha", False),
+            use_safety_checker=generation.get("use_safety_checker", False),
+        )
+    finally:
+        detector_temporary.cleanup()
 
     from PIL import Image
     image_records = []
