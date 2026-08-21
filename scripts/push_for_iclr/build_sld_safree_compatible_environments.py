@@ -23,7 +23,7 @@ def run(command, **kwargs):
 def package_versions(python):
     code = """
 import importlib.metadata, json, platform
-names = ['torch','torchvision','diffusers','transformers','accelerate','numpy','Pillow','huggingface-hub','albumentations','albucore','onnxruntime','onnxruntime-gpu','nudenet','clip']
+names = ['torch','torchvision','diffusers','transformers','accelerate','numpy','Pillow','huggingface-hub','albumentations','albucore','onnxruntime','onnxruntime-gpu','nudenet','sld','python-sld','clip']
 out = {'python': platform.python_version(), 'packages': {}}
 for name in names:
     try: out['packages'][name] = importlib.metadata.version(name)
@@ -54,7 +54,12 @@ def build(task_id):
             "onnxruntime 1.18.1 package and repository-vendored "
             "nudenet/classify_pil.py implementation are preserved. Installing the "
             "PyPI nudenet package would shadow that implicit namespace package and "
-            "is explicitly forbidden. No SAFREE method code changes."
+            "is explicitly forbidden. SAFREE also pins Diffusers 0.29.0 while its "
+            "unconditionally imported sld 0.0.1 dependency uses the removed "
+            "diffusers.pipeline_utils path. That dependency import is migrated to "
+            "diffusers.pipelines.pipeline_utils with before/after hashes; the SLD "
+            "class is not exercised by the paper's erase_id=std SAFREE route. No "
+            "SAFREE method code changes."
         )
     else:
         raise ValueError("task-id must be 0 or 1")
@@ -100,14 +105,41 @@ def build(task_id):
         else:
             run([python, "-m", "pip", "install", "--no-deps", "--force-reinstall",
                  "albucore==0.0.16"])
+            purelib = Path(subprocess.check_output(
+                [str(python), "-c", "import sysconfig; print(sysconfig.get_paths()['purelib'])"],
+                text=True,
+            ).strip())
+            sld_pipeline = purelib / "sld/sld_pipeline.py"
+            old_import = "from diffusers.pipeline_utils import DiffusionPipeline"
+            new_import = "from diffusers.pipelines.pipeline_utils import DiffusionPipeline"
+            source_text = sld_pipeline.read_text(encoding="utf-8")
+            if source_text.count(old_import) != 1:
+                raise RuntimeError("Unexpected sld 0.0.1 Diffusers import surface")
+            sld_before_sha256 = sha256_file(sld_pipeline)
+            sld_pipeline.write_text(source_text.replace(old_import, new_import), encoding="utf-8")
+            atomic_json(temporary / "DEPENDENCY_COMPATIBILITY.json", {
+                "distribution": "sld==0.0.1",
+                "file": str(sld_pipeline.relative_to(temporary)),
+                "reason": "SAFREE pins Diffusers 0.29.0, which moved pipeline_utils under diffusers.pipelines",
+                "old_import": old_import,
+                "new_import": new_import,
+                "before_sha256": sld_before_sha256,
+                "after_sha256": sha256_file(sld_pipeline),
+                "safree_route": "erase_id=std; ModifiedSLDPipeline imported but not instantiated",
+            })
             source = str(Path(config["upstream"]["repo"]).resolve())
             probe = f"""
 import importlib.metadata as metadata
 from pathlib import Path
 import albumentations, albucore, onnxruntime, torch
 import nudenet.classify_pil as classify_pil
+from diffusers.pipelines.pipeline_utils import DiffusionPipeline
+from sld.sld_pipeline import DiffusionPipeline as SLDDiffusionPipeline
 assert albucore.__version__ == '0.0.16'
 assert metadata.version('onnxruntime') == '1.18.1'
+assert metadata.version('sld') == '0.0.1'
+assert metadata.version('diffusers') == '0.29.0'
+assert SLDDiffusionPipeline is DiffusionPipeline
 for forbidden in ('onnxruntime-gpu', 'nudenet'):
     try:
         metadata.version(forbidden)
@@ -124,6 +156,7 @@ print('SAFREE_COMPATIBILITY_OK')
 """
             environment = os.environ.copy()
             environment["PYTHONPATH"] = config["upstream"]["repo"]
+            environment["NO_ALBUMENTATIONS_UPDATE"] = "1"
             run([python, "-c", probe], cwd=config["upstream"]["repo"], env=environment)
 
         freeze = subprocess.check_output([str(python), "-m", "pip", "freeze", "--all"], text=True)
