@@ -1,0 +1,111 @@
+schema_version: 1
+ontology_id: violence_global_v1
+category: violence
+prompt_independent: true
+context_independent: true
+
+canonical_negative_prompt: "visible active physical assault, weapon threat or use against a person, bodily harm, wounds, blood, gore, mutilation, self-directed harm, or graphic violent aftermath"
+canonical_positive_prompt: "a calm non-violent or de-escalated situation without active attack, bodily harm, visible wounds, blood, gore, or graphic injury, while preserving unrelated scene content"
+canonical_neutral_prompt: "an ordinary neutral visual scene with the original non-safety subjects, actions, objects, setting, style, and composition preserved"
+
+generic_positive_suffix: "Depict a calm, non-violent situation with no active attack, bodily harm, visible wounds, blood, gore, or graphic injury."
+config_positive_suffix: "Render a calm non-violent or clearly de-escalated situation with no active assault, weapon harm, visible wounds, blood, gore, mutilation, self-harm, or graphic aftermath; preserve the requested identities, subject count, setting, benign objects, style, lighting, camera, and composition unrelated to violence."
+
+parents:
+  - id: active_harm
+    title: Active physical harm
+    description: Active assault, attack, directed weapon threat, and bodily injury.
+    children: [active_assault, physical_attack, weapon_threat, weapon_harm, visible_injury]
+  - id: graphic_harm
+    title: Graphic physical harm
+    description: Blood, gore, mutilation, graphic injury, and graphic aftermath.
+    children: [blood, gore, mutilation, graphic_aftermath]
+  - id: self_directed_harm
+    title: Self-directed physical harm
+    description: Visible self-inflicted physical injury or imminent harmful action.
+    children: [self_harm]
+  - id: safe_conflict_states
+    title: Safe and de-escalated states
+    description: Conflict-related scenes without visible active physical harm.
+    children: [aggressive_no_contact, non_graphic_conflict, deescalation]
+  - id: contextual_boundaries
+    title: Contextual boundaries
+    description: Medical, sporting, emergency, theatrical, and documentary contexts requiring careful separation.
+    children: [medical_treatment, combat_sport, emergency_response, theatrical_prop, historical_documentary]
+
+leaves:
+  - {id: active_assault, parent_id: active_harm, polarity: unsafe, text: "an active assault against a person", description: "A person is visibly attacking or forcibly harming another person."}
+  - {id: physical_attack, parent_id: active_harm, polarity: unsafe, text: "a physical attack with force directed at a person", description: "Impact, restraint, beating, or other active force is visibly directed at someone."}
+  - {id: weapon_threat, parent_id: active_harm, polarity: unsafe, text: "a weapon actively threatening a person", description: "A weapon is visibly aimed, brandished, or used to threaten imminent bodily harm."}
+  - {id: weapon_harm, parent_id: active_harm, polarity: unsafe, text: "a weapon causing visible bodily harm", description: "Weapon use visibly injures a person or depicts the moment of harmful impact."}
+  - {id: visible_injury, parent_id: active_harm, polarity: unsafe, text: "a visible wound or bodily injury", description: "The image visibly depicts physical injury rather than merely implying an off-screen event."}
+  - {id: blood, parent_id: graphic_harm, polarity: unsafe, text: "visible blood associated with bodily harm", description: "Blood is visibly connected to an injury, attack, or violent aftermath."}
+  - {id: gore, parent_id: graphic_harm, polarity: unsafe, text: "graphic gore or severe bodily damage", description: "Graphic tissue damage or extreme injury is visibly depicted."}
+  - {id: mutilation, parent_id: graphic_harm, polarity: unsafe, text: "visible mutilation or dismemberment", description: "A body is visibly mutilated, dismembered, or severely deformed by harm."}
+  - {id: graphic_aftermath, parent_id: graphic_harm, polarity: unsafe, text: "a graphic aftermath with bodies, severe wounds, or gore", description: "The aftermath visibly centers severe physical harm even if no attack is active."}
+  - {id: self_harm, parent_id: self_directed_harm, polarity: unsafe, text: "visible self-directed physical harm", description: "A person visibly injures or is imminently injuring themselves."}
+  - {id: aggressive_no_contact, parent_id: safe_conflict_states, polarity: boundary, text: "an aggressive posture without physical contact or visible injury", description: "Threatening body language is distinguished from visible active bodily harm."}
+  - {id: non_graphic_conflict, parent_id: safe_conflict_states, polarity: boundary, text: "a non-graphic disagreement or conflict without bodily harm", description: "Conflict context is preserved while no visible physical injury occurs."}
+  - {id: deescalation, parent_id: safe_conflict_states, polarity: safe, text: "a calm de-escalated interaction without attack or injury", description: "Subjects remain in the requested scene but active violence is absent."}
+  - {id: medical_treatment, parent_id: contextual_boundaries, polarity: boundary, text: "non-graphic medical treatment or injury care", description: "Medical care is not treated as attack; graphic wounds remain unsafe if visibly central."}
+  - {id: combat_sport, parent_id: contextual_boundaries, polarity: boundary, text: "regulated sport or combat sport without visible severe injury", description: "Rules, protective context, and absence of visible bodily harm distinguish sport from assault."}
+  - {id: emergency_response, parent_id: contextual_boundaries, polarity: boundary, text: "non-graphic emergency response or rescue", description: "Rescue and response are preserved unless graphic injury becomes central."}
+  - {id: theatrical_prop, parent_id: contextual_boundaries, polarity: boundary, text: "clearly theatrical fictional staging or harmless prop", description: "A visibly staged prop without directed harm is distinguished from a real weapon attack."}
+  - {id: historical_documentary, parent_id: contextual_boundaries, polarity: boundary, text: "non-graphic historical or documentary conflict context", description: "Documentary context alone is not unsafe; visible active or graphic harm controls the boundary."}
+
+runtime_probe_groups:
+  negative:
+    - {id: violence_negative_00, text: "an active physical assault causing bodily harm", weight: 1.0}
+    - {id: violence_negative_01, text: "a weapon aimed at and threatening a person", weight: 1.0}
+    - {id: violence_negative_02, text: "a weapon visibly injuring a person", weight: 1.0}
+    - {id: violence_negative_03, text: "visible wounds and blood caused by an attack", weight: 1.0}
+    - {id: violence_negative_04, text: "graphic gore and severe bodily damage", weight: 1.0}
+    - {id: violence_negative_05, text: "visible mutilation or dismemberment", weight: 1.0}
+    - {id: violence_negative_06, text: "a graphic violent aftermath with severe injuries", weight: 1.0}
+    - {id: violence_negative_07, text: "visible self-directed physical harm", weight: 1.0}
+  positive:
+    - {id: violence_positive_00, text: "a calm non-violent interaction without physical attack", weight: 1.0}
+    - {id: violence_positive_01, text: "a de-escalated conflict with no bodily harm", weight: 1.0}
+    - {id: violence_positive_02, text: "people standing safely apart without threatening contact", weight: 1.0}
+    - {id: violence_positive_03, text: "a scene without visible wounds, blood, gore, or injury", weight: 1.0}
+    - {id: violence_positive_04, text: "safe handling of ordinary objects without weapon threat", weight: 1.0}
+    - {id: violence_positive_05, text: "non-graphic emergency assistance focused on care and rescue", weight: 1.0}
+    - {id: violence_positive_06, text: "regulated sport without visible severe injury or malicious assault", weight: 1.0}
+    - {id: violence_positive_07, text: "a non-violent scene preserving subjects, objects, setting, action, and composition", weight: 1.0}
+  neutral:
+    - {id: violence_neutral_00, text: "an ordinary neutral visual scene with the original non-safety content preserved", weight: 1.0}
+    - {id: violence_neutral_01, text: "the same subjects, actions, objects, setting, lighting, style, and composition", weight: 1.0}
+    - {id: violence_neutral_02, text: "a context-preserving visual depiction without specifying conflict or physical safety", weight: 1.0}
+
+boundary_cases:
+  - id: combat_sport
+    safe_side: "Regulated sport, protective equipment, ordinary contact, and no visible severe injury."
+    unsafe_side: "Malicious assault, weapon use, or visible severe bodily harm outside the sporting context."
+    preserve: "Athletes, count, uniforms, venue, sport action, camera, and audience."
+  - id: medical_treatment
+    safe_side: "Care, treatment, rescue, or clinical procedure without graphic injury as the visual focus."
+    unsafe_side: "Graphic wound, blood, gore, or mutilation dominates the image."
+    preserve: "Patient and responder identities, equipment, setting, treatment action, and composition."
+  - id: theatrical_historical
+    safe_side: "Clearly staged prop, rehearsal, museum, or non-graphic documentary context."
+    unsafe_side: "Visible directed attack, bodily impact, injury, blood, or graphic aftermath."
+    preserve: "Historical period, costumes, props, location, style, and camera framing."
+  - id: aggressive_posture
+    safe_side: "Tense or assertive posture without contact, weapon threat, or visible injury."
+    unsafe_side: "Imminent or active physical attack directed at a person."
+    preserve: "Subjects, facial affect, location, benign objects, lighting, and composition."
+
+preservation_axes:
+  - subject_identity
+  - subject_count
+  - age
+  - gender_presentation
+  - pose_unless_unsafe_pose_is_target
+  - scene
+  - camera
+  - lighting
+  - style
+  - occupation
+  - objects_unrelated_to_harm
+  - action_unrelated_to_violence
+  - composition

@@ -1,0 +1,89 @@
+schema_version: 1
+ontology_id: combined_nudity_violence_global_v1
+category: combined_nudity_violence
+prompt_independent: true
+context_independent: true
+
+canonical_negative_prompt: "visible explicit nudity or sexualized body exposure together with visible active violence, weapon harm, bodily injury, blood, gore, mutilation, self-harm, or graphic aftermath"
+canonical_positive_prompt: "fully clothed non-sexual people in a calm non-violent scene without attack, bodily harm, wounds, blood, gore, or graphic injury, preserving all unrelated content"
+canonical_neutral_prompt: "an ordinary neutral visual scene with the original non-safety subjects, actions, objects, setting, style, and composition preserved"
+
+generic_positive_suffix: "Keep all people fully clothed and non-sexual, and depict a calm non-violent scene without attack, bodily harm, blood, gore, or graphic injury."
+config_positive_suffix: "Render every person fully clothed in ordinary non-sexual presentation and render the situation calm and non-violent, with no intimate exposure, erotic framing, assault, weapon harm, visible wounds, blood, gore, mutilation, self-harm, or graphic aftermath; preserve all requested non-target identities, subjects, actions, objects, setting, style, lighting, camera, and composition."
+
+component_ontologies:
+  - nudity_global_v1
+  - violence_global_v1
+combination_policy: independent_component_directions_activation_priority_weighted_joint_mean
+
+parents:
+  - id: nudity_component
+    title: Nudity component
+    description: Frozen nudity ontology evaluated independently before joint correction.
+    children: [combined_explicit_exposure, combined_sexualized_semantics, combined_clothed_safe]
+  - id: violence_component
+    title: Violence component
+    description: Frozen violence ontology evaluated independently before joint correction.
+    children: [combined_active_harm, combined_graphic_harm, combined_nonviolent_safe]
+  - id: joint_preservation
+    title: Joint non-target preservation
+    description: Unrelated prompt content that neither safety component may erase.
+    children: [combined_context_preservation, combined_boundary_preservation]
+
+leaves:
+  - {id: combined_explicit_exposure, parent_id: nudity_component, polarity: unsafe, text: "visible explicit intimate body exposure", description: "The nudity component detects explicit intimate anatomy and full or partial nudity."}
+  - {id: combined_sexualized_semantics, parent_id: nudity_component, polarity: unsafe, text: "pornographic or strongly sexualized pose and framing", description: "The nudity component detects erotic scene, pose, interaction, and camera semantics."}
+  - {id: combined_clothed_safe, parent_id: nudity_component, polarity: safe, text: "fully clothed non-sexual ordinary presentation", description: "The nudity target preserves identity and context while removing explicit exposure."}
+  - {id: combined_active_harm, parent_id: violence_component, polarity: unsafe, text: "active attack, weapon threat, or bodily harm", description: "The violence component detects visible directed physical harm."}
+  - {id: combined_graphic_harm, parent_id: violence_component, polarity: unsafe, text: "visible injury, blood, gore, mutilation, or graphic aftermath", description: "The violence component detects visible graphic bodily damage."}
+  - {id: combined_nonviolent_safe, parent_id: violence_component, polarity: safe, text: "calm non-violent de-escalated situation without injury", description: "The violence target removes active and graphic harm while preserving context."}
+  - {id: combined_context_preservation, parent_id: joint_preservation, polarity: safe, text: "the original non-safety subjects, actions, objects, scene, and composition", description: "Both corrections must preserve content unrelated to nudity and violence."}
+  - {id: combined_boundary_preservation, parent_id: joint_preservation, polarity: boundary, text: "ordinary swimwear, medicine, sport, emergency, art, and documentary context", description: "Boundary contexts remain unless visible evidence crosses an explicit unsafe definition."}
+  - {id: combined_identity, parent_id: joint_preservation, polarity: safe, text: "the same subject identity and subject count", description: "Safety correction must not replace or remove unrelated subjects."}
+  - {id: combined_action, parent_id: joint_preservation, polarity: safe, text: "the same benign action and object relationships", description: "Unrelated requested actions and objects remain coherent."}
+  - {id: combined_camera, parent_id: joint_preservation, polarity: safe, text: "the same camera, lighting, medium, and visual style", description: "Visual presentation is preserved unless its framing is itself unsafe."}
+  - {id: combined_composition, parent_id: joint_preservation, polarity: safe, text: "the same scene layout and composition", description: "Joint correction does not genericize or replace the scene."}
+
+runtime_probe_groups:
+  negative:
+    - {id: combined_negative_00, text: "visible explicit nudity and exposed intimate anatomy", weight: 1.0}
+    - {id: combined_negative_01, text: "pornographic or strongly sexualized body exposure and framing", weight: 1.0}
+    - {id: combined_negative_02, text: "an active physical assault or weapon attack against a person", weight: 1.0}
+    - {id: combined_negative_03, text: "visible wounds, blood, gore, mutilation, or graphic violent aftermath", weight: 1.0}
+  positive:
+    - {id: combined_positive_00, text: "fully clothed people in ordinary non-sexual presentation", weight: 1.0}
+    - {id: combined_positive_01, text: "non-explicit documentary framing that preserves the original context", weight: 1.0}
+    - {id: combined_positive_02, text: "a calm non-violent interaction without attack or bodily harm", weight: 1.0}
+    - {id: combined_positive_03, text: "a scene without visible wounds, blood, gore, or graphic injury", weight: 1.0}
+  neutral:
+    - {id: combined_neutral_00, text: "an ordinary neutral visual scene with the original non-safety content preserved", weight: 1.0}
+    - {id: combined_neutral_01, text: "the same subjects, actions, objects, setting, lighting, style, and composition", weight: 1.0}
+
+boundary_cases:
+  - id: body_visibility
+    safe_side: "Ordinary clothing, swimwear, medical, care, or art context without intimate exposure or erotic framing."
+    unsafe_side: "Explicit intimate anatomy, pornographic semantics, or central erotic exposure."
+    preserve: "People, identity, count, pose, scene, medium, and composition."
+  - id: conflict_context
+    safe_side: "Sport, emergency, theatrical, or documentary context without visible active or graphic harm."
+    unsafe_side: "Directed attack, bodily impact, wounds, blood, gore, mutilation, or self-harm."
+    preserve: "People, role, setting, benign action, period, style, and camera."
+  - id: simultaneous_boundary
+    safe_side: "A boundary context remains visibly non-explicit and non-violent."
+    unsafe_side: "Either independent component has clear visible evidence of its unsafe definition."
+    preserve: "All content unrelated to whichever component is active."
+
+preservation_axes:
+  - subject_identity
+  - subject_count
+  - age
+  - gender_presentation
+  - pose_unless_unsafe_pose_is_target
+  - scene
+  - camera
+  - lighting
+  - style
+  - occupation
+  - objects_unrelated_to_safety
+  - actions_unrelated_to_safety
+  - composition

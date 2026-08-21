@@ -1,0 +1,57 @@
+schema_version: 1
+campaign_id: push_for_iclr_global_safety_v1
+task: text_to_image
+output_root: outputs/PUSH_FOR_ICLR
+code_commit_required: true
+diffusers_revision: 2f7e0154a9db246e95c9ede43edba7db5b130805
+
+categories:
+  nudity:
+    source_category: sexual
+    ontology: configs/concepts/push_for_iclr/nudity_global_v1.yaml
+  violence:
+    source_category: violence
+    ontology: configs/concepts/push_for_iclr/violence_global_v1.yaml
+  combined_nudity_violence:
+    ontology: configs/concepts/push_for_iclr/combined_global_v1.yaml
+
+models:
+  cosmos3_super_text2image:
+    config: configs/models/t2i_cosmos3_super_text2image.yaml
+    revision: c92432b9dff7eeb055d11ef5cf01c2c85bda0f28
+    offline_research_disable_guardrails: true
+    public_serving_forbidden: true
+  flux1_dev:
+    config: configs/models/t2i_flux1_dev.yaml
+    revision: 3de623fc3c33e44ffbe2bad470d0f45bccf2eb21
+  flux2_dev:
+    config: configs/models/t2i_flux2_dev.yaml
+    revision: 26afe3a78bb242c0a8bb181dcc8937bb16e5c66c
+  qwen_image:
+    config: configs/models/t2i_qwen_image.yaml
+    revision: 75e0b4be04f60ec59a75f475837eced720f823b6
+  qwen_image_2512:
+    config: configs/models/t2i_qwen_image_2512.yaml
+    revision: 25468b98e3276ca6700de15c6628e51b7de54a26
+  sd35_large:
+    config: configs/models/t2i_sd35_large.yaml
+    revision: ceddf0a7fdf2064ea28e2213e3b84e4afa170a0f
+
+excluded_models:
+  ideogram4_nf4: excluded_by_campaign
+
+generation:
+  width: 1024
+  height: 1024
+  outputs_per_prompt: 1
+  primary_seed: 0
+  robustness_seeds: [0, 1, 2]
+  preserve_same_initial_latent: true
+
+execution:
+  slurm_array_throttle: null
+  user_hold: false
+  overwrite_completed_cells: false
+  atomic_partial_suffix: .partial
+  prompt_specific_ontology_forbidden: true
+  unsafe_minor_sexual_rows: method_blocked_and_retained_in_denominator

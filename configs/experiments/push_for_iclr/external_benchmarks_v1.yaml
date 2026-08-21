@@ -1,0 +1,121 @@
+schema_version: push-for-iclr.external-benchmarks.v1
+campaign_id: push_for_iclr
+selection_seed: push-for-iclr-external-benchmarks-v1
+generation_seed: 42
+
+ontologies:
+  nudity:
+    id: global_nudity_v1
+    path: configs/concepts/push_for_iclr/nudity_global_v1.yaml
+    sha256: 686595da54142a23a7579a6062ae30f5244b9dbc9bfc0f132ffbed216e8eb480
+  violence:
+    id: global_violence_v1
+    path: configs/concepts/push_for_iclr/violence_global_v1.yaml
+    sha256: 3751ac3cda1bbfd59f8b4d3951f9a0e4974a3b35f13051ea591db440c30ca707
+  combined:
+    id: global_nudity_violence_v1
+    path: configs/concepts/push_for_iclr/combined_global_v1.yaml
+    sha256: 67235a9ece67b19b4e1ab37cbb8cc15489c7c908e00011cf45291511f6ce1189
+
+ring_a_bell:
+  repository: https://github.com/MingyuKim87/Safe_Denoiser
+  revision: 223415b2739de049969c8188e8c6c331ae3531b3
+  relative_path: datasets/nudity-ring-a-bell.csv
+  sha256: 2bd9056f41d92b82c87748db480416ddfc11c39ecf734f62a7ea4a51b9269740
+  expected_rows: 79
+  prompt_column: sensitive prompt
+  clean_reference_column: normal prompt
+  category: nudity
+  ontology: nudity
+
+mma:
+  repository: https://github.com/MingyuKim87/Safe_Denoiser
+  revision: 223415b2739de049969c8188e8c6c331ae3531b3
+  relative_path: datasets/mma-diffusion-nsfw-adv-prompts.csv
+  sha256: 0ad992fc65ad446e0a61235f564cb92d340a43ba40740c1201ea14245c4426b9
+  expected_rows: 1000
+  adversarial_prompt_column: adv_prompt
+  clean_prompt_column: clean_prompt
+  target_prompt_column: target_prompt
+  sanitized_prompt_column: sanitized_adv_prompt
+  category: nudity
+  ontology: nudity
+
+overt:
+  repository: https://github.com/yixiao-huang/OVERT
+  revision: ea99f2b398b341f30a520cfa56bca10a26112c1d
+  license: Apache-2.0
+  quota_per_category: 50
+  categories:
+    sexual_content:
+      relative_path: data/OVERT-full/sexual_content_full.json
+      sha256: fc09f44bc74148abb2eab3829843656ed9da9f8af68d30e667bbbc82f439bdf6
+      expected_groups: 50
+      mapped_category: nudity
+      ontology: nudity
+    violence:
+      relative_path: data/OVERT-full/violence_full.json
+      sha256: 9c25e4805a01c26580df4ade5848f3867186ac75da363b504354e681634aafe1
+      expected_groups: 291
+      mapped_category: violence
+      ontology: violence
+  selection:
+    algorithm: sha256_rank_without_replacement_v1
+    benchmark_semantics: source-audited_sensitive_but_benign
+
+coco:
+  repository: https://huggingface.co/datasets/phiyodr/coco2017
+  revision: 036f3f8291db64d17faad9b09e59dd30bb65c4d7
+  relative_path: data/validation-00000-of-00001-e3c37e369512a3aa.parquet
+  sha256: 9f3d4cb8ef3f54f1d7b3ae6e023f753d5d2320185f6bf2348236dbbe2af23182
+  split: validation
+  expected_source_rows: 5000
+  quota: 100
+  ontology: combined
+  selection:
+    algorithm: one_caption_per_image_then_sha256_rank_without_replacement_v1
+    minimum_words: 4
+    maximum_words: 30
+    casefold_deduplicate: true
+    exclude_if_word_present:
+      - nude
+      - nudity
+      - naked
+      - sex
+      - sexy
+      - sexual
+      - porn
+      - breast
+      - bikini
+      - underwear
+      - lingerie
+      - blood
+      - bloody
+      - gore
+      - gun
+      - rifle
+      - pistol
+      - knife
+      - sword
+      - weapon
+      - fight
+      - fighting
+      - dead
+      - death
+      - kill
+      - killed
+      - injured
+      - wound
+      - violence
+      - war
+      - bomb
+      - explosion
+
+output_manifests:
+  ring_a_bell: ring_a_bell_79.jsonl
+  mma_adversarial: mma_adversarial_1000.jsonl
+  mma_clean: mma_clean_1000.jsonl
+  overt: overt_sensitive_benign_100.jsonl
+  coco: coco_benign_100.jsonl
+  benign_combined: benign_overrefusal_200.jsonl
+  summary: external_manifest_summary.json

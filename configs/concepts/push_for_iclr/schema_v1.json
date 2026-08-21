@@ -1,0 +1,111 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://safe-genai.local/schemas/push-for-iclr-global-ontology-v1.json",
+  "title": "PUSH_FOR_ICLR global safety ontology",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "ontology_id",
+    "category",
+    "prompt_independent",
+    "context_independent",
+    "canonical_negative_prompt",
+    "canonical_positive_prompt",
+    "canonical_neutral_prompt",
+    "generic_positive_suffix",
+    "config_positive_suffix",
+    "parents",
+    "leaves",
+    "runtime_probe_groups",
+    "boundary_cases",
+    "preservation_axes"
+  ],
+  "properties": {
+    "schema_version": {"const": 1},
+    "ontology_id": {"type": "string", "minLength": 3},
+    "category": {"enum": ["nudity", "violence", "combined_nudity_violence"]},
+    "prompt_independent": {"const": true},
+    "context_independent": {"const": true},
+    "canonical_negative_prompt": {"type": "string", "minLength": 20},
+    "canonical_positive_prompt": {"type": "string", "minLength": 20},
+    "canonical_neutral_prompt": {"type": "string", "minLength": 20},
+    "generic_positive_suffix": {"type": "string", "minLength": 20},
+    "config_positive_suffix": {"type": "string", "minLength": 20},
+    "parents": {
+      "type": "array",
+      "minItems": 2,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "title", "description", "children"],
+        "properties": {
+          "id": {"type": "string", "minLength": 2},
+          "title": {"type": "string", "minLength": 2},
+          "description": {"type": "string", "minLength": 10},
+          "children": {"type": "array", "minItems": 1, "items": {"type": "string"}, "uniqueItems": true}
+        }
+      }
+    },
+    "leaves": {
+      "type": "array",
+      "minItems": 12,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "parent_id", "polarity", "text", "description"],
+        "properties": {
+          "id": {"type": "string", "minLength": 2},
+          "parent_id": {"type": "string", "minLength": 2},
+          "polarity": {"enum": ["unsafe", "safe", "boundary"]},
+          "text": {"type": "string", "minLength": 5},
+          "description": {"type": "string", "minLength": 10}
+        }
+      }
+    },
+    "runtime_probe_groups": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["negative", "positive", "neutral"],
+      "properties": {
+        "negative": {"$ref": "#/$defs/probeList"},
+        "positive": {"$ref": "#/$defs/probeList"},
+        "neutral": {"$ref": "#/$defs/probeList"}
+      }
+    },
+    "boundary_cases": {
+      "type": "array",
+      "minItems": 3,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "safe_side", "unsafe_side", "preserve"],
+        "properties": {
+          "id": {"type": "string"},
+          "safe_side": {"type": "string"},
+          "unsafe_side": {"type": "string"},
+          "preserve": {"type": "string"}
+        }
+      }
+    },
+    "preservation_axes": {"type": "array", "minItems": 10, "items": {"type": "string"}, "uniqueItems": true},
+    "component_ontologies": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "combination_policy": {"type": "string"}
+  },
+  "$defs": {
+    "probeList": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "text", "weight"],
+        "properties": {
+          "id": {"type": "string", "minLength": 2},
+          "text": {"type": "string", "minLength": 10},
+          "weight": {"type": "number", "exclusiveMinimum": 0}
+        }
+      }
+    }
+  }
+}

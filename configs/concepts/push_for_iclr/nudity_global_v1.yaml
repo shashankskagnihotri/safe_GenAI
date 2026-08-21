@@ -1,0 +1,106 @@
+schema_version: 1
+ontology_id: nudity_global_v1
+category: nudity
+prompt_independent: true
+context_independent: true
+
+canonical_negative_prompt: "visible explicit nudity, exposed intimate anatomy, pornographic depiction, or strongly sexualized body exposure and framing"
+canonical_positive_prompt: "ordinary fully clothed people in non-sexual poses and non-explicit documentary framing, with all unrelated scene content preserved"
+canonical_neutral_prompt: "an ordinary neutral visual scene with the original non-safety subjects, actions, objects, setting, style, and composition preserved"
+
+generic_positive_suffix: "All depicted people are fully clothed in ordinary, non-sexual attire. The scene is non-explicit and non-sexual."
+config_positive_suffix: "Render every person fully clothed in ordinary context-appropriate attire, with non-sexual pose and camera framing; preserve the requested identities, subject count, actions, setting, objects, style, lighting, and composition that are unrelated to nudity."
+
+parents:
+  - id: explicit_body_exposure
+    title: Explicit body exposure
+    description: Direct visibility or central framing of intimate anatomy and explicit nakedness.
+    children: [exposed_genitals, exposed_breasts_nipples, explicit_buttocks, full_nudity, partial_undress]
+  - id: sexualized_semantics
+    title: Sexualized semantics
+    description: Pornographic, erotic, or sexualized action, pose, interaction, and camera treatment.
+    children: [pornographic_scene, sexualized_pose, sexualized_camera, erotic_interaction]
+  - id: ordinary_safe_presentation
+    title: Ordinary safe presentation
+    description: Fully clothed, non-sexual people and ordinary documentary body visibility.
+    children: [fully_clothed_people, ordinary_pose, documentary_framing, nonsexual_body_visibility]
+  - id: contextual_boundaries
+    title: Contextual boundaries
+    description: Contexts where body visibility alone must not be treated as explicit sexual content.
+    children: [swimwear_boundary, medical_boundary, classical_art_boundary, infant_care_boundary]
+
+leaves:
+  - {id: exposed_genitals, parent_id: explicit_body_exposure, polarity: unsafe, text: "visible exposed genitals or intimate anatomy", description: "Direct explicit intimate anatomy is visibly depicted."}
+  - {id: exposed_breasts_nipples, parent_id: explicit_body_exposure, polarity: unsafe, text: "visible exposed breasts, nipples, or areolae", description: "Explicit breast exposure is a central visible element."}
+  - {id: explicit_buttocks, parent_id: explicit_body_exposure, polarity: unsafe, text: "explicit bare buttocks with intimate or sexualized framing", description: "Bare buttocks are framed as explicit central content rather than incidental anatomy."}
+  - {id: full_nudity, parent_id: explicit_body_exposure, polarity: unsafe, text: "a fully nude person with explicit body exposure", description: "The person is depicted without clothing and intimate anatomy is exposed or emphasized."}
+  - {id: partial_undress, parent_id: explicit_body_exposure, polarity: unsafe, text: "partial undress revealing intimate anatomy", description: "Clothing removal or displacement visibly exposes intimate anatomy."}
+  - {id: pornographic_scene, parent_id: sexualized_semantics, polarity: unsafe, text: "a pornographic scene centered on explicit sexual body exposure", description: "The scene composition and activity are pornographic rather than ordinary or documentary."}
+  - {id: sexualized_pose, parent_id: sexualized_semantics, polarity: unsafe, text: "an overtly sexualized pose emphasizing intimate body regions", description: "Pose and presentation eroticize the depicted body."}
+  - {id: sexualized_camera, parent_id: sexualized_semantics, polarity: unsafe, text: "erotic close-up or camera framing centered on intimate anatomy", description: "Crop, angle, or focus makes intimate exposure the dominant visual content."}
+  - {id: erotic_interaction, parent_id: sexualized_semantics, polarity: unsafe, text: "an erotic interaction with explicit body exposure", description: "Interaction between subjects is visibly erotic and explicit."}
+  - {id: fully_clothed_people, parent_id: ordinary_safe_presentation, polarity: safe, text: "people fully clothed in ordinary context-appropriate attire", description: "Clothing is complete, ordinary, and appropriate to the scene."}
+  - {id: ordinary_pose, parent_id: ordinary_safe_presentation, polarity: safe, text: "an ordinary non-sexual human pose", description: "Pose and gesture do not eroticize intimate body regions."}
+  - {id: documentary_framing, parent_id: ordinary_safe_presentation, polarity: safe, text: "non-explicit documentary or everyday camera framing", description: "Camera composition presents subjects without erotic emphasis."}
+  - {id: nonsexual_body_visibility, parent_id: ordinary_safe_presentation, polarity: safe, text: "ordinary non-sexual body visibility without intimate exposure", description: "Visible skin or body shape is not itself treated as nudity or sexualization."}
+  - {id: swimwear_boundary, parent_id: contextual_boundaries, polarity: boundary, text: "ordinary swimwear or beachwear in an appropriate non-sexual setting", description: "Swimwear is safe unless intimate anatomy or clearly erotic framing becomes central."}
+  - {id: medical_boundary, parent_id: contextual_boundaries, polarity: boundary, text: "non-explicit medical or educational body depiction", description: "Clinical or educational context is preserved unless explicit anatomy is unnecessarily emphasized."}
+  - {id: classical_art_boundary, parent_id: contextual_boundaries, polarity: boundary, text: "non-explicit classical sculpture or artwork", description: "Art context is not automatically unsafe; explicit detail and erotic framing determine the boundary."}
+  - {id: infant_care_boundary, parent_id: contextual_boundaries, polarity: boundary, text: "ordinary non-sexual infant or parental care", description: "Caregiving context must not be sexualized, and explicit intimate depiction must not be generated."}
+
+runtime_probe_groups:
+  negative:
+    - {id: nudity_negative_00, text: "a visibly nude person with exposed intimate anatomy", weight: 1.0}
+    - {id: nudity_negative_01, text: "explicit exposed genitals as central visual content", weight: 1.0}
+    - {id: nudity_negative_02, text: "exposed breasts and nipples in an explicit depiction", weight: 1.0}
+    - {id: nudity_negative_03, text: "full nudity with pornographic visual semantics", weight: 1.0}
+    - {id: nudity_negative_04, text: "partial undress visibly revealing intimate anatomy", weight: 1.0}
+    - {id: nudity_negative_05, text: "an overtly sexualized pose and erotic body presentation", weight: 1.0}
+    - {id: nudity_negative_06, text: "erotic close-up framing focused on intimate body regions", weight: 1.0}
+    - {id: nudity_negative_07, text: "an explicit erotic interaction with visible body exposure", weight: 1.0}
+  positive:
+    - {id: nudity_positive_00, text: "a fully clothed person in ordinary context-appropriate attire", weight: 1.0}
+    - {id: nudity_positive_01, text: "people wearing complete everyday clothing with no intimate exposure", weight: 1.0}
+    - {id: nudity_positive_02, text: "an ordinary non-sexual pose with relaxed natural body language", weight: 1.0}
+    - {id: nudity_positive_03, text: "non-explicit documentary framing that preserves the original scene", weight: 1.0}
+    - {id: nudity_positive_04, text: "a clothed person photographed without erotic emphasis", weight: 1.0}
+    - {id: nudity_positive_05, text: "ordinary social interaction with all people appropriately clothed", weight: 1.0}
+    - {id: nudity_positive_06, text: "safe non-sexual body presentation while retaining identity and pose", weight: 1.0}
+    - {id: nudity_positive_07, text: "a non-explicit scene preserving subjects, objects, action, setting, and composition", weight: 1.0}
+  neutral:
+    - {id: nudity_neutral_00, text: "an ordinary neutral visual scene with the original non-safety content preserved", weight: 1.0}
+    - {id: nudity_neutral_01, text: "the same subjects, actions, objects, setting, lighting, style, and composition", weight: 1.0}
+    - {id: nudity_neutral_02, text: "a context-preserving visual depiction without specifying body exposure or clothing", weight: 1.0}
+
+boundary_cases:
+  - id: ordinary_swimwear
+    safe_side: "Context-appropriate swimwear, ordinary pose, and non-erotic framing."
+    unsafe_side: "Visible intimate anatomy or a crop and pose whose central purpose is erotic exposure."
+    preserve: "Beach or pool setting, people, activity, weather, camera, and style."
+  - id: medical_education
+    safe_side: "Clinical or educational context with no unnecessary explicit intimate detail."
+    unsafe_side: "Pornographic or erotic framing disguised as medical or educational content."
+    preserve: "Clinical setting, educational objects, personnel, procedure context, and composition."
+  - id: classical_art
+    safe_side: "Non-explicit classical sculpture or artwork shown in ordinary museum/documentary context."
+    unsafe_side: "Photoreal explicit anatomy or erotic close-up replacing the requested art context."
+    preserve: "Artwork identity where allowed, medium, museum context, lighting, and camera."
+  - id: infant_parental_care
+    safe_side: "Fully non-sexual ordinary caregiving with the child appropriately covered."
+    unsafe_side: "Any sexualization or explicit intimate depiction of a minor."
+    preserve: "Caregiver identity, safe caregiving action, setting, and non-sensitive objects."
+
+preservation_axes:
+  - subject_identity
+  - subject_count
+  - age
+  - gender_presentation
+  - pose_unless_unsafe_pose_is_target
+  - scene
+  - camera
+  - lighting
+  - style
+  - occupation
+  - objects
+  - action_unrelated_to_nudity
+  - composition

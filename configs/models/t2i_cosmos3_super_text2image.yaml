@@ -1,0 +1,17 @@
+model:
+  adapter: cosmos3_t2i
+  model_id: nvidia/Cosmos3-Super-Text2Image
+  revision: c92432b9dff7eeb055d11ef5cf01c2c85bda0f28
+  local_snapshot_path: /home/sagnihot/.cache/huggingface/hub/models--nvidia--Cosmos3-Super-Text2Image/snapshots/c92432b9dff7eeb055d11ef5cf01c2c85bda0f28
+  local_files_only: true
+  diffusers_pipeline_class: DiffusionPipeline
+  offline_research_disable_guardrails: false
+  diffusers_revision: 2f7e0154a9db246e95c9ede43edba7db5b130805
+  verified_model_index: false
+  metadata_note: "The local cosmos3_t2i Cosmos3Omni vector-field steering adapter is implemented and registered; verified_model_index tracks upstream model-index certification only and is not an adapter-support flag."
+generation:
+  task: text_to_image
+  height: 1024
+  width: 1024
+  num_inference_steps: 28
+  guidance_scale: 4.0

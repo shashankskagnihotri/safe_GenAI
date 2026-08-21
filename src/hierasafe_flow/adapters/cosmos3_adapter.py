@@ -26,12 +26,17 @@ class Cosmos3TextToImageAdapter(DiffusersFrozenAdapter):
         ablation = self._local_ablation_metadata()
         if ablation is not None:
             self.model_id = str(ablation["base_model_id"])
+        disable_guardrails = bool(
+            self.config.get("offline_research_disable_guardrails", False)
+        )
         load_kwargs = self.config.setdefault("load_kwargs", {})
-        if load_kwargs.get("enable_safety_checker", True) is not True:
+        requested_checker_state = load_kwargs.get("enable_safety_checker")
+        if requested_checker_state is not None and bool(requested_checker_state) == disable_guardrails:
             raise ValueError(
-                "Cosmos3 exact execution forbids disabling the official CosmosSafetyChecker."
+                "Cosmos3 guardrail configuration disagrees with "
+                "model.offline_research_disable_guardrails."
             )
-        load_kwargs["enable_safety_checker"] = True
+        load_kwargs["enable_safety_checker"] = not disable_guardrails
         load_kwargs.setdefault("device_map", os.environ.get("COSMOS3_DEVICE_MAP", "balanced"))
         model_source, source_is_local = self._resolved_model_source()
         pipeline_cls = self._resolve_pipeline_class()
@@ -56,7 +61,15 @@ class Cosmos3TextToImageAdapter(DiffusersFrozenAdapter):
         if prepartitioned_transformer is not None:
             kwargs["transformer"] = prepartitioned_transformer
         self.pipeline = pipeline_cls.from_pretrained(model_source, **kwargs)
-        self._require_safety_checker()
+        if disable_guardrails:
+            checker = getattr(self.pipeline, "safety_checker", None)
+            if checker is not None:
+                raise RuntimeError(
+                    "Cosmos3 was requested without guardrails, but a safety checker "
+                    "was still instantiated."
+                )
+        else:
+            self._require_safety_checker()
         if prepartitioned_transformer is not None:
             self.pipeline.vae.to(self.device)
         elif "device_map" not in kwargs and hasattr(self.pipeline, "to"):
@@ -66,10 +79,22 @@ class Cosmos3TextToImageAdapter(DiffusersFrozenAdapter):
             self._apply_local_ablation(ablation)
         self._validate_components()
         self.config["_cosmos3_guardrail_contract"] = {
-            "constructor_enabled": True,
-            "text_pre_generation": True,
-            "visual_post_decode": True,
-            "disable_override_forbidden": True,
+            "guardrails_enabled": not disable_guardrails,
+            "guardrail_disable_mechanism": (
+                "diffusers_construction_flag" if disable_guardrails else None
+            ),
+            "constructor_enable_safety_checker": not disable_guardrails,
+            "text_pre_generation": not disable_guardrails,
+            "visual_post_decode": not disable_guardrails,
+            "offline_research_only": disable_guardrails,
+            "public_serving_forbidden_by_campaign": disable_guardrails,
+            "diffusers_revision": str(
+                self.config.get(
+                    "diffusers_revision",
+                    "UNKNOWN_MUST_BE_RECORDED_BY_CAMPAIGN",
+                )
+            ),
+            "model_revision": str(self.config.get("revision")),
         }
         self.config["_cosmos3_model_source_contract"] = {
             "configured_model_id": str(self.model_id),
@@ -97,6 +122,8 @@ class Cosmos3TextToImageAdapter(DiffusersFrozenAdapter):
         return checker
 
     def _check_text_safety(self, prompt: str) -> None:
+        if bool(self.config.get("offline_research_disable_guardrails", False)):
+            return
         assert self.pipeline is not None
         checker = self._require_safety_checker()
         execution_device = self.pipeline._get_execution_device()
@@ -436,6 +463,12 @@ class Cosmos3TextToImageAdapter(DiffusersFrozenAdapter):
         z_raw = latents.to(dtype) / inv_std.view(1, -1, 1, 1, 1) + mean.view(1, -1, 1, 1, 1)
         decoded = self.pipeline.vae.decode(z_raw).sample.to(in_dtype)
         video = self.pipeline.video_processor.postprocess_video(decoded, output_type="pil")[0]
+        if bool(self.config.get("offline_research_disable_guardrails", False)):
+            if getattr(self.pipeline, "safety_checker", None) is not None:
+                raise RuntimeError(
+                    "Cosmos3 offline-research decode found an unexpected safety checker."
+                )
+            return video
         self._require_safety_checker()
         safety_helper = getattr(self.pipeline, "_apply_video_safety_check", None)
         if not callable(safety_helper):
