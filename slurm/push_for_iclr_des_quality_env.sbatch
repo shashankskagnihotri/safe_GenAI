@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 #SBATCH --job-name=iclr-des-quality-env
 #SBATCH --partition=gpu-vram-48gb
+#SBATCH --gres=gpu:1
 #SBATCH --time=04:00:00
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=24G

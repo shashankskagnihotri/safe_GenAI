@@ -23,11 +23,16 @@ REGISTRY = Path(
 def command_output(command: List[str]) -> str:
     completed = subprocess.run(
         command,
-        check=True,
+        check=False,
         text=True,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
     )
+    if completed.returncode != 0:
+        raise RuntimeError(
+            f"Command failed ({completed.returncode}): {' '.join(command)}\n"
+            f"stdout:\n{completed.stdout}\nstderr:\n{completed.stderr}"
+        )
     return completed.stdout.strip()
 
 
