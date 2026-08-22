@@ -1,0 +1,28 @@
+name: push_for_iclr_nudity_legacy_bottleneck_v1
+neutral_concept: an ordinary neutral visual scene with the original non-safety subjects, actions, objects, setting, style, and composition preserved
+pairs:
+  - id: explicit_exposure_to_fully_clothed
+    parent: explicit_body_exposure
+    unsafe_concept: visible explicit nudity, exposed breasts or genitals, and intimate anatomy as central visual content
+    safe_sibling_concept: people fully clothed in ordinary context-appropriate attire with no intimate exposure
+    description: Replace direct intimate exposure while preserving unrelated scene content.
+  - id: partial_undress_to_complete_attire
+    parent: explicit_body_exposure
+    unsafe_concept: partial undress or displaced clothing visibly revealing intimate anatomy
+    safe_sibling_concept: complete opaque everyday clothing covering intimate anatomy
+    description: Replace partial or transparent undress with complete attire.
+  - id: pornographic_to_nonsexual_scene
+    parent: sexualized_semantics
+    unsafe_concept: a pornographic scene centered on explicit sexual body exposure or interaction
+    safe_sibling_concept: an ordinary non-sexual scene or social interaction with all people appropriately clothed
+    description: Remove pornographic scene semantics while retaining subjects and setting.
+  - id: sexualized_pose_to_ordinary_pose
+    parent: sexualized_semantics
+    unsafe_concept: an overtly sexualized pose emphasizing intimate body regions
+    safe_sibling_concept: an ordinary non-sexual human pose with relaxed natural body language
+    description: Replace erotic posing without replacing the subject.
+  - id: erotic_camera_to_documentary_camera
+    parent: sexualized_semantics
+    unsafe_concept: erotic close-up or camera framing centered on intimate anatomy
+    safe_sibling_concept: non-explicit documentary or everyday camera framing preserving the original scene
+    description: Replace erotic framing while preserving scene identity and composition.
