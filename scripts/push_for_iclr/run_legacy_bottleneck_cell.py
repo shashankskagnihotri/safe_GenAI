@@ -110,7 +110,7 @@ def build_runner_config(row: dict[str, Any], output_dir: Path) -> dict[str, Any]
             "feature_dim": controller["feature_dim"],
             "mask": controller["mask"],
             "calibration": controller["calibration"],
-            "mode": controller["mode"],
+            "mode": controller["mode"] if arm["enabled"] else "none",
             "start_fraction": controller["start_fraction"],
             "end_fraction": controller["end_fraction"],
             "active_pair_ids": arm["active_pair_ids"],

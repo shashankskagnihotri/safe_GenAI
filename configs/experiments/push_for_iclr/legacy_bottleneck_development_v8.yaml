@@ -1,5 +1,5 @@
 schema_version: push-for-iclr.legacy-bottleneck-development.v1
-campaign_id: push_for_iclr_legacy_bottleneck_v8_exact_reproduction
+campaign_id: push_for_iclr_legacy_bottleneck_v8_exact_reproduction_attempt_002
 stage: 7
 split_role: development_only_method_redesign
 source_manifest:
@@ -55,6 +55,6 @@ slurm:
   array_throttle: null
   user_hold: false
 output:
-  stage_directory: 02_LEGACY_BOTTLENECK_DEV_V8_EXACT
-  manifest_filename: legacy_bottleneck_development_24_v8.jsonl
-  prepared_registry_filename: legacy_bottleneck_development_v8_prepared.json
+  stage_directory: 02_LEGACY_BOTTLENECK_DEV_V8_EXACT_ATTEMPT_002
+  manifest_filename: legacy_bottleneck_development_24_v8_attempt_002.jsonl
+  prepared_registry_filename: legacy_bottleneck_development_v8_attempt_002_prepared.json
