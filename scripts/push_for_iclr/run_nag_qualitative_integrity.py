@@ -13,6 +13,7 @@ import subprocess
 import sys
 import tempfile
 import time
+import types
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -58,6 +59,18 @@ def git_head(path: Path) -> str:
     ).strip()
 
 
+def install_flux_only_nag_namespace(upstream: Path) -> None:
+    """Expose pinned FLUX submodules without executing unrelated eager exports."""
+    package_dir = (upstream / "nag").resolve()
+    if not (package_dir / "transformer_flux.py").is_file():
+        raise RuntimeError(f"Pinned NAG FLUX package is incomplete: {package_dir}")
+    package = types.ModuleType("nag")
+    package.__file__ = str(package_dir / "__init__.py")
+    package.__package__ = "nag"
+    package.__path__ = [str(package_dir)]
+    sys.modules["nag"] = package
+
+
 def make_pipeline(config: dict, arm_id: str):
     model_dir = Path(config["model"]["local_dir"])
     admission = load_json(model_dir / "ADMISSION.json")
@@ -75,6 +88,7 @@ def make_pipeline(config: dict, arm_id: str):
             local_files_only=True,
         )
     else:
+        install_flux_only_nag_namespace(Path(config["upstream"]["path"]))
         from nag.transformer_flux import NAGFluxTransformer2DModel
         import nag.pipeline_flux_nag as pipeline_module
 
@@ -126,7 +140,9 @@ def main() -> None:
     }
     if configured_overlay not in resolved_sys_path:
         raise RuntimeError("NAG admitted package overlay is absent from sys.path")
-    expected_packages = environment_admission["packages"]
+    expected_packages = environment_admission.get(
+        "effective_packages", environment_admission["packages"]
+    )
     actual_packages = {
         name: importlib.metadata.version(name) for name in expected_packages
     }
@@ -236,6 +252,7 @@ def main() -> None:
                 "admission_sha256": sha256_file(environment_admission_path),
                 "base_python": config["base_python"],
                 "pythonpath_overlay": str(configured_overlay),
+                "nag_import_policy": config["nag_import_policy"],
                 "packages": actual_packages,
             },
             "model_revision": config["model"]["revision"],

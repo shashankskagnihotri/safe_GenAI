@@ -1,20 +1,21 @@
 {
   "schema_version": 1,
-  "experiment_id": "nag_figure5_qualitative_integrity_attempt002",
+  "experiment_id": "nag_figure5_qualitative_integrity_attempt003",
   "claim_scope": "Qualitative implementation-integrity diagnostic only; not an exact Table 1 reproduction because the paper's quantitative protocol is unreleased.",
   "upstream": {
     "path": "/ceph/sagnihot/projects/safety_genAI_upstreams/PUSH_FOR_ICLR/NAG",
     "commit": "8bb34a16e517692743fab99bc60838c20f975ded"
   },
-  "environment": "/ceph/sagnihot/projects/safety_genAI/outputs/PUSH_FOR_ICLR/REPRODUCTIONS/ENVIRONMENTS/nag/8bb34a16e517_diffusers0350_protobuf5295_v2",
+  "environment": "/ceph/sagnihot/projects/safety_genAI/outputs/PUSH_FOR_ICLR/REPRODUCTIONS/ENVIRONMENTS/nag/8bb34a16e517_diffusers0331_protobuf5295_v3",
   "base_python": "/ceph/sagnihot/projects/safety_genAI/outputs/PUSH_FOR_ICLR/REPRODUCTIONS/ENVIRONMENTS/nag/8bb34a16e517/env/bin/python",
-  "pythonpath_overlay": "/ceph/sagnihot/projects/safety_genAI/outputs/PUSH_FOR_ICLR/REPRODUCTIONS/ENVIRONMENTS/nag/8bb34a16e517_diffusers0350_protobuf5295_v2/overlay",
+  "pythonpath_overlay": "/ceph/sagnihot/projects/safety_genAI/outputs/PUSH_FOR_ICLR/REPRODUCTIONS/ENVIRONMENTS/nag/8bb34a16e517_diffusers0331_protobuf5295_v3/overlay",
+  "nag_import_policy": "pinned_flux_submodules_without_unrelated_eager_package_exports_v1",
   "model": {
     "repo_id": "black-forest-labs/FLUX.1-schnell",
     "revision": "741f7c3ce8b383c54771c7003378a50191e9efe9",
     "local_dir": "/ceph/sagnihot/projects/safety_genAI/outputs/PUSH_FOR_ICLR/REPRODUCTIONS/ASSETS/nag/flux_schnell_diffusers_741f7c3ce8b3"
   },
-  "output_root": "/ceph/sagnihot/projects/safety_genAI/outputs/PUSH_FOR_ICLR/REPRODUCTIONS/nag/figure5_qualitative_integrity/ATTEMPT_002",
+  "output_root": "/ceph/sagnihot/projects/safety_genAI/outputs/PUSH_FOR_ICLR/REPRODUCTIONS/nag/figure5_qualitative_integrity/ATTEMPT_003",
   "generation": {
     "height": 1024,
     "width": 1024,

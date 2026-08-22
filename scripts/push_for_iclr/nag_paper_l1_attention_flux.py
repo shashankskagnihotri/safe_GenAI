@@ -12,6 +12,7 @@ from __future__ import annotations
 import hashlib
 import inspect
 import re
+import sys
 import textwrap
 from types import ModuleType
 from typing import Any
@@ -34,7 +35,12 @@ def build_paper_l1_processor_class(upstream_module: ModuleType) -> tuple[type, d
     if transformed_source.count("p=1") < EXPECTED_REPLACEMENTS:
         raise RuntimeError("L1 source transformation postcondition failed")
 
-    namespace = dict(vars(upstream_module))
+    defining_module = sys.modules.get(original_class.__module__)
+    if defining_module is None:
+        raise RuntimeError(
+            f"Defining module {original_class.__module__!r} is not imported"
+        )
+    namespace = dict(vars(defining_module))
     namespace["__name__"] = __name__
     exec(compile(transformed_source, "<nag-paper-equation-l1>", "exec"), namespace)
     transformed_class = namespace[original_class.__name__]
@@ -44,6 +50,7 @@ def build_paper_l1_processor_class(upstream_module: ModuleType) -> tuple[type, d
         "transformation": "four norm-order keyword literals p=2 -> p=1",
         "replacement_count": len(sites),
         "original_class": f"{original_class.__module__}.{original_class.__qualname__}",
+        "defining_module": defining_module.__name__,
         "original_source_sha256": hashlib.sha256(original_source.encode()).hexdigest(),
         "transformed_source_sha256": hashlib.sha256(transformed_source.encode()).hexdigest(),
     }
