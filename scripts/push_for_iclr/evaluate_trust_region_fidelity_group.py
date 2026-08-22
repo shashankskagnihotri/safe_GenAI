@@ -149,15 +149,27 @@ def main() -> None:
     parser.add_argument("--config", type=Path, required=True)
     parser.add_argument("--group-index", type=int, required=True)
     parser.add_argument("--summary-root", type=Path, required=True)
+    parser.add_argument("--allow-subset-manifest", action="store_true")
     args = parser.parse_args()
 
-    rows = load_manifest(args.manifest, args.manifest_file_sha256)
-    keys = group_keys(rows)
+    rows = load_manifest(
+        args.manifest,
+        args.manifest_file_sha256,
+        allow_subset=args.allow_subset_manifest,
+    )
+    keys = group_keys(rows, expected_count=None if args.allow_subset_manifest else 24)
     if args.group_index < 0 or args.group_index >= len(keys):
         raise IndexError(args.group_index)
     model_id, arm_id = keys[args.group_index]
-    selected = rows_for_group(rows, model_id, arm_id)
-    baselines = baseline_index(rows)
+    selected = rows_for_group(
+        rows,
+        model_id,
+        arm_id,
+        expected_rows=None if args.allow_subset_manifest else 20,
+    )
+    baselines = baseline_index(
+        rows, expected_count=None if args.allow_subset_manifest else 40
+    )
     config = yaml.safe_load(args.config.read_text(encoding="utf-8"))
     runtime = FidelityRuntime(config["fidelity"])
     records: list[dict[str, Any]] = []

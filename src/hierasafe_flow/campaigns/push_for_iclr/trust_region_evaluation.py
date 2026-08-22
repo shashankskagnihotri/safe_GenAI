@@ -110,7 +110,12 @@ def atomic_csv(path: Path, rows: Sequence[Mapping[str, Any]], fields: Sequence[s
         raise
 
 
-def load_manifest(path: Path, expected_file_sha256: str | None = None) -> list[dict[str, Any]]:
+def load_manifest(
+    path: Path,
+    expected_file_sha256: str | None = None,
+    *,
+    allow_subset: bool = False,
+) -> list[dict[str, Any]]:
     path = path.resolve()
     if not path.is_file():
         raise FileNotFoundError(path)
@@ -142,7 +147,10 @@ def load_manifest(path: Path, expected_file_sha256: str | None = None) -> list[d
                 if field not in row:
                     raise RuntimeError(f"Manifest line {line_number} lacks {field!r}.")
             rows.append(row)
-    validate_manifest_population(rows)
+    if allow_subset:
+        validate_subset_manifest_population(rows)
+    else:
+        validate_manifest_population(rows)
     return rows
 
 
@@ -184,10 +192,62 @@ def validate_manifest_population(rows: Sequence[Mapping[str, Any]]) -> None:
                     )
 
 
-def group_keys(rows: Sequence[Mapping[str, Any]]) -> list[tuple[str, str]]:
+def validate_subset_manifest_population(rows: Sequence[Mapping[str, Any]]) -> None:
+    """Validate a development-only matched subset without relaxing full-run checks."""
+    if not rows:
+        raise RuntimeError("A trust-region subset manifest cannot be empty.")
+    seen: set[tuple[str, str, str]] = set()
+    groups: dict[tuple[str, str], dict[str, Mapping[str, Any]]] = defaultdict(dict)
+    for row in rows:
+        model_id = str(row["model_id"])
+        arm_id = str(row["arm_id"])
+        source_row_id = str(row["source_row_id"])
+        identity = (model_id, arm_id, source_row_id)
+        if identity in seen:
+            raise RuntimeError(f"Duplicate trust-region subset identity: {identity}.")
+        seen.add(identity)
+        groups[(model_id, arm_id)][source_row_id] = row
+
+    models = sorted({model_id for model_id, _ in groups})
+    for model_id in models:
+        baseline_key = (model_id, "R00_BASELINE")
+        if baseline_key not in groups:
+            raise RuntimeError(
+                f"Subset model {model_id!r} lacks the matched R00_BASELINE group."
+            )
+        baseline_rows = groups[baseline_key]
+        baseline_ids = set(baseline_rows)
+        if not baseline_ids:
+            raise RuntimeError(f"Subset baseline for {model_id!r} is empty.")
+        for (group_model, arm_id), arm_rows in groups.items():
+            if group_model != model_id:
+                continue
+            arm_ids = set(arm_rows)
+            if arm_ids != baseline_ids:
+                raise RuntimeError(
+                    f"Subset group {model_id}/{arm_id} is not source-matched to baseline: "
+                    f"baseline={sorted(baseline_ids)}, arm={sorted(arm_ids)}."
+                )
+            for source_row_id, row in arm_rows.items():
+                baseline = baseline_rows[source_row_id]
+                for field in ("category", "original_prompt", "original_prompt_sha256"):
+                    if row.get(field) != baseline.get(field):
+                        raise RuntimeError(
+                            f"Subset metadata mismatch for {model_id}/{arm_id}/"
+                            f"{source_row_id}: {field}."
+                        )
+
+
+def group_keys(
+    rows: Sequence[Mapping[str, Any]], expected_count: int | None = 24
+) -> list[tuple[str, str]]:
     keys = sorted({(str(row["model_id"]), str(row["arm_id"])) for row in rows})
-    if len(keys) != len(EXPECTED_MODELS) * len(EXPECTED_ARMS):
-        raise RuntimeError(f"Expected 24 model-arm groups, observed {len(keys)}.")
+    if expected_count is not None and len(keys) != expected_count:
+        raise RuntimeError(
+            f"Expected {expected_count} model-arm groups, observed {len(keys)}."
+        )
+    if not keys:
+        raise RuntimeError("No model-arm groups were found.")
     return keys
 
 
@@ -204,7 +264,10 @@ def sheet_keys(rows: Sequence[Mapping[str, Any]]) -> list[tuple[str, str, str]]:
 
 
 def rows_for_group(
-    rows: Sequence[Mapping[str, Any]], model_id: str, arm_id: str
+    rows: Sequence[Mapping[str, Any]],
+    model_id: str,
+    arm_id: str,
+    expected_rows: int | None = EXPECTED_ROWS_PER_GROUP,
 ) -> list[dict[str, Any]]:
     selected = [
         dict(row)
@@ -212,11 +275,13 @@ def rows_for_group(
         if row["model_id"] == model_id and row["arm_id"] == arm_id
     ]
     selected.sort(key=lambda row: (row["category"], row["source_row_id"]))
-    if len(selected) != EXPECTED_ROWS_PER_GROUP:
+    if expected_rows is not None and len(selected) != expected_rows:
         raise RuntimeError(
             f"{model_id}/{arm_id} has {len(selected)} rows; "
-            f"expected {EXPECTED_ROWS_PER_GROUP}."
+            f"expected {expected_rows}."
         )
+    if not selected:
+        raise RuntimeError(f"{model_id}/{arm_id} has no rows.")
     return selected
 
 
@@ -247,7 +312,16 @@ def cell_directory(source_root: Path, row: Mapping[str, Any]) -> Path:
     relative = Path(str(row["expected_output_relative_path"]))
     if relative.is_absolute() or ".." in relative.parts:
         raise RuntimeError(f"Unsafe output-relative path: {relative}.")
-    return campaign_output_root(source_root) / relative
+    source_root = source_root.resolve()
+    campaign_root = campaign_output_root(source_root).resolve()
+    if relative.parts[:2] == ("outputs", "PUSH_FOR_ICLR"):
+        candidate = source_root / relative
+    else:
+        candidate = campaign_root / relative
+    resolved = candidate.resolve()
+    if resolved != campaign_root and campaign_root not in resolved.parents:
+        raise RuntimeError(f"Output path escapes campaign root: {candidate}.")
+    return candidate
 
 
 def image_path(source_root: Path, row: Mapping[str, Any]) -> Path:
@@ -261,7 +335,9 @@ def evaluation_path(source_root: Path, row: Mapping[str, Any], metric: str) -> P
     return cell_directory(source_root, row) / "evaluations" / f"{metric}.json"
 
 
-def baseline_index(rows: Sequence[Mapping[str, Any]]) -> dict[tuple[str, str], dict[str, Any]]:
+def baseline_index(
+    rows: Sequence[Mapping[str, Any]], expected_count: int | None = 40
+) -> dict[tuple[str, str], dict[str, Any]]:
     index: dict[tuple[str, str], dict[str, Any]] = {}
     for row in rows:
         if row["arm_id"] != "R00_BASELINE":
@@ -270,8 +346,12 @@ def baseline_index(rows: Sequence[Mapping[str, Any]]) -> dict[tuple[str, str], d
         if key in index:
             raise RuntimeError(f"Duplicate baseline cell: {key}.")
         index[key] = dict(row)
-    if len(index) != len(EXPECTED_MODELS) * 20:
-        raise RuntimeError(f"Expected 40 baseline cells, observed {len(index)}.")
+    if expected_count is not None and len(index) != expected_count:
+        raise RuntimeError(
+            f"Expected {expected_count} baseline cells, observed {len(index)}."
+        )
+    if not index:
+        raise RuntimeError("No baseline cells were found.")
     return index
 
 
