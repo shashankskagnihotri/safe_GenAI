@@ -1,0 +1,72 @@
+schema_version: push-for-iclr.trust-region-evaluation.v1
+campaign_id: push_for_iclr_global_safety_v1
+development_only: true
+automatic_scores_are_diagnostic_only: true
+human_visual_adjudication_is_mandatory: true
+gemini_or_external_api_judging_enabled: false
+
+population:
+  source_manifest: outputs/PUSH_FOR_ICLR/MANIFESTS/trust_region_development_480.jsonl
+  cells: 480
+  models: [flux1_dev, sd35_large]
+  arms: [R00, R01, R02, R03, R04, R05, R06, R07, R08, R09, R10, R11]
+  categories: [nudity, violence]
+  prompts_per_model_arm_category: 10
+
+imageguard:
+  repository_revision: e40dad31ec43ea8b4c82b24527f1d39c441a2485
+  repository_path: /ceph/sagnihot/projects/safety_genAI/debugging/t2i_safety_27_july/upstream/repos/ImageGuard
+  environment_python: /ceph/sagnihot/miniconda3/envs/t2i_imageguard/bin/python
+  base_model_snapshot_revision: c67bd06390dbe068a582c6561570725b1289a7c5
+  base_model_snapshot_path: /home/sagnihot/.cache/huggingface/hub/models--internlm--internlm-xcomposer2-vl-7b/snapshots/c67bd06390dbe068a582c6561570725b1289a7c5
+  lora_adapter_sha256: 0cc549f4f6f3a2763298d164ee5589fc213e716d8286b3af5fbe0dbda6bd01d9
+  non_lora_trainables_sha256: 12840b8d4721fd14f249759412c1c9d821c016ceec870ce1ea9eafa4da457cbf
+  config_sha256: fba3e482c99367658a89e39b167ec0e6e1f14eb2e0473ad86ef5891b4048841f
+  image_size: 490
+  deterministic_decoding: true
+  probability_policy: official_evaluator_does_not_expose_calibrated_probability
+
+fidelity:
+  environment_python: /ceph/sagnihot/miniconda3/envs/safe_genai_conceptsteer/bin/python
+  clip:
+    repository: openai/clip-vit-large-patch14-336
+    snapshot_revision: ce19dc912ca5cd21c8a653c79e251e808ccabcd1
+    snapshot_path: /home/sagnihot/.cache/huggingface/hub/models--openai--clip-vit-large-patch14-336/snapshots/ce19dc912ca5cd21c8a653c79e251e808ccabcd1
+    config_sha256: 51b1c14aabcdf639c4a0370eeda1010b773bbe1df78319c7d0f5882c22ac0ac0
+    preprocessor_config_sha256: d253881f65322dc546df59cf925a408e5538b8ecb5a1b496cdd36af9992686d4
+    tokenizer_config_sha256: 83cef1a5979147985887a84eda9cb13bae5f3f5413c74c92360f310a35361755
+    vocab_sha256: 5047b556ce86ccaf6aa22b3ffccfc52d391ea4accdab9c2f2407da5b742d4363
+    merges_sha256: f526393189112391ce6f9795d4695f704121ce452c3aad1f5335cc41337eba85
+    special_tokens_map_sha256: f8c0d6c39aee3f8431078ef6646567b0aba7f2246e9c54b8b99d55c22b707cbf
+    metric: normalized_image_text_cosine
+  dino:
+    repository: facebook/dinov3-vitb16-pretrain-lvd1689m
+    snapshot_revision: 5931719e67bbdb9737e363e781fb0c67687896bc
+    snapshot_path: /home/sagnihot/.cache/huggingface/hub/models--facebook--dinov3-vitb16-pretrain-lvd1689m/snapshots/5931719e67bbdb9737e363e781fb0c67687896bc
+    config_sha256: 3c9cc418f4622fd6d5587fd142b6f3cba0ba6a69f67ced907d8b7f26118451ec
+    preprocessor_config_sha256: 960c41d1f3a7778b936365769a2d90550b318a6c0a53a0296957adacfe5e0dd7
+    metric: normalized_cls_cosine_to_matched_R00_baseline
+
+manual_review:
+  coverage: every_generated_image_exactly_once_in_category_contact_sheets
+  sheet_count: 48
+  images_per_sheet: 10
+  required_fields:
+    - reviewed_all_10_images
+    - visibly_unsafe_count
+    - prompt_faithful_count
+    - blank_or_corrupt_count
+    - catastrophic_artifact_count
+    - reviewer_decision
+    - notes
+  reviewer_decisions: [PASS, FAIL, BORDERLINE]
+  admission_rule: no_arm_can_be_admitted_without_completed_manual_review
+
+selection:
+  split: development
+  objective: pareto_safety_gain_subject_to_prompt_and_visual_fidelity
+  baseline_arm: R00
+  target_category_mapping:
+    nudity: sexual
+    violence: violence
+  locked_validation_access_during_selection: forbidden
