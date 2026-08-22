@@ -1,0 +1,80 @@
+schema_version: 2
+ontology_id: violence_global_v2_trust_region
+category: violence
+prompt_independent: true
+context_independent: true
+runtime_conditioning: safety_concept_prefix_plus_exact_original_prompt
+
+design:
+  purpose: "Route assault, weapon, gore, explosion, aftermath, and crowd modes to matched non-graphic siblings."
+  safety_target_only: "Remove directed bodily harm and graphic injury while retaining subjects, period, location, genre, and non-harmful action."
+  hierarchy_source: "Full frozen violence taxonomy; development prompts are used only for arm tuning."
+
+parents:
+  - {id: directed_harm, unsafe_children: [active_assault, weapon_harm], safe_children: [deescalated_confrontation, safe_weapon_context]}
+  - {id: graphic_harm, unsafe_children: [gore_or_dismemberment, dead_or_graphic_aftermath], safe_children: [intact_non_graphic_action, rescue_or_non_graphic_aftermath]}
+  - {id: destructive_event, unsafe_children: [explosion_with_casualties], safe_children: [distant_controlled_event]}
+  - {id: collective_conflict, unsafe_children: [riot_or_crowd_attack], safe_children: [peaceful_crowd_or_deescalation]}
+
+runtime_probe_pairs:
+  - id: assault_to_deescalated_confrontation
+    parent: directed_harm
+    source:
+      - {id: assault_0, text: "an active physical assault with force directed at a person", weight: 1.0}
+      - {id: attack_0, text: "a person or creature actively attacking and injuring another", weight: 1.0}
+    target:
+      - {id: deescalation_0, text: "the same subjects in a tense but deescalated confrontation without physical contact", weight: 1.0}
+      - {id: standoff_0, text: "the same action setting with subjects safely separated and no bodily harm", weight: 1.0}
+  - id: weapon_harm_to_safe_weapon_context
+    parent: directed_harm
+    source:
+      - {id: weapon_harm_0, text: "a weapon fired, swung, or used to cause visible bodily harm", weight: 1.0}
+      - {id: weapon_threat_0, text: "a weapon aimed directly at a person in an imminent attack", weight: 1.0}
+    target:
+      - {id: lowered_weapon_0, text: "the same weapon visibly lowered, secured, or used as a harmless historical prop", weight: 1.0}
+      - {id: safe_weapon_context_0, text: "the same people and setting without weapon impact, injury, or directed threat", weight: 1.0}
+  - id: gore_to_intact_non_graphic_action
+    parent: graphic_harm
+    source:
+      - {id: gore_0, text: "graphic blood, exposed tissue, severe wounds, or bodily destruction", weight: 1.0}
+      - {id: dismemberment_0, text: "visible mutilation, dismemberment, or severed body parts", weight: 1.0}
+    target:
+      - {id: intact_action_0, text: "the same characters physically intact with no visible wounds, blood, or gore", weight: 1.0}
+      - {id: non_graphic_action_0, text: "the same cinematic action conveyed non-graphically without bodily damage", weight: 1.0}
+  - id: graphic_aftermath_to_rescue
+    parent: graphic_harm
+    source:
+      - {id: death_aftermath_0, text: "a dead body or graphic violent aftermath centered in the scene", weight: 1.0}
+      - {id: severe_injury_0, text: "a person visibly suffering severe or fatal injury", weight: 1.0}
+    target:
+      - {id: rescue_0, text: "the same location with a living person receiving non-graphic rescue or assistance", weight: 1.0}
+      - {id: intact_aftermath_0, text: "the same scene after danger has passed, with people intact and no graphic injury", weight: 1.0}
+  - id: casualty_explosion_to_distant_controlled_event
+    parent: destructive_event
+    source:
+      - {id: casualty_explosion_0, text: "an explosion visibly injuring or killing people", weight: 1.0}
+      - {id: destructive_blast_0, text: "a destructive blast with visible bodily harm and graphic debris", weight: 1.0}
+    target:
+      - {id: distant_event_0, text: "the same distant explosion with no people in danger and no visible injury", weight: 1.0}
+      - {id: controlled_effect_0, text: "the same cinematic environment with a controlled special effect and intact surroundings", weight: 1.0}
+  - id: riot_to_peaceful_crowd
+    parent: collective_conflict
+    source:
+      - {id: riot_0, text: "a crowd riot involving active attacks, trampling, or bodily harm", weight: 1.0}
+      - {id: battlefield_0, text: "chaotic group combat with visible injury and directed violence", weight: 1.0}
+    target:
+      - {id: peaceful_crowd_0, text: "the same crowd and city setting as a peaceful gathering without attacks", weight: 1.0}
+      - {id: separated_groups_0, text: "the same groups visibly separated and deescalating with no bodily harm", weight: 1.0}
+
+neutral_probes:
+  - {id: neutral_0, text: "preserve the original subjects, identities, action context, objects, location, period, style, lighting, and composition", weight: 1.0}
+  - {id: neutral_1, text: "the exact requested scene without adding a generic crowd, table, room, or unrelated replacement subject", weight: 1.0}
+  - {id: neutral_2, text: "ordinary visual rendering with only directed harm and graphic injury left unspecified", weight: 1.0}
+
+boundary_cases:
+  - {id: combat_sport, rule: "Preserve regulated sport and ordinary contact unless severe injury or malicious assault is visible."}
+  - {id: medical, rule: "Preserve treatment and rescue; graphic wounds remain unsafe if visually central."}
+  - {id: theatrical_historical, rule: "Preserve period, props, and documentary context while removing directed injury."}
+  - {id: aggressive_posture, rule: "Preserve tension without contact, weapon impact, or visible injury."}
+
+preservation_axes: [subject_identity, subject_count, historical_or_fantasy_period, action_context_without_bodily_harm, non_harmful_objects, setting, camera, lighting, style, composition]

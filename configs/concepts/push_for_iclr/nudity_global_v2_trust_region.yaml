@@ -1,0 +1,71 @@
+schema_version: 2
+ontology_id: nudity_global_v2_trust_region
+category: nudity
+prompt_independent: true
+context_independent: true
+runtime_conditioning: safety_concept_prefix_plus_exact_original_prompt
+
+design:
+  purpose: "Route to one or two matched safe siblings instead of averaging unrelated nudity modes."
+  safety_target_only: "Change explicit exposure, sexual activity, or erotic framing while preserving unrelated scene semantics."
+  hierarchy_source: "Full frozen nudity taxonomy; development prompts are used only for arm tuning."
+
+parents:
+  - {id: explicit_exposure, unsafe_children: [explicit_anatomy, transparent_or_partial_undress], safe_children: [context_clothing, opaque_context_attire]}
+  - {id: sexual_semantics, unsafe_children: [explicit_sexual_activity, erotic_pose_or_camera], safe_children: [nonsexual_interaction, neutral_pose_and_camera]}
+  - {id: explicit_object_or_metaphor, unsafe_children: [explicit_sexual_object_or_anatomical_metaphor], safe_children: [nonexplicit_product_or_still_life]}
+
+runtime_probe_pairs:
+  - id: explicit_anatomy_to_context_clothing
+    parent: explicit_exposure
+    source:
+      - {id: exposed_anatomy_0, text: "visible exposed genitals, breasts, nipples, or explicit intimate anatomy", weight: 1.0}
+      - {id: full_nudity_0, text: "a fully nude person with intimate anatomy visibly emphasized", weight: 1.0}
+    target:
+      - {id: context_clothing_0, text: "the same person fully clothed in context-appropriate ordinary attire", weight: 1.0}
+      - {id: context_clothing_1, text: "the same subjects and scene with intimate anatomy covered and unrelated details preserved", weight: 1.0}
+  - id: undress_to_opaque_attire
+    parent: explicit_exposure
+    source:
+      - {id: undress_0, text: "clothing removed or displaced to reveal intimate anatomy", weight: 1.0}
+      - {id: transparent_clothes_0, text: "transparent clothing visibly exposing intimate anatomy", weight: 1.0}
+    target:
+      - {id: opaque_attire_0, text: "the same clothing style rendered opaque and covering intimate anatomy", weight: 1.0}
+      - {id: opaque_attire_1, text: "the same action and scene with complete context-appropriate attire", weight: 1.0}
+  - id: sexual_activity_to_nonsexual_interaction
+    parent: sexual_semantics
+    source:
+      - {id: sexual_activity_0, text: "an explicit sexual act or pornographic interaction", weight: 1.0}
+      - {id: erotic_interaction_0, text: "an erotic interaction centered on explicit body contact", weight: 1.0}
+    target:
+      - {id: nonsexual_interaction_0, text: "the same people in a nonsexual social interaction with ordinary personal space", weight: 1.0}
+      - {id: nonsexual_interaction_1, text: "a non-explicit affectionate or conversational interaction preserving identities and setting", weight: 1.0}
+  - id: erotic_framing_to_documentary_framing
+    parent: sexual_semantics
+    source:
+      - {id: erotic_pose_0, text: "an overtly sexualized pose emphasizing intimate body regions", weight: 1.0}
+      - {id: erotic_camera_0, text: "an erotic close-up or camera crop centered on intimate anatomy", weight: 1.0}
+    target:
+      - {id: neutral_pose_0, text: "the same person in an ordinary nonsexual pose", weight: 1.0}
+      - {id: documentary_camera_0, text: "the same scene in non-explicit documentary framing preserving identity and composition", weight: 1.0}
+  - id: explicit_object_to_nonexplicit_still_life
+    parent: explicit_object_or_metaphor
+    source:
+      - {id: sexual_object_0, text: "an explicitly sexual object presented for sexual use", weight: 1.0}
+      - {id: anatomy_metaphor_0, text: "food, sculpture, or an object deliberately framed as explicit intimate anatomy", weight: 1.0}
+    target:
+      - {id: product_photo_0, text: "the same hand and object category in neutral nonsexual product photography", weight: 1.0}
+      - {id: still_life_0, text: "the same materials, colors, and setting composed as a non-explicit still life", weight: 1.0}
+
+neutral_probes:
+  - {id: neutral_0, text: "preserve the original subjects, identities, actions, objects, setting, style, lighting, and composition", weight: 1.0}
+  - {id: neutral_1, text: "the exact requested scene without adding a generic replacement setting or unrelated people", weight: 1.0}
+  - {id: neutral_2, text: "ordinary visual rendering with only the explicit safety attribute left unspecified", weight: 1.0}
+
+boundary_cases:
+  - {id: swimwear, rule: "Preserve context-appropriate swimwear unless intimate anatomy or erotic framing is explicit."}
+  - {id: medical, rule: "Preserve clinical and educational context while avoiding unnecessary explicit detail."}
+  - {id: classical_art, rule: "Preserve artwork identity and medium unless photoreal explicit anatomy or erotic framing dominates."}
+  - {id: infant_care, rule: "Preserve ordinary caregiving but never sexualize or explicitly expose a minor."}
+
+preservation_axes: [subject_identity, subject_count, age, gender_presentation, action_unrelated_to_explicit_content, objects_unrelated_to_explicit_content, setting, camera_except_unsafe_crop, lighting, style, composition]
