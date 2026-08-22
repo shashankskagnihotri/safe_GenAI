@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "protocol_name": "DES_SD15_PAPER_QUALITY_EXACT_V1",
+  "method": "DES",
+  "primary_reproduction_commit": "af1f96ded891f66e0bd0b0d39f421375a8896a53",
+  "primary_protocol_sha256": "600950e47aa58da7e8e20f90013872fe6cf5fb9e5c0dc5c28f3b8280d6269748",
+  "upstreams": {
+    "des": {
+      "path": "/ceph/sagnihot/projects/safety_genAI_upstreams/PUSH_FOR_ICLR/DES",
+      "commit": "1d77e0a2a72023470f201d3149e80429f7b60e15"
+    },
+    "text2image_benchmark": {
+      "path": "/ceph/sagnihot/projects/safety_genAI_upstreams/PUSH_FOR_ICLR/text2image-benchmark",
+      "commit": "532229f679d7e97ecba61914db7276f95733e707",
+      "tree_sha256": "aa042bd1f84d7b2a74905297d90af59b260cf69fb09e66da879d0a932f9ce85a"
+    },
+    "openai_clip": {
+      "path": "/ceph/sagnihot/projects/safety_genAI_upstreams/PUSH_FOR_ICLR/openai_CLIP",
+      "commit": "dcba3cb2e2827b402d2701e7e1c7d9fed8a20ef1",
+      "tree_sha256": "1084e0c0e01334d793a2a4f5bd13b97b3b29371ec676b0f0e2714b896b6ceb7f"
+    }
+  },
+  "paths": {
+    "attempt_root": "/ceph/sagnihot/projects/safety_genAI/outputs/PUSH_FOR_ICLR/REPRODUCTIONS/des/1d77e0a2a720/SD15_TABLE2_TABLE1/ATTEMPT_001",
+    "generated_search_root": "/ceph/sagnihot/projects/safety_genAI/outputs/PUSH_FOR_ICLR/REPRODUCTIONS/des/1d77e0a2a720/SD15_TABLE2_TABLE1/ATTEMPT_001",
+    "quality_root": "/ceph/sagnihot/projects/safety_genAI/outputs/PUSH_FOR_ICLR/REPRODUCTIONS/des/1d77e0a2a720/SD15_TABLE2_TABLE1/ATTEMPT_001/QUALITY",
+    "prompt_csv": "/ceph/sagnihot/projects/safety_genAI_upstreams/PUSH_FOR_ICLR/DES/datasets/coco_prompts.csv",
+    "clipscore_script": "/ceph/sagnihot/projects/safety_genAI_upstreams/PUSH_FOR_ICLR/DES/clipscore.py",
+    "fid_script": "/ceph/sagnihot/projects/safety_genAI_upstreams/PUSH_FOR_ICLR/DES/fid.py",
+    "reference_images": "/ceph/sagnihot/projects/safety_genAI/outputs/PUSH_FOR_ICLR/REPRODUCTIONS/ASSETS/des/coco_10k_exact/images",
+    "mapping_admission": "/ceph/sagnihot/projects/safety_genAI/outputs/PUSH_FOR_ICLR/REPRODUCTIONS/ASSETS/des/coco_10k_exact/MAPPING_ADMISSION.json",
+    "image_admission": "/ceph/sagnihot/projects/safety_genAI/outputs/PUSH_FOR_ICLR/REPRODUCTIONS/ASSETS/des/coco_10k_exact/IMAGE_ADMISSION.json",
+    "reference_manifest": "/ceph/sagnihot/projects/safety_genAI/outputs/PUSH_FOR_ICLR/REPRODUCTIONS/ASSETS/des/coco_10k_exact/FINAL_IMAGE_MANIFEST.jsonl",
+    "hf_home": "/ceph/sagnihot/projects/safety_genAI/outputs/PUSH_FOR_ICLR/REPRODUCTIONS/ASSETS/des/clip_hf_home",
+    "clip_model_safetensors": "/ceph/sagnihot/projects/safety_genAI/outputs/PUSH_FOR_ICLR/REPRODUCTIONS/ASSETS/des/clip_hf_home/hub/models--openai--clip-vit-large-patch14/snapshots/32bd64288804d66eefd0ccbe215aa642df71cc41/model.safetensors",
+    "torch_home": "/ceph/sagnihot/projects/safety_genAI/outputs/PUSH_FOR_ICLR/REPRODUCTIONS/ASSETS/des/torch_home",
+    "inception_checkpoint": "/ceph/sagnihot/projects/safety_genAI/outputs/PUSH_FOR_ICLR/REPRODUCTIONS/ASSETS/des/torch_home/hub/checkpoints/pt_inception-2015-12-05-6726825d.pth",
+    "primary_environment": "/ceph/sagnihot/projects/safety_genAI/outputs/PUSH_FOR_ICLR/REPRODUCTIONS/ENVIRONMENTS/des/1d77e0a2a720/env",
+    "quality_environment": "/ceph/sagnihot/projects/safety_genAI/outputs/PUSH_FOR_ICLR/REPRODUCTIONS/ENVIRONMENTS/des_quality/1d77e0a2a720_532229f679d7_dcba3cb2e282/env"
+  },
+  "expected_sha256": {
+    "prompt_csv": "0d23e52d6baa776b05778ee5c85d718292aad257128451249850d4ee1f008fa6",
+    "clipscore_script": "2692310fd6f8208909622ed3f0696e57f6004f33a0eaf6b5682f4d03db1eeca1",
+    "fid_script": "09ee1202587e85cb7efc94765e570cb9bec435d10ed2428b0aca8ff520883612",
+    "mapping_admission": "95117a6abaae72f1cc49d88cab22b841eca4b585f087edb196122948d60f6dd6",
+    "image_admission": "6137ba4e0280f83f2b95f2ccb913e57e237ae390b07b891fd9df0a24b8a73b63",
+    "reference_manifest": "e82a13f63a3d76be2e38862aa5bfa249adfe2452c738ccad1aa427343433f956",
+    "clip_model_safetensors": "a2bf730a0c7debf160f7a6b50b3aaf3703e7e88ac73de7a314903141db026dcb",
+    "inception_checkpoint": "6726825d0af5f729cebd5821db510b11b1cfad8faad88a03f1befd49fb9129b2"
+  },
+  "generated_images": {
+    "count": 9969,
+    "start_index": 0,
+    "stop_index_exclusive": 9969,
+    "suffix": ".png",
+    "locator_rule": "exactly one directory below generated_search_root must contain the complete immediate-file set 0.png through 9968.png"
+  },
+  "reference_images": {
+    "count": 9969,
+    "mapping_rule": "first caption of each first previously unseen COCO val2014 image, matched to all 9969 released DES COCO prompts after NFKC and whitespace normalization"
+  },
+  "paper_targets": {
+    "clip_score_percent": 25.52,
+    "clip_absolute_tolerance": 0.3,
+    "fid": 15.44,
+    "fid_absolute_tolerance": 1.0
+  },
+  "metric_protocol": {
+    "clip": "Pinned DES clipscore.py, openai/clip-vit-large-patch14, all 9969 generated images, released prompt order",
+    "fid": "Pinned DES fid.py and pinned T2IBenchmark FID implementation, all 9969 generated images, exact matched official COCO val2014 references",
+    "fallbacks_allowed": false
+  }
+}
