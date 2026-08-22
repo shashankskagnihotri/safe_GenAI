@@ -179,18 +179,44 @@ def image_files(directory: Path) -> List[Path]:
     )
 
 
-def locate_generated_coco(config: Dict[str, Any]) -> Dict[str, Any]:
+def locate_generated_coco(config: Dict[str, Any], config_sha: str) -> Dict[str, Any]:
     spec = config["generated_images"]
     root = Path(config["paths"]["generated_search_root"])
     expected_count = int(spec["count"])
     start = int(spec["start_index"])
     stop = int(spec["stop_index_exclusive"])
     suffix = str(spec["suffix"])
-    expected_names = {f"{index}{suffix}" for index in range(start, stop)}
+    filename_template = str(spec.get("filename_template", "{index}" + suffix))
+    expected_names = {filename_template.format(index=index) for index in range(start, stop)}
     if len(expected_names) != expected_count:
         raise RuntimeError("Generated image denominator and index interval disagree")
     if not root.is_dir():
         raise RuntimeError(f"DES generation root does not exist: {root}")
+
+    admission_path = config.get("paths", {}).get("author_generation_admission")
+    if admission_path is not None:
+        admission_file = Path(admission_path)
+        if not admission_file.is_file():
+            raise RuntimeError(f"Missing DES author-generation admission: {admission_file}")
+        admission = json.loads(admission_file.read_text(encoding="utf-8"))
+        if admission.get("status") != "AUTHOR_GENERATION_ADMITTED":
+            raise RuntimeError("DES author-generation admission did not pass")
+        if admission.get("fallback_used") is not False:
+            raise RuntimeError("DES author-generation admission used a prohibited fallback")
+        if admission.get("config_sha256") != config_sha:
+            raise RuntimeError("DES author-generation admission configuration hash mismatch")
+        if admission.get("image_count") != expected_count:
+            raise RuntimeError("DES author-generation admission denominator mismatch")
+        if admission.get("author_generation_manifest_sha256") != config["expected_sha256"]["author_generation_manifest"]:
+            raise RuntimeError("DES author-generation admission manifest hash mismatch")
+        if admission.get("author_image_directory") != config["paths"]["author_generation_images"]:
+            raise RuntimeError("DES author-generation admission image directory mismatch")
+        if admission.get("all_source_hashes_verified") is not True:
+            raise RuntimeError("DES author-generation admission did not verify every image hash")
+        if admission.get("all_prompts_verified_against_released_csv") is not True:
+            raise RuntimeError("DES author-generation admission did not verify every prompt")
+        if admission.get("author_filename_contract_preserved") is not True:
+            raise RuntimeError("DES author-generation admission changed the author filename contract")
 
     directories: Iterable[Path] = [root, *sorted(path for path in root.rglob("*") if path.is_dir())]
     candidates: List[Tuple[Path, List[Path]]] = []
@@ -204,7 +230,7 @@ def locate_generated_coco(config: Dict[str, Any]) -> Dict[str, Any]:
     if len(candidates) != 1:
         rendered = [str(path) for path, _ in candidates]
         raise RuntimeError(
-            "Expected exactly one complete 0.png..9968.png DES COCO directory; "
+            f"Expected exactly one complete {filename_template} DES COCO directory; "
             f"found {len(candidates)}: {rendered}"
         )
     directory, files = candidates[0]
@@ -309,7 +335,7 @@ def run_metric(config: Dict[str, Any], config_sha: str, task_id: int) -> Dict[st
     if task_id not in (0, 1):
         raise RuntimeError("DES quality task id must be 0 (CLIP) or 1 (FID)")
     static_asset_admission(config, config_sha)
-    generated = locate_generated_coco(config)
+    generated = locate_generated_coco(config, config_sha)
     paths = config["paths"]
     quality_root = Path(paths["quality_root"])
     metric = "clip" if task_id == 0 else "fid"
