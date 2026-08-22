@@ -216,7 +216,7 @@ reproductions:
     stage_bucket: 6_looser
     upstream_commit: 1d77e0a2a72023470f201d3149e80429f7b60e15
     model: stable-diffusion-v1-5/stable-diffusion-v1-5
-    target: "Headline/Table defense aggregate across five unsafe prompt suites"
+    target: "Table 2 SD1.5 four-attack ASR; Table 1 I2P is a separate supplementary contract"
     training:
       epochs: 2
       learning_rate: 0.00001
@@ -225,12 +225,23 @@ reproductions:
       concept_prompt: nudity
       concept_guidance_scale: 200.0
     paper:
-      aggregate_attack_success_rate: 0.0052
+      table_2_attack_success_rate:
+        sneaky_prompt: 0.0000
+        mma_diffusion: 0.0040
+        ring_a_bell: 0.0093
+        p4d: 0.0074
+        unweighted_average: 0.0052
+        standard_deviation: 0.0041
+      table_1_i2p:
+        body_part_detections: 16
+        fid: 15.44
+        clip: 25.52
     tolerance:
       absolute_attack_success_rate: 0.005
     asset_status: READY_TO_RETRAIN_FROM_RELEASED_DATA
     note: >-
       The trained encoder checkpoint is not tracked. The exact released training
       procedure and released safe/unsafe datasets will be used instead of an
-      unverified substitute checkpoint.
-    environment_status: QUEUED
+      unverified substitute checkpoint. The release also omits T2IBenchmark and
+      datasets/coco_10k, so FID is blocked rather than silently substituted.
+    environment_status: BUILT_NOT_PAPER_ADMITTED
