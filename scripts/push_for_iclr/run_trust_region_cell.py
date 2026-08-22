@@ -43,6 +43,7 @@ from hierasafe_flow.campaigns.push_for_iclr.trust_region_controller import (  # 
     TrustRegionArm,
     TrustRegionContractError,
     bounded_trust_region_delta,
+    calibrate_relative_rms_direction,
     contextualize_probe,
     matched_pair_direction,
     project_semantic_component,
@@ -416,6 +417,17 @@ def execute_cell(row: Mapping[str, Any], manifest_path: Path, manifest_file_sha2
                 "mean_abs_cosine_before": 0.0,
                 "mean_abs_cosine_after": 0.0,
             }
+            calibration_meta = {
+                "policy": "normalize_projected_direction_then_scale_to_base_rms_v1",
+                "reason": "arm_disabled_or_schedule_zero",
+                "requested_relative_rms": arm.target_relative_rms,
+                "base_rms": float(tensor_rms(base_prediction, eps=0.0).cpu()),
+                "input_direction_rms": 0.0,
+                "unit_direction_rms": 0.0,
+                "calibration_scale": 0.0,
+                "calibrated_direction_rms": 0.0,
+                "achieved_pre_trust_relative_rms": 0.0,
+            }
             trust_meta = {
                 "schedule_weight": schedule_weight,
                 "effective_local_cap": 0.0,
@@ -480,9 +492,15 @@ def execute_cell(row: Mapping[str, Any], manifest_path: Path, manifest_file_sha2
                     coefficient=arm.semantic_projection,
                     eps=mask_config.eps,
                 )
-                delta, trust_meta = bounded_trust_region_delta(
+                calibrated_direction, calibration_meta = calibrate_relative_rms_direction(
                     base=base_prediction,
                     direction=projected_direction,
+                    target_relative_rms=arm.target_relative_rms,
+                    eps=mask_config.eps,
+                )
+                delta, trust_meta = bounded_trust_region_delta(
+                    base=base_prediction,
+                    direction=calibrated_direction,
                     feature_dim=layout.feature_dim,
                     schedule_weight=schedule_weight,
                     max_local_relative=arm.max_local_relative,
@@ -527,6 +545,7 @@ def execute_cell(row: Mapping[str, Any], manifest_path: Path, manifest_file_sha2
                     "routing": routing,
                     "pair_records": pair_records,
                     "semantic_projection": projection_meta,
+                    "relative_rms_calibration": calibration_meta,
                     "trust_region": trust_meta,
                     "delta_fingerprint": tensor_fingerprint(delta_f),
                     "counters_after_step": dict(counters),
@@ -595,6 +614,7 @@ def execute_cell(row: Mapping[str, Any], manifest_path: Path, manifest_file_sha2
         "conditioning_provenance": adapter.conditioning_provenance(),
         "conditioning_memory": condition_storage,
         "probe_context_conditioning": row["probe_context_conditioning"],
+        "relative_rms_calibration_policy": "normalize_projected_direction_then_scale_to_base_rms_v1",
         "composed_probe_prompts": composed_probe_prompts,
         "ontology_pair_count": len(prepared_pairs),
         "unified_time_map": {

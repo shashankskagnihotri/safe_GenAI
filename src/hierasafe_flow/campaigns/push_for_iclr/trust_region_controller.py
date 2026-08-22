@@ -10,6 +10,8 @@ import torch
 
 from hierasafe_flow.campaigns.push_for_iclr.ablation_controller import (
     intervention_energy,
+    normalize_direction_rms,
+    tensor_rms,
     tensor_stats,
 )
 from hierasafe_flow.steering.local_masks import (
@@ -36,6 +38,7 @@ class TrustRegionArm:
     start_fraction: float
     end_fraction: float
     max_local_relative: float
+    target_relative_rms: float
     cumulative_energy_budget: float
     semantic_projection: float
     top_k_pairs: int
@@ -51,6 +54,7 @@ class TrustRegionArm:
             start_fraction=float(value["start_fraction"]),
             end_fraction=float(value["end_fraction"]),
             max_local_relative=float(value["max_local_relative"]),
+            target_relative_rms=float(value["target_relative_rms"]),
             cumulative_energy_budget=float(value["cumulative_energy_budget"]),
             semantic_projection=float(value["semantic_projection"]),
             top_k_pairs=int(value["top_k_pairs"]),
@@ -69,9 +73,17 @@ class TrustRegionArm:
         )
         if arm.enabled:
             _require(0.0 < arm.max_local_relative <= 0.25, "Bad local trust-region cap")
+            _require(
+                0.0 < arm.target_relative_rms <= 0.25,
+                "Bad target relative RMS",
+            )
             _require(arm.cumulative_energy_budget > 0.0, "Energy budget must be positive")
         else:
             _require(arm.max_local_relative == 0.0, "Disabled arm must have zero local cap")
+            _require(
+                arm.target_relative_rms == 0.0,
+                "Disabled arm must have zero target relative RMS",
+            )
             _require(
                 arm.cumulative_energy_budget == 0.0,
                 "Disabled arm must have zero energy budget",
@@ -235,6 +247,70 @@ def project_semantic_component(
         "coefficient": float(coefficient),
         "mean_abs_cosine_before": float(cosine_before.abs().mean().cpu()),
         "mean_abs_cosine_after": float(cosine_after.abs().mean().cpu()),
+    }
+
+
+def calibrate_relative_rms_direction(
+    *,
+    base: torch.Tensor,
+    direction: torch.Tensor,
+    target_relative_rms: float,
+    eps: float = 1.0e-12,
+) -> tuple[torch.Tensor, dict[str, Any]]:
+    """Match historical relative-RMS strength before applying trust bounds."""
+
+    _require(base.shape == direction.shape, "Relative-RMS calibration shape mismatch")
+    _require(0.0 <= target_relative_rms <= 0.25, "Bad target relative RMS")
+    _require(eps >= 0.0, "Negative RMS epsilon")
+    _require(bool(torch.isfinite(base).all()), "Non-finite base during RMS calibration")
+    _require(bool(torch.isfinite(direction).all()), "Non-finite direction during RMS calibration")
+
+    base_rms_tensor = tensor_rms(base, eps=0.0)
+    input_rms_tensor = tensor_rms(direction, eps=0.0)
+    base_rms = float(base_rms_tensor.detach().cpu())
+    input_rms = float(input_rms_tensor.detach().cpu())
+    _require(math.isfinite(base_rms) and base_rms > eps, "Base RMS is too small")
+    _require(math.isfinite(input_rms), "Non-finite input direction RMS")
+
+    if target_relative_rms == 0.0 or input_rms <= eps:
+        return torch.zeros_like(direction), {
+            "policy": "normalize_projected_direction_then_scale_to_base_rms_v1",
+            "reason": (
+                "zero_target_relative_rms"
+                if target_relative_rms == 0.0
+                else "zero_projected_direction_rms"
+            ),
+            "requested_relative_rms": float(target_relative_rms),
+            "base_rms": base_rms,
+            "input_direction_rms": input_rms,
+            "unit_direction_rms": 0.0,
+            "calibration_scale": 0.0,
+            "calibrated_direction_rms": 0.0,
+            "achieved_pre_trust_relative_rms": 0.0,
+        }
+
+    unit_direction = normalize_direction_rms(direction, eps=0.0)
+    target_rms_tensor = base_rms_tensor * float(target_relative_rms)
+    calibrated = unit_direction * target_rms_tensor
+    unit_rms = float(tensor_rms(unit_direction, eps=0.0).detach().cpu())
+    calibrated_rms = float(tensor_rms(calibrated, eps=0.0).detach().cpu())
+    achieved = calibrated_rms / base_rms
+    calibration_scale = float((target_rms_tensor / input_rms_tensor).detach().cpu())
+    _require(bool(torch.isfinite(calibrated).all()), "Non-finite calibrated direction")
+    _require(
+        abs(achieved - float(target_relative_rms)) <= 2.0e-5,
+        f"Relative-RMS calibration mismatch: {achieved} != {target_relative_rms}",
+    )
+    return calibrated.to(dtype=direction.dtype), {
+        "policy": "normalize_projected_direction_then_scale_to_base_rms_v1",
+        "reason": "calibrated",
+        "requested_relative_rms": float(target_relative_rms),
+        "base_rms": base_rms,
+        "input_direction_rms": input_rms,
+        "unit_direction_rms": unit_rms,
+        "calibration_scale": calibration_scale,
+        "calibrated_direction_rms": calibrated_rms,
+        "achieved_pre_trust_relative_rms": achieved,
     }
 
 
