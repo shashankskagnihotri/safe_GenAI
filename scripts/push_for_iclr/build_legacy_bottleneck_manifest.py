@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build the immutable 24-cell V8 legacy-bottleneck development manifest."""
+"""Build an immutable legacy-bottleneck development manifest."""
 
 from __future__ import annotations
 
@@ -105,13 +105,23 @@ def main() -> int:
     }
 
     arms = config["arms"]
-    require(len(arms) == 12, "V8 requires exactly 12 arms")
-    require(len({arm["id"] for arm in arms}) == 12, "duplicate arm id")
+    require(isinstance(arms, list) and len(arms) >= 2, "at least two arms are required")
+    require(len({arm["id"] for arm in arms}) == len(arms), "duplicate arm id")
+    baseline_arms = [arm for arm in arms if not bool(arm["enabled"])]
+    require(len(baseline_arms) == 1, "exactly one disabled baseline arm is required")
+    require(baseline_arms[0]["id"] == "R00_BASELINE", "disabled baseline must be R00_BASELINE")
+    require(float(baseline_arms[0]["strength"]) == 0.0, "baseline strength must be zero")
     hierarchy = yaml.safe_load(hierarchy_path.read_text(encoding="utf-8"))
     pair_ids = {pair["id"] for pair in hierarchy["pairs"]}
     for arm in arms:
         require(float(arm["strength"]) >= 0.0, f"negative strength in {arm['id']}")
+        require(bool(arm["active_pair_ids"]), f"empty pair selection in {arm['id']}")
+        require(len(set(arm["active_pair_ids"])) == len(arm["active_pair_ids"]), f"duplicate pair in {arm['id']}")
         require(set(arm["active_pair_ids"]).issubset(pair_ids), f"unknown pair in {arm['id']}")
+        if bool(arm["enabled"]):
+            require(float(arm["strength"]) > 0.0, f"enabled arm must have positive strength: {arm['id']}")
+        else:
+            require(float(arm["strength"]) == 0.0, f"disabled arm must have zero strength: {arm['id']}")
 
     rows: list[dict[str, Any]] = []
     stage_directory = config["output"]["stage_directory"]
@@ -161,7 +171,8 @@ def main() -> int:
                 }
             )
 
-    require(len(rows) == 24, "V8 manifest must contain 24 rows")
+    expected_row_count = len(arms) * len(config["prompt_ids"])
+    require(len(rows) == expected_row_count, "manifest matrix cardinality mismatch")
     manifest_payload_sha256 = hashlib.sha256(canonical_bytes(rows)).hexdigest()
     manifest_bytes = b"".join(canonical_bytes(row) for row in rows)
     manifest_path = output_root / "MANIFESTS" / config["output"]["manifest_filename"]
@@ -173,7 +184,7 @@ def main() -> int:
         "split_role": config["split_role"],
         "code_commit": args.code_commit,
         "job_count": len(rows),
-        "array_expression": "0-23",
+        "array_expression": f"0-{len(rows) - 1}",
         "array_throttle": None,
         "manifest_path": str(manifest_path),
         "manifest_payload_sha256": manifest_payload_sha256,
