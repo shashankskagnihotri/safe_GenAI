@@ -50,6 +50,10 @@ from hierasafe_flow.campaigns.push_for_iclr.trust_region_controller import (  # 
     raised_cosine_window,
     route_pair_directions,
 )
+from hierasafe_flow.steering.canonical import (  # noqa: E402
+    canonicalize_prediction,
+    prediction_from_x0,
+)
 
 
 class CellExecutionError(RuntimeError):
@@ -394,7 +398,46 @@ def execute_cell(row: Mapping[str, Any], manifest_path: Path, manifest_file_sha2
             )
             counters["base_denoiser_forwards"] += 1
             _require(bool(torch.isfinite(base_prediction).all()), "Non-finite base prediction")
-            layout = adapter.latent_layout(base_prediction)
+            guidance_scale = float(row["generation"].get("guidance_scale", 1.0))
+            base_canonical = canonicalize_prediction(
+                adapter=adapter,
+                model_id=row["model_id"],
+                latents=latents,
+                native=base_prediction,
+                timestep=timestep,
+                step_index=step_index,
+                guidance_scale=guidance_scale,
+                branch="base",
+            )
+            base_x0 = base_canonical.predicted_x0
+            _require(bool(torch.isfinite(base_x0).all()), "Non-finite canonical base x0")
+            layout = adapter.latent_layout(base_x0)
+
+            def canonical_x0(native_prediction: torch.Tensor, branch: str) -> torch.Tensor:
+                canonical = canonicalize_prediction(
+                    adapter=adapter,
+                    model_id=row["model_id"],
+                    latents=latents,
+                    native=native_prediction,
+                    timestep=timestep,
+                    step_index=step_index,
+                    guidance_scale=guidance_scale,
+                    branch=branch,
+                )
+                _require(
+                    canonical.parameterization == base_canonical.parameterization,
+                    "Probe parameterization differs from base parameterization",
+                )
+                _require(
+                    canonical.schedule == base_canonical.schedule,
+                    "Probe schedule point differs from base schedule point",
+                )
+                _require(
+                    bool(torch.isfinite(canonical.predicted_x0).all()),
+                    f"Non-finite canonical x0 for {branch}",
+                )
+                return canonical.predicted_x0
+
             schedule_weight = (
                 raised_cosine_window(
                     step_index,
@@ -421,7 +464,7 @@ def execute_cell(row: Mapping[str, Any], manifest_path: Path, manifest_file_sha2
                 "policy": "normalize_projected_direction_then_scale_to_base_rms_v1",
                 "reason": "arm_disabled_or_schedule_zero",
                 "requested_relative_rms": arm.target_relative_rms,
-                "base_rms": float(tensor_rms(base_prediction, eps=0.0).cpu()),
+                "base_rms": float(tensor_rms(base_x0, eps=0.0).cpu()),
                 "input_direction_rms": 0.0,
                 "unit_direction_rms": 0.0,
                 "calibration_scale": 0.0,
@@ -445,6 +488,7 @@ def execute_cell(row: Mapping[str, Any], manifest_path: Path, manifest_file_sha2
                     ),
                 )
                 counters["neutral_probe_forwards"] += len(neutral_conditions)
+                neutral_x0 = canonical_x0(neutral_prediction, "neutral")
                 pair_directions = []
                 for pair in prepared_pairs:
                     source_prediction = weighted_prediction_mean(
@@ -463,13 +507,19 @@ def execute_cell(row: Mapping[str, Any], manifest_path: Path, manifest_file_sha2
                     )
                     counters["source_probe_forwards"] += len(pair["source_conditions"])
                     counters["target_probe_forwards"] += len(pair["target_conditions"])
+                    source_x0 = canonical_x0(
+                        source_prediction, f"source:{pair['id']}"
+                    )
+                    target_x0 = canonical_x0(
+                        target_prediction, f"target:{pair['id']}"
+                    )
                     pair_direction = matched_pair_direction(
                         pair_id=pair["id"],
                         parent=pair["parent"],
-                        v_base=base_prediction,
-                        v_source=source_prediction,
-                        v_target=target_prediction,
-                        v_neutral=neutral_prediction,
+                        v_base=base_x0,
+                        v_source=source_x0,
+                        v_target=target_x0,
+                        v_neutral=neutral_x0,
                         feature_dim=layout.feature_dim,
                         margin=float(row["margin"]),
                         mask_config=mask_config,
@@ -479,7 +529,7 @@ def execute_cell(row: Mapping[str, Any], manifest_path: Path, manifest_file_sha2
                     counters["pair_direction_evaluations"] += 1
                 routed_direction, routing = route_pair_directions(
                     pair_directions,
-                    base=base_prediction,
+                    base=base_x0,
                     top_k_pairs=arm.top_k_pairs,
                     minimum_pair_score=arm.minimum_pair_score,
                     routing_temperature=arm.routing_temperature,
@@ -487,19 +537,19 @@ def execute_cell(row: Mapping[str, Any], manifest_path: Path, manifest_file_sha2
                 counters["routing_evaluations"] += 1
                 projected_direction, projection_meta = project_semantic_component(
                     routed_direction,
-                    base_prediction - neutral_prediction,
+                    base_x0 - neutral_x0,
                     feature_dim=layout.feature_dim,
                     coefficient=arm.semantic_projection,
                     eps=mask_config.eps,
                 )
                 calibrated_direction, calibration_meta = calibrate_relative_rms_direction(
-                    base=base_prediction,
+                    base=base_x0,
                     direction=projected_direction,
                     target_relative_rms=arm.target_relative_rms,
                     eps=mask_config.eps,
                 )
                 delta, trust_meta = bounded_trust_region_delta(
-                    base=base_prediction,
+                    base=base_x0,
                     direction=calibrated_direction,
                     feature_dim=layout.feature_dim,
                     schedule_weight=schedule_weight,
@@ -517,7 +567,7 @@ def execute_cell(row: Mapping[str, Any], manifest_path: Path, manifest_file_sha2
                     for pair in pair_directions
                 ]
             else:
-                delta = torch.zeros_like(base_prediction)
+                delta = torch.zeros_like(base_x0)
 
             delta_f = delta.float()
             if float(tensor_rms(delta_f, eps=0.0).cpu()) > 0.0:
@@ -528,7 +578,43 @@ def execute_cell(row: Mapping[str, Any], manifest_path: Path, manifest_file_sha2
                 cumulative_energy <= arm.cumulative_energy_budget + 5.0e-7,
                 "Cumulative intervention budget exceeded",
             )
-            model_prediction = (base_prediction.float() + delta_f).to(base_prediction.dtype)
+            native_delta_f = torch.zeros_like(base_prediction, dtype=torch.float32)
+            roundtrip_relative_rms_error = 0.0
+            if float(tensor_rms(delta_f, eps=0.0).cpu()) > 0.0:
+                steered_x0 = (base_x0.float() + delta_f).to(base_x0.dtype)
+                model_prediction = prediction_from_x0(
+                    latents,
+                    steered_x0,
+                    base_canonical.parameterization,
+                    base_canonical.schedule,
+                ).to(base_prediction.dtype)
+                _require(
+                    bool(torch.isfinite(model_prediction).all()),
+                    "Non-finite native prediction converted from steered x0",
+                )
+                native_delta_f = model_prediction.float() - base_prediction.float()
+                roundtrip_x0 = canonicalize_prediction(
+                    adapter=adapter,
+                    model_id=row["model_id"],
+                    latents=latents,
+                    native=model_prediction,
+                    timestep=timestep,
+                    step_index=step_index,
+                    guidance_scale=guidance_scale,
+                    branch="steered_roundtrip",
+                ).predicted_x0
+                roundtrip_relative_rms_error = float(
+                    tensor_rms(roundtrip_x0.float() - steered_x0.float(), eps=0.0).cpu()
+                    / tensor_rms(steered_x0.float()).cpu()
+                )
+                _require(
+                    roundtrip_relative_rms_error <= 1.0e-2,
+                    "Canonical x0 roundtrip error exceeded one percent",
+                )
+            else:
+                steered_x0 = base_x0
+                model_prediction = base_prediction
+            calibration_meta["direction_space"] = "canonical_predicted_x0"
             traces.append(
                 {
                     "step_index": step_index,
@@ -537,8 +623,14 @@ def execute_cell(row: Mapping[str, Any], manifest_path: Path, manifest_file_sha2
                     "native_sigma_source": sigma_source,
                     "unified_diffusion_time": float(unified_time),
                     "schedule_weight": schedule_weight,
-                    "base_stats": tensor_stats(base_prediction),
+                    "direction_space": "canonical_predicted_x0",
+                    "canonical_prediction": base_canonical.metadata(),
+                    "base_stats": tensor_stats(base_x0),
+                    "native_base_stats": tensor_stats(base_prediction),
                     "delta_stats": tensor_stats(delta_f),
+                    "native_delta_stats": tensor_stats(native_delta_f),
+                    "steered_x0_stats": tensor_stats(steered_x0),
+                    "canonical_roundtrip_relative_rms_error": roundtrip_relative_rms_error,
                     "step_intervention_energy": step_energy,
                     "cumulative_intervention_energy": cumulative_energy,
                     "remaining_energy": max(0.0, arm.cumulative_energy_budget - cumulative_energy),
@@ -604,7 +696,7 @@ def execute_cell(row: Mapping[str, Any], manifest_path: Path, manifest_file_sha2
         ),
     }
     metadata = {
-        "schema_version": "push-for-iclr.trust-region-cell-metadata.v1",
+        "schema_version": "push-for-iclr.trust-region-cell-metadata.v2",
         "job": dict(row),
         "job_manifest_path": str(manifest_path),
         "job_manifest_file_sha256": manifest_file_sha256,
@@ -614,7 +706,9 @@ def execute_cell(row: Mapping[str, Any], manifest_path: Path, manifest_file_sha2
         "conditioning_provenance": adapter.conditioning_provenance(),
         "conditioning_memory": condition_storage,
         "probe_context_conditioning": row["probe_context_conditioning"],
-        "relative_rms_calibration_policy": "normalize_projected_direction_then_scale_to_base_rms_v1",
+        "direction_space": "canonical_predicted_x0",
+        "native_conversion_policy": "canonical_x0_to_audited_model_parameterization_v1",
+        "relative_rms_calibration_policy": "normalize_projected_direction_then_scale_to_canonical_x0_rms_v2",
         "composed_probe_prompts": composed_probe_prompts,
         "ontology_pair_count": len(prepared_pairs),
         "unified_time_map": {
@@ -636,6 +730,7 @@ def execute_cell(row: Mapping[str, Any], manifest_path: Path, manifest_file_sha2
     validation = {
         "schema_version": "push-for-iclr.trust-region-trace-validation.v1",
         "status": "PASS",
+        "direction_space": "canonical_predicted_x0",
         "development_only": row["ablation_split"] == "development",
         "expected_counts": expected_counts,
         "observed_counts": counters,
@@ -645,6 +740,7 @@ def execute_cell(row: Mapping[str, Any], manifest_path: Path, manifest_file_sha2
         "all_trace_values_finite": all(
             math.isfinite(float(trace["step_intervention_energy"]))
             and math.isfinite(float(trace["cumulative_intervention_energy"]))
+            and math.isfinite(float(trace["canonical_roundtrip_relative_rms_error"]))
             for trace in traces
         ),
     }
