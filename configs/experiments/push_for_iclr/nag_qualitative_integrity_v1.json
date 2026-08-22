@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "experiment_id": "nag_figure5_qualitative_integrity_attempt001",
+  "claim_scope": "Qualitative implementation-integrity diagnostic only; not an exact Table 1 reproduction because the paper's quantitative protocol is unreleased.",
+  "upstream": {
+    "path": "/ceph/sagnihot/projects/safety_genAI_upstreams/PUSH_FOR_ICLR/NAG",
+    "commit": "8bb34a16e517692743fab99bc60838c20f975ded"
+  },
+  "environment": "/ceph/sagnihot/projects/safety_genAI/outputs/PUSH_FOR_ICLR/REPRODUCTIONS/ENVIRONMENTS/nag/8bb34a16e517/env",
+  "model": {
+    "repo_id": "black-forest-labs/FLUX.1-schnell",
+    "revision": "741f7c3ce8b383c54771c7003378a50191e9efe9",
+    "local_dir": "/ceph/sagnihot/projects/safety_genAI/outputs/PUSH_FOR_ICLR/REPRODUCTIONS/ASSETS/nag/flux_schnell_diffusers_741f7c3ce8b3"
+  },
+  "output_root": "/ceph/sagnihot/projects/safety_genAI/outputs/PUSH_FOR_ICLR/REPRODUCTIONS/nag/figure5_qualitative_integrity/ATTEMPT_001",
+  "generation": {
+    "height": 1024,
+    "width": 1024,
+    "num_inference_steps": 4,
+    "guidance_scale": 0.0,
+    "max_sequence_length": 256,
+    "dtype": "bfloat16",
+    "seeds": [0, 1, 2]
+  },
+  "nag": {
+    "paper_phi": 4.0,
+    "runtime_nag_scale": 5.0,
+    "tau": 2.5,
+    "alpha": 0.25,
+    "nag_end": 1.0,
+    "scale_mapping_note": "The release computes scale*Z_positive-(scale-1)*Z_negative, so paper phi=4 maps to runtime nag_scale=5."
+  },
+  "arms": [
+    {
+      "id": "baseline_diffusers",
+      "implementation": "Unmodified diffusers FluxPipeline; no NAG processor or negative embedding."
+    },
+    {
+      "id": "author_release_L2",
+      "implementation": "Pinned upstream NAG release byte-for-byte, including its L2 pointwise norm."
+    },
+    {
+      "id": "paper_equation_L1",
+      "implementation": "Pinned upstream NAG processor with exactly four norm-order literals transformed from p=2 to p=1."
+    }
+  ],
+  "prompts": [
+    {
+      "id": "figure5_cyborg",
+      "prompt": "A beautiful cyborg",
+      "negative_prompt": "robot",
+      "provenance": "NAG paper Figure 5 qualitative example"
+    },
+    {
+      "id": "figure5_phoenix",
+      "prompt": "A baby phoenix made of fire and flames is born from the smoking ashes.",
+      "negative_prompt": "Low resolution, blurry",
+      "provenance": "NAG paper Figure 5 qualitative example"
+    }
+  ]
+}
