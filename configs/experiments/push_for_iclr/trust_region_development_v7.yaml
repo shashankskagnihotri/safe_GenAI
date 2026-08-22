@@ -1,0 +1,67 @@
+schema_version: push-for-iclr.trust-region-development.v1
+campaign_id: push_for_iclr_global_safety_trust_region_v7_concept_only_canonical_x0
+stage: 7
+split_role: development_only_method_redesign
+seed: 0
+source_manifest:
+  path: outputs/PUSH_FOR_ICLR/MANIFESTS/ablation_20_development.jsonl
+  row_count: 20
+  manifest_sha256: 50e08fcbdb90c058fd3a4cd46bc8e0d4db4990af21049b4f7bdfe326d5b89891
+  file_sha256: e61dc33db4a4c01cc1b6c709d7358e928a9cf13890ab042b8dfb29cea82a5846
+  required_split: development
+  forbidden_manifest_substring: locked_validation
+ontologies:
+  nudity: configs/concepts/push_for_iclr/nudity_global_v2_trust_region.yaml
+  violence: configs/concepts/push_for_iclr/violence_global_v2_trust_region.yaml
+models:
+  flux1_dev:
+    config: configs/models/t2i_flux1_dev.yaml
+    revision: 3de623fc3c33e44ffbe2bad470d0f45bccf2eb21
+    margin: 0.08
+    mask: {enabled: true, mode: max_normalized, threshold: 0.05, percentile: 0.85, eps: 1.0e-6}
+  sd35_large:
+    config: configs/models/t2i_sd35_large.yaml
+    revision: ceddf0a7fdf2064ea28e2213e3b84e4afa170a0f
+    margin: 0.04
+    mask: {enabled: true, mode: max_normalized, threshold: 0.08, percentile: 0.85, eps: 1.0e-6}
+arms:
+  - {id: R00_BASELINE, enabled: false, start_fraction: 0.0, end_fraction: 1.0, max_local_relative: 0.0, target_relative_rms: 0.0, cumulative_energy_budget: 0.0, semantic_projection: 1.0, top_k_pairs: 1, minimum_pair_score: 0.01, routing_temperature: 0.05, activation_top_fraction: 0.10}
+  - {id: V7_R01_X0_T02_C05_P1, enabled: true, start_fraction: 0.0, end_fraction: 0.35, max_local_relative: 0.05, target_relative_rms: 0.02, cumulative_energy_budget: 0.01, semantic_projection: 1.0, top_k_pairs: 1, minimum_pair_score: 0.01, routing_temperature: 0.05, activation_top_fraction: 0.10}
+  - {id: V7_R02_X0_T04_C10_P1, enabled: true, start_fraction: 0.0, end_fraction: 0.35, max_local_relative: 0.10, target_relative_rms: 0.04, cumulative_energy_budget: 0.03, semantic_projection: 1.0, top_k_pairs: 1, minimum_pair_score: 0.01, routing_temperature: 0.05, activation_top_fraction: 0.10}
+  - {id: V7_R03_X0_T08_C15_P1, enabled: true, start_fraction: 0.0, end_fraction: 0.35, max_local_relative: 0.15, target_relative_rms: 0.08, cumulative_energy_budget: 0.08, semantic_projection: 1.0, top_k_pairs: 1, minimum_pair_score: 0.01, routing_temperature: 0.05, activation_top_fraction: 0.10}
+  - {id: V7_R04_X0_T12_C20_P1, enabled: true, start_fraction: 0.0, end_fraction: 0.35, max_local_relative: 0.20, target_relative_rms: 0.12, cumulative_energy_budget: 0.15, semantic_projection: 1.0, top_k_pairs: 1, minimum_pair_score: 0.01, routing_temperature: 0.05, activation_top_fraction: 0.10}
+  - {id: V7_R05_X0_T18_C25_P1, enabled: true, start_fraction: 0.0, end_fraction: 0.35, max_local_relative: 0.25, target_relative_rms: 0.18, cumulative_energy_budget: 0.28, semantic_projection: 1.0, top_k_pairs: 1, minimum_pair_score: 0.01, routing_temperature: 0.05, activation_top_fraction: 0.10}
+  - {id: V7_R06_X0_T25_C35_P1, enabled: true, start_fraction: 0.0, end_fraction: 0.35, max_local_relative: 0.35, target_relative_rms: 0.25, cumulative_energy_budget: 0.45, semantic_projection: 1.0, top_k_pairs: 1, minimum_pair_score: 0.01, routing_temperature: 0.05, activation_top_fraction: 0.10}
+  - {id: V7_R07_X0_T12_C25_P0, enabled: true, start_fraction: 0.0, end_fraction: 0.35, max_local_relative: 0.25, target_relative_rms: 0.12, cumulative_energy_budget: 0.18, semantic_projection: 0.0, top_k_pairs: 1, minimum_pair_score: 0.01, routing_temperature: 0.05, activation_top_fraction: 0.10}
+  - {id: V7_R08_X0_T12_C25_P05, enabled: true, start_fraction: 0.0, end_fraction: 0.35, max_local_relative: 0.25, target_relative_rms: 0.12, cumulative_energy_budget: 0.18, semantic_projection: 0.5, top_k_pairs: 1, minimum_pair_score: 0.01, routing_temperature: 0.05, activation_top_fraction: 0.10}
+  - {id: V7_R09_X0_T12_C25_P1_K2, enabled: true, start_fraction: 0.0, end_fraction: 0.35, max_local_relative: 0.25, target_relative_rms: 0.12, cumulative_energy_budget: 0.18, semantic_projection: 1.0, top_k_pairs: 2, minimum_pair_score: 0.01, routing_temperature: 0.05, activation_top_fraction: 0.10}
+  - {id: V7_R10_X0_T12_C25_P1_E50_K2, enabled: true, start_fraction: 0.0, end_fraction: 0.50, max_local_relative: 0.25, target_relative_rms: 0.12, cumulative_energy_budget: 0.28, semantic_projection: 1.0, top_k_pairs: 2, minimum_pair_score: 0.01, routing_temperature: 0.05, activation_top_fraction: 0.10}
+  - {id: V7_R11_X0_T18_C35_P1_E50_K2, enabled: true, start_fraction: 0.0, end_fraction: 0.50, max_local_relative: 0.35, target_relative_rms: 0.18, cumulative_energy_budget: 0.45, semantic_projection: 1.0, top_k_pairs: 2, minimum_pair_score: 0.01, routing_temperature: 0.05, activation_top_fraction: 0.10}
+generation:
+  use_model_native_resolution: true
+  use_model_native_step_count: true
+  preserve_exact_original_prompt: true
+  preserve_initial_latent_across_arms: true
+  dtype: bfloat16
+  device: cuda
+  conditioning_memory_policy: persistent_cpu_per_call_gpu_materialization_v1
+  probe_context_conditioning: concept_only_pair_endpoint_v1
+  intervention_space: canonical_predicted_x0
+output:
+  root: outputs/PUSH_FOR_ICLR
+  stage_directory: 02_TRUST_REGION_REDESIGN_DEV_V7_CONCEPT_ONLY_CANONICAL_X0
+  manifest_filename: trust_region_development_480_v7.jsonl
+  prepared_registry_filename: trust_region_development_480_v7_prepared.json
+  never_overwrite_completed_cell: true
+  same_directory_atomic_partial_writes: true
+slurm:
+  partition: gpu-vram-94gb
+  gres: gpu:nvidia_h100_nvl:1
+  account: ml-staff
+  qos: walltime5d
+  cpus_per_task: 16
+  memory: 300G
+  walltime: 1-00:00:00
+  array_count: 480
+  array_throttle: null
+  user_hold: false

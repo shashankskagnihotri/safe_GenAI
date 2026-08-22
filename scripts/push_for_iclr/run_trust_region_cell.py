@@ -239,20 +239,32 @@ def _prepare_group(
     original_prompt: str,
     probes: Sequence[Mapping[str, Any]],
     role: str,
+    probe_context_conditioning: str,
 ) -> tuple[list[Any], list[float], list[str]]:
     conditions: list[Any] = []
     weights: list[float] = []
     prompts: list[str] = []
     for probe in probes:
-        prompt = contextualize_probe(original_prompt, str(probe["text"]))
+        concept = str(probe["text"]).strip()
+        if probe_context_conditioning == "safety_concept_prefix_plus_exact_original_prompt":
+            prompt = contextualize_probe(original_prompt, concept)
+            prompt_view = "trust_region_context_probe"
+        elif probe_context_conditioning == "concept_only_pair_endpoint_v1":
+            _require(bool(concept), "Probe concept is empty")
+            prompt = concept
+            prompt_view = "trust_region_concept_only_probe"
+        else:
+            raise TrustRegionContractError(
+                f"Unsupported probe context conditioning: {probe_context_conditioning!r}"
+            )
         prompts.append(prompt)
         conditions.append(
             _persistent_cpu_condition(
                 adapter.prepare_prompt_for_state(
-                prompt,
-                state,
-                prompt_view="trust_region_context_probe",
-                call_role=f"{role}:{probe['id']}",
+                    prompt,
+                    state,
+                    prompt_view=prompt_view,
+                    call_role=f"{role}:{probe['id']}",
                 )
             )
         )
@@ -342,15 +354,30 @@ def execute_cell(row: Mapping[str, Any], manifest_path: Path, manifest_file_sha2
     composed_probe_prompts: dict[str, Any] = {}
     if arm.enabled:
         neutral_conditions, neutral_weights, neutral_prompts = _prepare_group(
-            adapter, state, row["original_prompt"], ontology["neutral_probes"], "neutral"
+            adapter,
+            state,
+            row["original_prompt"],
+            ontology["neutral_probes"],
+            "neutral",
+            row["probe_context_conditioning"],
         )
         composed_probe_prompts["neutral"] = neutral_prompts
         for pair in ontology["runtime_probe_pairs"]:
             source_conditions, source_weights, source_prompts = _prepare_group(
-                adapter, state, row["original_prompt"], pair["source"], f"source:{pair['id']}"
+                adapter,
+                state,
+                row["original_prompt"],
+                pair["source"],
+                f"source:{pair['id']}",
+                row["probe_context_conditioning"],
             )
             target_conditions, target_weights, target_prompts = _prepare_group(
-                adapter, state, row["original_prompt"], pair["target"], f"target:{pair['id']}"
+                adapter,
+                state,
+                row["original_prompt"],
+                pair["target"],
+                f"target:{pair['id']}",
+                row["probe_context_conditioning"],
             )
             prepared_pairs.append(
                 {

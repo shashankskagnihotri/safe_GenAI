@@ -99,6 +99,18 @@ def build_trust_region_manifest(
         conditioning_memory_policy == "persistent_cpu_per_call_gpu_materialization_v1",
         "Unsupported conditioning memory policy",
     )
+    probe_context_conditioning = config["generation"].get(
+        "probe_context_conditioning",
+        "safety_concept_prefix_plus_exact_original_prompt",
+    )
+    _require(
+        probe_context_conditioning
+        in {
+            "safety_concept_prefix_plus_exact_original_prompt",
+            "concept_only_pair_endpoint_v1",
+        },
+        "Unsupported probe context conditioning",
+    )
 
     source_spec = config["source_manifest"]
     _require(
@@ -210,7 +222,7 @@ def build_trust_region_manifest(
                         "ontology_path": ontology_record["path"],
                         "ontology_sha256": ontology_record["sha256"],
                         "prompt_specific_ontology_used": False,
-                        "probe_context_conditioning": "safety_concept_prefix_plus_exact_original_prompt",
+                        "probe_context_conditioning": probe_context_conditioning,
                         "conditioning_memory_policy": conditioning_memory_policy,
                         "margin": float(model_spec["margin"]),
                         "mask": model_spec["mask"],
@@ -271,6 +283,7 @@ def build_trust_region_manifest(
         "stage_config_sha256": config_sha256,
         "output_stage_directory": config["output"]["stage_directory"],
         "conditioning_memory_policy": conditioning_memory_policy,
+        "probe_context_conditioning": probe_context_conditioning,
         "models": list(config["models"]),
         "arms": [arm.arm_id for arm in arms],
         "ontologies": ontology_records,
