@@ -136,7 +136,7 @@ def main() -> int:
                     "stage": int(config["stage"]),
                     "split_role": config["split_role"],
                     "source_row_id": source["row_id"],
-                    "source_job_index": source["job_index"],
+                    "source_release_index": source["release_index"],
                     "prompt_id": prompt_id,
                     "category": source["category"],
                     "difficulty_stratum": source["difficulty_stratum"],
