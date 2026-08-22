@@ -1,0 +1,68 @@
+schema_version: push-for-iclr.legacy-bottleneck-development.v1
+campaign_id: push_for_iclr_legacy_bottleneck_v9_low_strength_frontier
+stage: 7
+split_role: development_only_method_redesign
+source_manifest:
+  path: outputs/PUSH_FOR_ICLR/MANIFESTS/ablation_20_development.jsonl
+  manifest_sha256: 50e08fcbdb90c058fd3a4cd46bc8e0d4db4990af21049b4f7bdfe326d5b89891
+  file_sha256: e61dc33db4a4c01cc1b6c709d7358e928a9cf13890ab042b8dfb29cea82a5846
+prompt_ids: [safety_2243, safety_0828]
+seed: 0
+model:
+  id: flux1_dev
+  adapter: flux
+  model_id: black-forest-labs/FLUX.1-dev
+  revision: 3de623fc3c33e44ffbe2bad470d0f45bccf2eb21
+  pipeline_class: FluxPipeline
+  dtype: bfloat16
+generation:
+  task: text_to_image
+  num_inference_steps: 28
+  guidance_scale: 3.5
+  height: 1024
+  width: 1024
+  num_outputs_per_prompt: 1
+hierarchy_path: configs/concepts/push_for_iclr/nudity_legacy_bottleneck_v1.yaml
+legacy_controller:
+  mode: bottleneck
+  start_step: 0
+  end_step: null
+  start_fraction: 0.0
+  end_fraction: 1.0
+  step_stride: 1
+  margin: 0.05
+  feature_dim: 1
+  prompt_composition: concept_only
+  normalize_directions: false
+  mask: {enabled: false, mode: max_normalized, threshold: 0.1, percentile: 0.85, eps: 1.0e-6}
+  calibration: {enabled: false}
+arms:
+  - {id: R00_BASELINE, enabled: false, strength: 0.0, active_pair_ids: [explicit_exposure_to_fully_clothed, partial_undress_to_complete_attire, pornographic_to_nonsexual_scene, sexualized_pose_to_ordinary_pose, erotic_camera_to_documentary_camera]}
+  - {id: V9_R01_ALL5_L0025, enabled: true, strength: 0.025, active_pair_ids: [explicit_exposure_to_fully_clothed, partial_undress_to_complete_attire, pornographic_to_nonsexual_scene, sexualized_pose_to_ordinary_pose, erotic_camera_to_documentary_camera]}
+  - {id: V9_R02_ALL5_L0050, enabled: true, strength: 0.05, active_pair_ids: [explicit_exposure_to_fully_clothed, partial_undress_to_complete_attire, pornographic_to_nonsexual_scene, sexualized_pose_to_ordinary_pose, erotic_camera_to_documentary_camera]}
+  - {id: V9_R03_ALL5_L0075, enabled: true, strength: 0.075, active_pair_ids: [explicit_exposure_to_fully_clothed, partial_undress_to_complete_attire, pornographic_to_nonsexual_scene, sexualized_pose_to_ordinary_pose, erotic_camera_to_documentary_camera]}
+  - {id: V9_R04_ALL5_L0100, enabled: true, strength: 0.1, active_pair_ids: [explicit_exposure_to_fully_clothed, partial_undress_to_complete_attire, pornographic_to_nonsexual_scene, sexualized_pose_to_ordinary_pose, erotic_camera_to_documentary_camera]}
+  - {id: V9_R05_ALL5_L0125, enabled: true, strength: 0.125, active_pair_ids: [explicit_exposure_to_fully_clothed, partial_undress_to_complete_attire, pornographic_to_nonsexual_scene, sexualized_pose_to_ordinary_pose, erotic_camera_to_documentary_camera]}
+  - {id: V9_R06_ALL5_L0150, enabled: true, strength: 0.15, active_pair_ids: [explicit_exposure_to_fully_clothed, partial_undress_to_complete_attire, pornographic_to_nonsexual_scene, sexualized_pose_to_ordinary_pose, erotic_camera_to_documentary_camera]}
+  - {id: V9_R07_ALL5_L0175, enabled: true, strength: 0.175, active_pair_ids: [explicit_exposure_to_fully_clothed, partial_undress_to_complete_attire, pornographic_to_nonsexual_scene, sexualized_pose_to_ordinary_pose, erotic_camera_to_documentary_camera]}
+  - {id: V9_R08_ALL5_L0200, enabled: true, strength: 0.2, active_pair_ids: [explicit_exposure_to_fully_clothed, partial_undress_to_complete_attire, pornographic_to_nonsexual_scene, sexualized_pose_to_ordinary_pose, erotic_camera_to_documentary_camera]}
+  - {id: V9_R09_EXPOSURE_UNDRESS_L0050, enabled: true, strength: 0.05, active_pair_ids: [explicit_exposure_to_fully_clothed, partial_undress_to_complete_attire]}
+  - {id: V9_R10_EXPOSURE_UNDRESS_L0100, enabled: true, strength: 0.1, active_pair_ids: [explicit_exposure_to_fully_clothed, partial_undress_to_complete_attire]}
+  - {id: V9_R11_EXPOSURE_UNDRESS_L0150, enabled: true, strength: 0.15, active_pair_ids: [explicit_exposure_to_fully_clothed, partial_undress_to_complete_attire]}
+  - {id: V9_R12_EXPOSURE_UNDRESS_L0200, enabled: true, strength: 0.2, active_pair_ids: [explicit_exposure_to_fully_clothed, partial_undress_to_complete_attire]}
+  - {id: V9_R13_PORNOGRAPHIC_L0100, enabled: true, strength: 0.1, active_pair_ids: [pornographic_to_nonsexual_scene]}
+  - {id: V9_R14_PORNOGRAPHIC_L0200, enabled: true, strength: 0.2, active_pair_ids: [pornographic_to_nonsexual_scene]}
+  - {id: V9_R15_POSE_L0100, enabled: true, strength: 0.1, active_pair_ids: [sexualized_pose_to_ordinary_pose]}
+  - {id: V9_R16_POSE_L0200, enabled: true, strength: 0.2, active_pair_ids: [sexualized_pose_to_ordinary_pose]}
+  - {id: V9_R17_CAMERA_L0100, enabled: true, strength: 0.1, active_pair_ids: [erotic_camera_to_documentary_camera]}
+  - {id: V9_R18_CAMERA_L0200, enabled: true, strength: 0.2, active_pair_ids: [erotic_camera_to_documentary_camera]}
+  - {id: V9_R19_PORN_POSE_CAMERA_L0100, enabled: true, strength: 0.1, active_pair_ids: [pornographic_to_nonsexual_scene, sexualized_pose_to_ordinary_pose, erotic_camera_to_documentary_camera]}
+slurm:
+  partition: gpu-vram-94gb
+  gres: gpu:nvidia_h100_nvl:1
+  array_throttle: null
+  user_hold: false
+output:
+  stage_directory: 02_LEGACY_BOTTLENECK_DEV_V9_LOW_STRENGTH_FRONTIER
+  manifest_filename: legacy_bottleneck_development_40_v9.jsonl
+  prepared_registry_filename: legacy_bottleneck_development_v9_prepared.json
