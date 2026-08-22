@@ -72,9 +72,9 @@ class TrustRegionArm:
             "activation_top_fraction must be in (0, 1]",
         )
         if arm.enabled:
-            _require(0.0 < arm.max_local_relative <= 0.25, "Bad local trust-region cap")
+            _require(0.0 < arm.max_local_relative <= 0.75, "Bad local trust-region cap")
             _require(
-                0.0 < arm.target_relative_rms <= 0.25,
+                0.0 < arm.target_relative_rms <= 0.50,
                 "Bad target relative RMS",
             )
             _require(arm.cumulative_energy_budget > 0.0, "Energy budget must be positive")
@@ -260,7 +260,7 @@ def calibrate_relative_rms_direction(
     """Match historical relative-RMS strength before applying trust bounds."""
 
     _require(base.shape == direction.shape, "Relative-RMS calibration shape mismatch")
-    _require(0.0 <= target_relative_rms <= 0.25, "Bad target relative RMS")
+    _require(0.0 <= target_relative_rms <= 0.50, "Bad target relative RMS")
     _require(eps >= 0.0, "Negative RMS epsilon")
     _require(bool(torch.isfinite(base).all()), "Non-finite base during RMS calibration")
     _require(bool(torch.isfinite(direction).all()), "Non-finite direction during RMS calibration")
