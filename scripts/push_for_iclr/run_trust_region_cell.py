@@ -23,6 +23,7 @@ from PIL import Image
 REPOSITORY_ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPOSITORY_ROOT / "src"))
 
+from hierasafe_flow.adapters.base import PromptCondition  # noqa: E402
 from hierasafe_flow.adapters.registry import create_adapter  # noqa: E402
 from hierasafe_flow.campaigns.push_for_iclr.ablation_controller import (  # noqa: E402
     build_unified_time_map,
@@ -161,6 +162,72 @@ def _save_image_atomic(path: Path, image: Image.Image) -> None:
         raise
 
 
+def _move_condition_value(value: Any, device: torch.device | str) -> Any:
+    """Copy every tensor in immutable prompt-conditioning data to ``device``."""
+
+    if torch.is_tensor(value):
+        return value.detach().to(device=device)
+    if isinstance(value, Mapping):
+        return {key: _move_condition_value(item, device) for key, item in value.items()}
+    if isinstance(value, tuple):
+        return tuple(_move_condition_value(item, device) for item in value)
+    if isinstance(value, list):
+        return [_move_condition_value(item, device) for item in value]
+    return value
+
+
+def _condition_on_device(condition: PromptCondition, device: torch.device | str) -> PromptCondition:
+    _require(isinstance(condition, PromptCondition), "Adapter returned a non-PromptCondition value")
+    return PromptCondition(
+        prompt=condition.prompt,
+        data=_move_condition_value(condition.data, device),
+    )
+
+
+def _persistent_cpu_condition(condition: PromptCondition) -> PromptCondition:
+    return _condition_on_device(condition, torch.device("cpu"))
+
+
+def _predict_with_materialized_condition(
+    adapter: Any,
+    latents: torch.Tensor,
+    timestep: Any,
+    condition: PromptCondition,
+    state: Any,
+) -> torch.Tensor:
+    """Materialize one condition on the execution device for exactly one forward."""
+
+    materialized = _condition_on_device(condition, adapter.device)
+    return adapter.predict_vector_field(latents, timestep, materialized, state)
+
+
+def _condition_storage_stats(conditions: Sequence[PromptCondition]) -> dict[str, Any]:
+    tensors: list[torch.Tensor] = []
+
+    def collect(value: Any) -> None:
+        if torch.is_tensor(value):
+            tensors.append(value)
+        elif isinstance(value, Mapping):
+            for item in value.values():
+                collect(item)
+        elif isinstance(value, (tuple, list)):
+            for item in value:
+                collect(item)
+
+    for condition in conditions:
+        collect(condition.data)
+    devices = sorted({tensor.device.type for tensor in tensors})
+    return {
+        "policy": "persistent_cpu_per_call_gpu_materialization_v1",
+        "condition_count": len(conditions),
+        "tensor_count": len(tensors),
+        "persistent_devices": devices,
+        "persistent_bytes": sum(tensor.numel() * tensor.element_size() for tensor in tensors),
+        "execution_device": "cuda",
+        "dtype_preserving": True,
+    }
+
+
 def _prepare_group(
     adapter: Any,
     state: Any,
@@ -175,11 +242,13 @@ def _prepare_group(
         prompt = contextualize_probe(original_prompt, str(probe["text"]))
         prompts.append(prompt)
         conditions.append(
-            adapter.prepare_prompt_for_state(
+            _persistent_cpu_condition(
+                adapter.prepare_prompt_for_state(
                 prompt,
                 state,
                 prompt_view="trust_region_context_probe",
                 call_role=f"{role}:{probe['id']}",
+                )
             )
         )
         weights.append(float(probe["weight"]))
@@ -217,6 +286,11 @@ def execute_cell(row: Mapping[str, Any], manifest_path: Path, manifest_file_sha2
     )
     _require(row["ablation_split"] == "development", "Locked validation is forbidden")
     _require(row["prompt_specific_ontology_used"] is False, "Prompt-specific ontology forbidden")
+    _require(
+        row["conditioning_memory_policy"]
+        == "persistent_cpu_per_call_gpu_materialization_v1",
+        "Unsealed conditioning memory policy",
+    )
 
     model_config = _load_yaml(model_path)
     ontology = _load_yaml(ontology_path)
@@ -251,8 +325,10 @@ def execute_cell(row: Mapping[str, Any], manifest_path: Path, manifest_file_sha2
     initial_latent_fingerprint = tensor_fingerprint(latents)
     timesteps = adapter.set_timesteps(num_steps, latents=latents, state=state)
     time_map = build_unified_time_map(timesteps)
-    base_condition = adapter.prepare_prompt_for_state(
-        row["original_prompt"], state, prompt_view="exact_original_prompt", call_role="base"
+    base_condition = _persistent_cpu_condition(
+        adapter.prepare_prompt_for_state(
+            row["original_prompt"], state, prompt_view="exact_original_prompt", call_role="base"
+        )
     )
 
     prepared_pairs: list[dict[str, Any]] = []
@@ -282,6 +358,13 @@ def execute_cell(row: Mapping[str, Any], manifest_path: Path, manifest_file_sha2
                 }
             )
             composed_probe_prompts[pair["id"]] = {"source": source_prompts, "target": target_prompts}
+    all_conditions = [base_condition, *neutral_conditions]
+    for pair in prepared_pairs:
+        all_conditions.extend(pair["source_conditions"])
+        all_conditions.extend(pair["target_conditions"])
+    condition_storage = _condition_storage_stats(all_conditions)
+    _require(condition_storage["persistent_devices"] in ([], ["cpu"]), "Condition remained on GPU")
+    torch.cuda.empty_cache()
     _sync()
     conditioning_seconds = time.perf_counter() - conditioning_start
 
@@ -305,7 +388,9 @@ def execute_cell(row: Mapping[str, Any], manifest_path: Path, manifest_file_sha2
     with torch.inference_mode():
         for step_index, (timestep, unified_time) in enumerate(zip(timesteps, time_map.unified_times)):
             native_sigma, sigma_source = _scheduler_sigma(adapter, step_index)
-            base_prediction = adapter.predict_vector_field(latents, timestep, base_condition, state)
+            base_prediction = _predict_with_materialized_condition(
+                adapter, latents, timestep, base_condition, state
+            )
             counters["base_denoiser_forwards"] += 1
             _require(bool(torch.isfinite(base_prediction).all()), "Non-finite base prediction")
             layout = adapter.latent_layout(base_prediction)
@@ -343,7 +428,9 @@ def execute_cell(row: Mapping[str, Any], manifest_path: Path, manifest_file_sha2
                 neutral_prediction = weighted_prediction_mean(
                     neutral_conditions,
                     neutral_weights,
-                    lambda condition: adapter.predict_vector_field(latents, timestep, condition, state),
+                    lambda condition: _predict_with_materialized_condition(
+                        adapter, latents, timestep, condition, state
+                    ),
                 )
                 counters["neutral_probe_forwards"] += len(neutral_conditions)
                 pair_directions = []
@@ -351,12 +438,16 @@ def execute_cell(row: Mapping[str, Any], manifest_path: Path, manifest_file_sha2
                     source_prediction = weighted_prediction_mean(
                         pair["source_conditions"],
                         pair["source_weights"],
-                        lambda condition: adapter.predict_vector_field(latents, timestep, condition, state),
+                        lambda condition: _predict_with_materialized_condition(
+                            adapter, latents, timestep, condition, state
+                        ),
                     )
                     target_prediction = weighted_prediction_mean(
                         pair["target_conditions"],
                         pair["target_weights"],
-                        lambda condition: adapter.predict_vector_field(latents, timestep, condition, state),
+                        lambda condition: _predict_with_materialized_condition(
+                            adapter, latents, timestep, condition, state
+                        ),
                     )
                     counters["source_probe_forwards"] += len(pair["source_conditions"])
                     counters["target_probe_forwards"] += len(pair["target_conditions"])
@@ -502,6 +593,7 @@ def execute_cell(row: Mapping[str, Any], manifest_path: Path, manifest_file_sha2
         "initial_latent_fingerprint": initial_latent_fingerprint,
         "adapter": adapter.inspect(),
         "conditioning_provenance": adapter.conditioning_provenance(),
+        "conditioning_memory": condition_storage,
         "probe_context_conditioning": row["probe_context_conditioning"],
         "composed_probe_prompts": composed_probe_prompts,
         "ontology_pair_count": len(prepared_pairs),

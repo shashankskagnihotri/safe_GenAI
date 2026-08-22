@@ -92,6 +92,13 @@ def build_trust_region_manifest(
     _require(config["split_role"] == "development_only_method_redesign", "Bad split role")
     _require(config["slurm"]["array_throttle"] is None, "Array throttle is forbidden")
     _require(config["slurm"]["user_hold"] is False, "User hold is forbidden")
+    conditioning_memory_policy = config["generation"].get(
+        "conditioning_memory_policy", "persistent_cpu_per_call_gpu_materialization_v1"
+    )
+    _require(
+        conditioning_memory_policy == "persistent_cpu_per_call_gpu_materialization_v1",
+        "Unsupported conditioning memory policy",
+    )
 
     source_spec = config["source_manifest"]
     _require(
@@ -204,6 +211,7 @@ def build_trust_region_manifest(
                         "ontology_sha256": ontology_record["sha256"],
                         "prompt_specific_ontology_used": False,
                         "probe_context_conditioning": "safety_concept_prefix_plus_exact_original_prompt",
+                        "conditioning_memory_policy": conditioning_memory_policy,
                         "margin": float(model_spec["margin"]),
                         "mask": model_spec["mask"],
                         "expected_output_relative_path": str(relative_output),
@@ -229,7 +237,22 @@ def build_trust_region_manifest(
     manifest_sha256 = sha256_bytes(payload)
     sealed = [{**row, "job_manifest_sha256": manifest_sha256} for row in rows]
     physical = "".join(f"{canonical_json(row)}\n" for row in sealed).encode("utf-8")
-    manifest_path = output_root / "MANIFESTS/trust_region_development_480.jsonl"
+    manifest_filename = config["output"].get(
+        "manifest_filename", "trust_region_development_480.jsonl"
+    )
+    prepared_registry_filename = config["output"].get(
+        "prepared_registry_filename", "trust_region_development_480_prepared.json"
+    )
+    _require(
+        Path(manifest_filename).name == manifest_filename and manifest_filename.endswith(".jsonl"),
+        "Manifest filename must be a JSONL basename",
+    )
+    _require(
+        Path(prepared_registry_filename).name == prepared_registry_filename
+        and prepared_registry_filename.endswith(".json"),
+        "Prepared registry filename must be a JSON basename",
+    )
+    manifest_path = output_root / "MANIFESTS" / manifest_filename
     file_sha256 = _write_immutable(manifest_path, physical)
     summary = {
         "schema_version": "push-for-iclr.trust-region-registry.v1",
@@ -246,11 +269,13 @@ def build_trust_region_manifest(
         "manifest_file_sha256": file_sha256,
         "source_prompt_manifest_sha256": source_spec["manifest_sha256"],
         "stage_config_sha256": config_sha256,
+        "output_stage_directory": config["output"]["stage_directory"],
+        "conditioning_memory_policy": conditioning_memory_policy,
         "models": list(config["models"]),
         "arms": [arm.arm_id for arm in arms],
         "ontologies": ontology_records,
     }
-    registry_path = output_root / "JOB_REGISTRY/trust_region_development_480_prepared.json"
+    registry_path = output_root / "JOB_REGISTRY" / prepared_registry_filename
     registry_payload = (json.dumps(summary, indent=2, sort_keys=True) + "\n").encode("utf-8")
     summary["registry_file_sha256"] = _write_immutable(registry_path, registry_payload)
     return summary
