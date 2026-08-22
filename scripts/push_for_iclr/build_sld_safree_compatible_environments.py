@@ -23,7 +23,7 @@ def run(command, **kwargs):
 def package_versions(python):
     code = """
 import importlib.metadata, json, platform
-names = ['torch','torchvision','diffusers','transformers','accelerate','numpy','Pillow','huggingface-hub','albumentations','albucore','onnxruntime','onnxruntime-gpu','nudenet','sld','python-sld','clip']
+names = ['torch','torchvision','diffusers','transformers','accelerate','numpy','scipy','Pillow','huggingface-hub','albumentations','albucore','onnxruntime','onnxruntime-gpu','nudenet','sld','python-sld','clip']
 out = {'python': platform.python_version(), 'packages': {}}
 for name in names:
     try: out['packages'][name] = importlib.metadata.version(name)
@@ -41,8 +41,10 @@ def build(task_id):
             "The admitted historical SLD environment is cloned immutably. NumPy 2.x "
             "cannot provide Torch 2.0.1's NumPy bridge, and current huggingface_hub "
             "removed cached_download required by Diffusers 0.20.2. Only NumPy 1.26.4 "
-            "and huggingface_hub 0.16.4 are replaced; method code and paper settings "
-            "are unchanged."
+            "and huggingface_hub 0.16.4 are replaced. The published LMS scheduler "
+            "requires Diffusers' optional SciPy backend, which the upstream package "
+            "metadata omitted, so release-compatible SciPy 1.10.1 is added. Method "
+            "code and paper settings are unchanged."
         )
     elif task_id == 1:
         method = "safree"
@@ -94,12 +96,13 @@ def build(task_id):
         python = temporary / "env/bin/python"
         if method == "sld":
             run([python, "-m", "pip", "install", "--no-deps", "--force-reinstall",
-                 "numpy==1.26.4", "huggingface_hub==0.16.4"])
+                 "numpy==1.26.4", "huggingface_hub==0.16.4", "scipy==1.10.1"])
             probe = (
-                "import numpy, torch, huggingface_hub; "
+                "import numpy, scipy, torch, huggingface_hub; "
                 "from huggingface_hub import cached_download; from sld import SLDPipeline; "
                 "assert torch.arange(3).numpy().tolist()==[0,1,2]; "
-                "assert numpy.__version__=='1.26.4'; print('SLD_COMPATIBILITY_OK')"
+                "assert numpy.__version__=='1.26.4'; assert scipy.__version__=='1.10.1'; "
+                "print('SLD_COMPATIBILITY_OK')"
             )
             run([python, "-c", probe])
         else:

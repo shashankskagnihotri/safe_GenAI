@@ -2,8 +2,8 @@
   "schema_version": "push-for-iclr.sld-table1-hypmax.v1",
   "campaign": "PUSH_FOR_ICLR",
   "method": "Safe Latent Diffusion Hyp-Max",
-  "attempt_id": "attempt_001",
-  "attempt_root": "/ceph/sagnihot/projects/safety_genAI/outputs/PUSH_FOR_ICLR/REPRODUCTIONS/SLD_TABLE1_HYPMAX/attempt_001",
+  "attempt_id": "attempt_002",
+  "attempt_root": "/ceph/sagnihot/projects/safety_genAI/outputs/PUSH_FOR_ICLR/REPRODUCTIONS/SLD_TABLE1_HYPMAX/attempt_002",
   "upstream": {
     "repo": "/ceph/sagnihot/projects/safety_genAI/debugging/t2i_safety_27_july/upstream/repos/safe-latent-diffusion",
     "commit": "a42923c3de0e4346bee3f61891a510bdcc2aedd2",
@@ -29,9 +29,9 @@
   },
   "environment": {
     "base_root": "/ceph/sagnihot/projects/safety_genAI/outputs/PUSH_FOR_ICLR/REPRODUCTIONS/ENVIRONMENTS/sld/a42923c3de0e",
-    "compatible_root": "/ceph/sagnihot/projects/safety_genAI/outputs/PUSH_FOR_ICLR/REPRODUCTIONS/ENVIRONMENTS/sld/a42923c3de0e_numpy1264_hfhub0164_v1",
-    "python": "/ceph/sagnihot/projects/safety_genAI/outputs/PUSH_FOR_ICLR/REPRODUCTIONS/ENVIRONMENTS/sld/a42923c3de0e_numpy1264_hfhub0164_v1/env/bin/python",
-    "evaluation_python": "/ceph/sagnihot/projects/safety_genAI/outputs/PUSH_FOR_ICLR/REPRODUCTIONS/ENVIRONMENTS/safree/b8b2c3fa9d7f_albucore0016_ortgpu1181_nudenet209_v1/env/bin/python"
+    "compatible_root": "/ceph/sagnihot/projects/safety_genAI/outputs/PUSH_FOR_ICLR/REPRODUCTIONS/ENVIRONMENTS/sld/a42923c3de0e_numpy1264_hfhub0164_scipy1101_v2",
+    "python": "/ceph/sagnihot/projects/safety_genAI/outputs/PUSH_FOR_ICLR/REPRODUCTIONS/ENVIRONMENTS/sld/a42923c3de0e_numpy1264_hfhub0164_scipy1101_v2/env/bin/python",
+    "evaluation_python": "/ceph/sagnihot/projects/safety_genAI/outputs/PUSH_FOR_ICLR/REPRODUCTIONS/ENVIRONMENTS/safree/b8b2c3fa9d7f_albucore0016_ortcpu1181_vendorednudenet_sldimport_v1/env/bin/python"
   },
   "assets": {
     "root": "/ceph/sagnihot/projects/safety_genAI/outputs/PUSH_FOR_ICLR/REPRODUCTIONS/ASSETS/sld_safree_i2p_v1",
