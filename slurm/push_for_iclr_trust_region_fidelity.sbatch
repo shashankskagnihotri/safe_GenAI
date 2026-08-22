@@ -22,8 +22,15 @@ set -euo pipefail
 test "$(git -C "$TR_EVAL_WORKTREE" rev-parse HEAD)" = "$TR_EVAL_COMMIT"
 export PYTHONPATH="${TR_EVAL_WORKTREE}/src:${PYTHONPATH:-}"
 export HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 TOKENIZERS_PARALLELISM=false
+subset_args=()
+case "${TR_ALLOW_SUBSET_MANIFEST:-0}" in
+  0) ;;
+  1) subset_args+=(--allow-subset-manifest) ;;
+  *) echo "TR_ALLOW_SUBSET_MANIFEST must be 0 or 1" >&2; exit 2 ;;
+esac
 exec /ceph/sagnihot/miniconda3/envs/push_iclr_eval_torch26_pipcu124/bin/python \
   "$TR_EVAL_WORKTREE/scripts/push_for_iclr/evaluate_trust_region_fidelity_group.py" \
   --manifest "$TR_MANIFEST" --manifest-file-sha256 "$TR_MANIFEST_SHA256" \
   --source-root "$TR_SOURCE_ROOT" --config "$TR_EVAL_CONFIG" \
-  --group-index "$SLURM_ARRAY_TASK_ID" --summary-root "$TR_SUMMARY_ROOT"
+  --group-index "$SLURM_ARRAY_TASK_ID" --summary-root "$TR_SUMMARY_ROOT" \
+  "${subset_args[@]}"
