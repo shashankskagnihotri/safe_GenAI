@@ -119,7 +119,16 @@ def static_asset_admission(config: Dict[str, Any], config_sha: str) -> Dict[str,
         "image_admission",
         "reference_manifest",
         "clip_model_safetensors",
+        "clip_model_config",
+        "clip_preprocessor_config",
+        "clip_merges",
+        "clip_tokenizer",
+        "clip_tokenizer_config",
+        "clip_special_tokens_map",
+        "clip_vocab",
+        "clip_ref_main",
         "inception_checkpoint",
+        "reused_fid_result",
     ):
         files[label] = require_file_hash(paths[label], expected[label], label)
 
@@ -413,13 +422,34 @@ def run_metric(config: Dict[str, Any], config_sha: str, task_id: int) -> Dict[st
 
 def aggregate(config: Dict[str, Any], config_sha: str) -> Dict[str, Any]:
     quality_root = Path(config["paths"]["quality_root"])
-    clip = json.loads((quality_root / "CLIP" / "RESULT.json").read_text(encoding="utf-8"))
-    fid = json.loads((quality_root / "FID" / "RESULT.json").read_text(encoding="utf-8"))
-    for result in (clip, fid):
-        if result.get("config_sha256") != config_sha:
-            raise RuntimeError("Metric result was produced from a different quality configuration")
+    input_specs = config.get("aggregate_inputs")
+    if not isinstance(input_specs, dict) or set(input_specs) != {"clip", "fid"}:
+        raise RuntimeError("aggregate_inputs must seal exactly clip and fid")
+    results: Dict[str, Dict[str, Any]] = {}
+    metric_sources: Dict[str, Dict[str, Any]] = {}
+    for metric in ("clip", "fid"):
+        spec = input_specs[metric]
+        result_path = Path(spec["path"])
+        expected_file_sha = spec.get("file_sha256")
+        if expected_file_sha is not None:
+            require_file_hash(result_path, expected_file_sha, f"aggregate_{metric}_result")
+        result = json.loads(result_path.read_text(encoding="utf-8"))
+        expected_config_sha = config_sha if spec["config_sha256"] == "CURRENT" else spec["config_sha256"]
+        if result.get("config_sha256") != expected_config_sha:
+            raise RuntimeError(f"{metric} metric result configuration hash mismatch")
+        if result.get("metric") != metric or result.get("status") != "METRIC_COMPLETE":
+            raise RuntimeError(f"Invalid sealed {metric} metric result")
         if result.get("fallback_used") is not False:
-            raise RuntimeError("Metric result used a prohibited fallback")
+            raise RuntimeError(f"{metric} metric result used a prohibited fallback")
+        results[metric] = result
+        metric_sources[metric] = {
+            "path": str(result_path),
+            "file_sha256": sha256_file(result_path),
+            "config_sha256": expected_config_sha,
+            "reuse_policy": spec["reuse_policy"],
+        }
+    clip = results["clip"]
+    fid = results["fid"]
     if clip["generated"] != fid["generated"]:
         raise RuntimeError("CLIP and FID did not evaluate the identical generated image set")
     numerical_pass = bool(clip["numerical_gate_passed"] and fid["numerical_gate_passed"])
@@ -436,6 +466,7 @@ def aggregate(config: Dict[str, Any], config_sha: str) -> Dict[str, Any]:
         "config_sha256": config_sha,
         "clip": clip,
         "fid": fid,
+        "metric_sources": metric_sources,
         "generated": clip["generated"],
         "fallback_used": False,
         "completed_at": utc_now(),

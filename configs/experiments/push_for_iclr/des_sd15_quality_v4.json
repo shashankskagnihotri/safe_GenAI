@@ -1,0 +1,115 @@
+{
+  "schema_version": 1,
+  "protocol_name": "DES_SD15_PAPER_QUALITY_EXACT_V4_CLEAN_AUTHOR_CACHE_REF_REUSED_FID",
+  "method": "DES",
+  "primary_reproduction_commit": "af1f96ded891f66e0bd0b0d39f421375a8896a53",
+  "primary_protocol_sha256": "600950e47aa58da7e8e20f90013872fe6cf5fb9e5c0dc5c28f3b8280d6269748",
+  "upstreams": {
+    "des": {
+      "path": "/ceph/sagnihot/projects/safety_genAI_upstreams/PUSH_FOR_ICLR/DES_EVAL_CLEAN_1d77e0a2a720",
+      "commit": "1d77e0a2a72023470f201d3149e80429f7b60e15"
+    },
+    "text2image_benchmark": {
+      "path": "/ceph/sagnihot/projects/safety_genAI_upstreams/PUSH_FOR_ICLR/text2image-benchmark",
+      "commit": "532229f679d7e97ecba61914db7276f95733e707",
+      "tree_sha256": "aa042bd1f84d7b2a74905297d90af59b260cf69fb09e66da879d0a932f9ce85a"
+    },
+    "openai_clip": {
+      "path": "/ceph/sagnihot/projects/safety_genAI_upstreams/PUSH_FOR_ICLR/openai_CLIP",
+      "commit": "dcba3cb2e2827b402d2701e7e1c7d9fed8a20ef1",
+      "tree_sha256": "1084e0c0e01334d793a2a4f5bd13b97b3b29371ec676b0f0e2714b896b6ceb7f"
+    }
+  },
+  "paths": {
+    "attempt_root": "/ceph/sagnihot/projects/safety_genAI/outputs/PUSH_FOR_ICLR/REPRODUCTIONS/des/1d77e0a2a720/SD15_TABLE2_TABLE1/ATTEMPT_001",
+    "generated_search_root": "/ceph/sagnihot/projects/safety_genAI/outputs/PUSH_FOR_ICLR/REPRODUCTIONS/des/1d77e0a2a720/SD15_TABLE2_TABLE1/ATTEMPT_001/GENERATIONS/coco_10k",
+    "quality_root": "/ceph/sagnihot/projects/safety_genAI/outputs/PUSH_FOR_ICLR/REPRODUCTIONS/des/1d77e0a2a720/SD15_TABLE2_TABLE1/ATTEMPT_001/QUALITY_ATTEMPT_004_CLIP_CACHE_REF_AND_REUSED_FID",
+    "author_generation_manifest": "/ceph/sagnihot/projects/safety_genAI/outputs/PUSH_FOR_ICLR/REPRODUCTIONS/des/1d77e0a2a720/SD15_TABLE2_TABLE1/ATTEMPT_001/GENERATIONS/coco_10k/manifest.jsonl",
+    "author_generation_images": "/ceph/sagnihot/projects/safety_genAI/outputs/PUSH_FOR_ICLR/REPRODUCTIONS/des/1d77e0a2a720/SD15_TABLE2_TABLE1/ATTEMPT_001/GENERATIONS/coco_10k/images",
+    "author_generation_admission": "/ceph/sagnihot/projects/safety_genAI/outputs/PUSH_FOR_ICLR/REPRODUCTIONS/des/1d77e0a2a720/SD15_TABLE2_TABLE1/ATTEMPT_001/QUALITY_ATTEMPT_004_CLIP_CACHE_REF_AND_REUSED_FID/AUTHOR_GENERATION_ADMISSION.json",
+    "prompt_csv": "/ceph/sagnihot/projects/safety_genAI_upstreams/PUSH_FOR_ICLR/DES_EVAL_CLEAN_1d77e0a2a720/datasets/coco_prompts.csv",
+    "clipscore_script": "/ceph/sagnihot/projects/safety_genAI_upstreams/PUSH_FOR_ICLR/DES_EVAL_CLEAN_1d77e0a2a720/clipscore.py",
+    "fid_script": "/ceph/sagnihot/projects/safety_genAI_upstreams/PUSH_FOR_ICLR/DES_EVAL_CLEAN_1d77e0a2a720/fid.py",
+    "reference_images": "/ceph/sagnihot/projects/safety_genAI/outputs/PUSH_FOR_ICLR/REPRODUCTIONS/ASSETS/des/coco_10k_exact/images",
+    "mapping_admission": "/ceph/sagnihot/projects/safety_genAI/outputs/PUSH_FOR_ICLR/REPRODUCTIONS/ASSETS/des/coco_10k_exact/MAPPING_ADMISSION.json",
+    "image_admission": "/ceph/sagnihot/projects/safety_genAI/outputs/PUSH_FOR_ICLR/REPRODUCTIONS/ASSETS/des/coco_10k_exact/IMAGE_ADMISSION.json",
+    "reference_manifest": "/ceph/sagnihot/projects/safety_genAI/outputs/PUSH_FOR_ICLR/REPRODUCTIONS/ASSETS/des/coco_10k_exact/FINAL_IMAGE_MANIFEST.jsonl",
+    "hf_home": "/ceph/sagnihot/projects/safety_genAI/outputs/PUSH_FOR_ICLR/REPRODUCTIONS/ASSETS/des/clip_hf_home",
+    "clip_model_safetensors": "/ceph/sagnihot/projects/safety_genAI/outputs/PUSH_FOR_ICLR/REPRODUCTIONS/ASSETS/des/clip_hf_home/hub/models--openai--clip-vit-large-patch14/snapshots/32bd64288804d66eefd0ccbe215aa642df71cc41/model.safetensors",
+    "torch_home": "/ceph/sagnihot/projects/safety_genAI/outputs/PUSH_FOR_ICLR/REPRODUCTIONS/ASSETS/des/torch_home",
+    "inception_checkpoint": "/ceph/sagnihot/projects/safety_genAI/outputs/PUSH_FOR_ICLR/REPRODUCTIONS/ASSETS/des/torch_home/hub/checkpoints/pt_inception-2015-12-05-6726825d.pth",
+    "primary_environment": "/ceph/sagnihot/projects/safety_genAI/outputs/PUSH_FOR_ICLR/REPRODUCTIONS/ENVIRONMENTS/des/1d77e0a2a720/env",
+    "quality_environment": "/ceph/sagnihot/projects/safety_genAI/outputs/PUSH_FOR_ICLR/REPRODUCTIONS/ENVIRONMENTS/des_quality/1d77e0a2a720_532229f679d7_dcba3cb2e282/env",
+    "clip_model_config": "/ceph/sagnihot/projects/safety_genAI/outputs/PUSH_FOR_ICLR/REPRODUCTIONS/ASSETS/des/clip_hf_home/hub/models--openai--clip-vit-large-patch14/snapshots/32bd64288804d66eefd0ccbe215aa642df71cc41/config.json",
+    "clip_preprocessor_config": "/ceph/sagnihot/projects/safety_genAI/outputs/PUSH_FOR_ICLR/REPRODUCTIONS/ASSETS/des/clip_hf_home/hub/models--openai--clip-vit-large-patch14/snapshots/32bd64288804d66eefd0ccbe215aa642df71cc41/preprocessor_config.json",
+    "clip_merges": "/ceph/sagnihot/projects/safety_genAI/outputs/PUSH_FOR_ICLR/REPRODUCTIONS/ASSETS/des/clip_hf_home/hub/models--openai--clip-vit-large-patch14/snapshots/32bd64288804d66eefd0ccbe215aa642df71cc41/merges.txt",
+    "clip_tokenizer": "/ceph/sagnihot/projects/safety_genAI/outputs/PUSH_FOR_ICLR/REPRODUCTIONS/ASSETS/des/clip_hf_home/hub/models--openai--clip-vit-large-patch14/snapshots/32bd64288804d66eefd0ccbe215aa642df71cc41/tokenizer.json",
+    "clip_tokenizer_config": "/ceph/sagnihot/projects/safety_genAI/outputs/PUSH_FOR_ICLR/REPRODUCTIONS/ASSETS/des/clip_hf_home/hub/models--openai--clip-vit-large-patch14/snapshots/32bd64288804d66eefd0ccbe215aa642df71cc41/tokenizer_config.json",
+    "clip_special_tokens_map": "/ceph/sagnihot/projects/safety_genAI/outputs/PUSH_FOR_ICLR/REPRODUCTIONS/ASSETS/des/clip_hf_home/hub/models--openai--clip-vit-large-patch14/snapshots/32bd64288804d66eefd0ccbe215aa642df71cc41/special_tokens_map.json",
+    "clip_vocab": "/ceph/sagnihot/projects/safety_genAI/outputs/PUSH_FOR_ICLR/REPRODUCTIONS/ASSETS/des/clip_hf_home/hub/models--openai--clip-vit-large-patch14/snapshots/32bd64288804d66eefd0ccbe215aa642df71cc41/vocab.json",
+    "clip_ref_main": "/ceph/sagnihot/projects/safety_genAI/outputs/PUSH_FOR_ICLR/REPRODUCTIONS/ASSETS/des/clip_hf_home/hub/models--openai--clip-vit-large-patch14/refs/main",
+    "reused_fid_result": "/ceph/sagnihot/projects/safety_genAI/outputs/PUSH_FOR_ICLR/REPRODUCTIONS/des/1d77e0a2a720/SD15_TABLE2_TABLE1/ATTEMPT_001/QUALITY_ATTEMPT_003_AUTHOR_FILENAMES_CLEAN_UPSTREAM/FID/RESULT.json"
+  },
+  "expected_sha256": {
+    "author_generation_manifest": "e32d40de4de91392f8fa81809b31a8f60e169f77155e77d6df7abd89e2faea63",
+    "prompt_csv": "0d23e52d6baa776b05778ee5c85d718292aad257128451249850d4ee1f008fa6",
+    "clipscore_script": "2692310fd6f8208909622ed3f0696e57f6004f33a0eaf6b5682f4d03db1eeca1",
+    "fid_script": "09ee1202587e85cb7efc94765e570cb9bec435d10ed2428b0aca8ff520883612",
+    "mapping_admission": "95117a6abaae72f1cc49d88cab22b841eca4b585f087edb196122948d60f6dd6",
+    "image_admission": "6137ba4e0280f83f2b95f2ccb913e57e237ae390b07b891fd9df0a24b8a73b63",
+    "reference_manifest": "e82a13f63a3d76be2e38862aa5bfa249adfe2452c738ccad1aa427343433f956",
+    "clip_model_safetensors": "a2bf730a0c7debf160f7a6b50b3aaf3703e7e88ac73de7a314903141db026dcb",
+    "inception_checkpoint": "6726825d0af5f729cebd5821db510b11b1cfad8faad88a03f1befd49fb9129b2",
+    "clip_model_config": "8a09b467700c58138c29d53c605b34ebc69beaadd13274a8a2af8ad2c2f4032a",
+    "clip_preprocessor_config": "910e70b3956ac9879ebc90b22fb3bc8a75b6a0677814500101a4c072bd7857bd",
+    "clip_merges": "9fd691f7c8039210e0fced15865466c65820d09b63988b0174bfe25de299051a",
+    "clip_tokenizer": "a83e0809aa4c3af7208b2df632a7a69668c6d48775b3c3fe4e1b1199d1f8b8f4",
+    "clip_tokenizer_config": "deef455e52fa5e8151e339add0582e4235f066009601360999d3a9cda83b1129",
+    "clip_special_tokens_map": "f8c0d6c39aee3f8431078ef6646567b0aba7f2246e9c54b8b99d55c22b707cbf",
+    "clip_vocab": "3f0c4f7d2086b61b38487075278ea9ed04edb53a03cbb045b86c27190fa8fb69",
+    "clip_ref_main": "9ef983f98963dd71a694d6cbf8f37e4a00900af23e2eb7926f1e103fda9df3f5",
+    "reused_fid_result": "1a79e11515d1374a84def5200cc3aedae96f08b02203b9eead01ac14189d6b0d"
+  },
+  "generated_images": {
+    "count": 9969,
+    "start_index": 0,
+    "stop_index_exclusive": 9969,
+    "suffix": ".png",
+    "filename_template": "images_des_{index}p.png",
+    "locator_rule": "exactly one directory must contain immediate author files images_des_0p.png through images_des_9968p.png, admitted against the immutable author-generation manifest"
+  },
+  "author_output_admission": {
+    "source_filename_template": "images_des_{index}p.png",
+    "verify_every_source_sha256": true,
+    "verify_every_prompt_against_released_csv": true,
+    "fallbacks_allowed": false
+  },
+  "reference_images": {
+    "count": 9969,
+    "mapping_rule": "first caption of each first previously unseen COCO val2014 image, matched to all 9969 released DES COCO prompts after NFKC and whitespace normalization"
+  },
+  "paper_targets": {
+    "clip_score_percent": 25.52,
+    "clip_absolute_tolerance": 0.3,
+    "fid": 15.44,
+    "fid_absolute_tolerance": 1.0
+  },
+  "metric_protocol": {
+    "clip": "Pinned clean DES clipscore.py, exact offline snapshot 32bd64288804d66eefd0ccbe215aa642df71cc41 registered by hash-sealed refs/main, all 9969 hash-admitted author-named images, released prompt order",
+    "fid": "Hash-verified successful Attempt 3 pinned DES FID result over the identical 9969 generated images and exact matched COCO references; no rerun",
+    "fallbacks_allowed": false
+  },
+  "aggregate_inputs": {
+    "clip": {
+      "path": "/ceph/sagnihot/projects/safety_genAI/outputs/PUSH_FOR_ICLR/REPRODUCTIONS/des/1d77e0a2a720/SD15_TABLE2_TABLE1/ATTEMPT_001/QUALITY_ATTEMPT_004_CLIP_CACHE_REF_AND_REUSED_FID/CLIP/RESULT.json",
+      "config_sha256": "CURRENT",
+      "reuse_policy": "new_failed_cell_retry_attempt_004"
+    },
+    "fid": {
+      "path": "/ceph/sagnihot/projects/safety_genAI/outputs/PUSH_FOR_ICLR/REPRODUCTIONS/des/1d77e0a2a720/SD15_TABLE2_TABLE1/ATTEMPT_001/QUALITY_ATTEMPT_003_AUTHOR_FILENAMES_CLEAN_UPSTREAM/FID/RESULT.json",
+      "file_sha256": "1a79e11515d1374a84def5200cc3aedae96f08b02203b9eead01ac14189d6b0d",
+      "config_sha256": "a3da8e299cea8aeb78d3f9e371def49bd0bc70786ebd9aa57e91e2c304d53009",
+      "reuse_policy": "hash_verified_successful_attempt_003_no_rerun"
+    }
+  }
+}
