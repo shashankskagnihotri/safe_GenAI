@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import importlib.metadata
 import json
 import os
 import platform
@@ -109,6 +110,30 @@ def main() -> None:
     args = parser.parse_args()
     config_path = args.config.resolve()
     config = load_json(config_path)
+    environment_root = Path(config["environment"]).resolve()
+    environment_admission_path = environment_root / "ADMISSION.json"
+    environment_admission = load_json(environment_admission_path)
+    if environment_admission.get("status") != "ADMITTED":
+        raise RuntimeError("NAG repaired environment overlay is not admitted")
+    if environment_admission.get("upstream_commit") != config["upstream"]["commit"]:
+        raise RuntimeError("NAG environment admission is bound to another upstream commit")
+    configured_overlay = Path(config["pythonpath_overlay"]).resolve()
+    admitted_overlay = Path(environment_admission["overlay"]).resolve()
+    if configured_overlay != admitted_overlay:
+        raise RuntimeError("NAG configured overlay does not match its admission record")
+    resolved_sys_path = {
+        Path(entry).resolve() for entry in sys.path if entry
+    }
+    if configured_overlay not in resolved_sys_path:
+        raise RuntimeError("NAG admitted package overlay is absent from sys.path")
+    expected_packages = environment_admission["packages"]
+    actual_packages = {
+        name: importlib.metadata.version(name) for name in expected_packages
+    }
+    if actual_packages != expected_packages:
+        raise RuntimeError(
+            f"NAG package mismatch: expected {expected_packages}, got {actual_packages}"
+        )
     if not torch.cuda.is_available():
         raise RuntimeError("CUDA is required; no CPU fallback is permitted")
 
@@ -203,7 +228,16 @@ def main() -> None:
             "completed_at_utc": utc_now(),
             "config_path": str(config_path),
             "config_sha256": sha256_file(config_path),
+            "campaign_code_commit": git_head(config_path.parents[2]),
             "upstream_commit": actual_upstream,
+            "environment": {
+                "root": str(environment_root),
+                "admission_path": str(environment_admission_path),
+                "admission_sha256": sha256_file(environment_admission_path),
+                "base_python": config["base_python"],
+                "pythonpath_overlay": str(configured_overlay),
+                "packages": actual_packages,
+            },
             "model_revision": config["model"]["revision"],
             "generation": generation,
             "nag": nag if arm_id != "baseline_diffusers" else None,
@@ -213,6 +247,7 @@ def main() -> None:
                 "host": platform.node(),
                 "python": platform.python_version(),
                 "torch": torch.__version__,
+                "packages": actual_packages,
                 "cuda": torch.version.cuda,
                 "gpu": torch.cuda.get_device_name(0),
                 "slurm_job_id": os.environ.get("SLURM_JOB_ID"),
