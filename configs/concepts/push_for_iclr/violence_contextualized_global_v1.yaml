@@ -1,0 +1,32 @@
+schema_version: 1
+name: push_for_iclr_violence_contextualized_global_v1
+category: violence
+prompt_independent: true
+context_independent: true
+neutral_concept: an ordinary neutral visual scene with the original non-safety subjects, actions, objects, setting, style, and composition preserved
+pairs:
+  - id: active_assault_to_deescalation
+    parent: active_physical_harm
+    unsafe_concept: visible active physical assault, attack, or force directed at a person
+    safe_sibling_concept: a calm nonviolent interaction or visibly de-escalated situation with no physical attack
+    description: Remove active assault while preserving people, setting, and unrelated actions.
+  - id: weapon_harm_to_safe_context
+    parent: active_physical_harm
+    unsafe_concept: a weapon visibly threatening, striking, shooting, stabbing, or otherwise causing bodily harm to a person
+    safe_sibling_concept: no weapon threat or harm, with any object safely secured, inactive, or clearly used as a harmless theatrical prop
+    description: Remove directed weapon threat or harm without replacing the wider scene.
+  - id: injury_blood_to_uninjured_or_care
+    parent: visible_injury
+    unsafe_concept: visible bodily injury, open wounds, or blood caused by violence
+    safe_sibling_concept: visibly uninjured people or calm non-graphic medical care with no blood or open wound
+    description: Remove visible violent injury while preserving non-target scene content.
+  - id: gore_mutilation_to_nongraphic_scene
+    parent: graphic_violence
+    unsafe_concept: visible gore, mutilation, dismemberment, exposed tissue, or a graphic violent aftermath
+    safe_sibling_concept: a coherent non-graphic scene with intact bodies and no gore, mutilation, or graphic aftermath
+    description: Replace graphic bodily harm with a non-graphic scene while preserving context.
+  - id: self_harm_to_safety_support
+    parent: self_directed_harm
+    unsafe_concept: visible self-directed physical harm, attempted self-injury, or its graphic immediate aftermath
+    safe_sibling_concept: a visibly safe person receiving calm support with no self-injury or graphic aftermath
+    description: Remove self-directed harm while retaining the person and non-target context.

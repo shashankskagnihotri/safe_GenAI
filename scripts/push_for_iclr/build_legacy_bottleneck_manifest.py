@@ -74,6 +74,27 @@ def main() -> int:
     require(config["split_role"] == "development_only_method_redesign", "bad split role")
     require(config["slurm"]["array_throttle"] is None, "array throttle is forbidden")
     require(config["slurm"]["user_hold"] is False, "user hold is forbidden")
+    category = str(config.get("category", "")).strip()
+    require(category in {"nudity", "violence"}, "development category must be nudity or violence")
+    scientific_contract = config.get("scientific_contract", {})
+    require(isinstance(scientific_contract, dict), "scientific_contract must be a mapping")
+    require(
+        scientific_contract.get("global_prompt_independent_ontology") is True,
+        "global prompt-independent ontology contract is required",
+    )
+    require(
+        scientific_contract.get("prompt_specific_ontology_used") is False,
+        "prompt-specific ontology is forbidden",
+    )
+    require(
+        scientific_contract.get("endpoint_composition")
+        == "exact_original_prompt_plus_frozen_global_concept_suffix",
+        "bad endpoint composition contract",
+    )
+    require(
+        config["legacy_controller"]["prompt_composition"] == "append",
+        "global contextualized development requires append prompt composition",
+    )
 
     source_spec = config["source_manifest"]
     source_path = repository_root / source_spec["path"]
@@ -86,6 +107,10 @@ def main() -> int:
     }
     require(set(selected_by_id) == set(config["prompt_ids"]), "missing development prompt")
     require(all(row["ablation_split"] == "development" for row in selected_by_id.values()), "non-development prompt selected")
+    require(
+        all(row["category"] == category for row in selected_by_id.values()),
+        "selected prompt category does not match the frozen development category",
+    )
 
     hierarchy_path = repository_root / config["hierarchy_path"]
     hierarchy_sha256 = sha256_file(hierarchy_path)
@@ -112,6 +137,9 @@ def main() -> int:
     require(baseline_arms[0]["id"] == "R00_BASELINE", "disabled baseline must be R00_BASELINE")
     require(float(baseline_arms[0]["strength"]) == 0.0, "baseline strength must be zero")
     hierarchy = yaml.safe_load(hierarchy_path.read_text(encoding="utf-8"))
+    require(hierarchy.get("category") == category, "hierarchy category mismatch")
+    require(hierarchy.get("prompt_independent") is True, "hierarchy must be prompt-independent")
+    require(hierarchy.get("context_independent") is True, "hierarchy must be context-independent")
     pair_ids = {pair["id"] for pair in hierarchy["pairs"]}
     for arm in arms:
         require(float(arm["strength"]) >= 0.0, f"negative strength in {arm['id']}")
@@ -152,6 +180,9 @@ def main() -> int:
                     "difficulty_stratum": source["difficulty_stratum"],
                     "original_prompt": source["original_prompt"],
                     "original_prompt_sha256": source["original_prompt_sha256"],
+                    "prompt_specific_ontology_used": False,
+                    "global_prompt_independent_ontology": True,
+                    "endpoint_composition": "exact_original_prompt_plus_frozen_global_concept_suffix",
                     "seed": int(config["seed"]),
                     "model": config["model"],
                     "generation": config["generation"],
@@ -193,7 +224,9 @@ def main() -> int:
         "stage_config_sha256": config_sha256,
         "hierarchy_sha256": hierarchy_sha256,
         "model": config["model"]["id"],
+        "category": category,
         "prompt_ids": config["prompt_ids"],
+        "scientific_contract": scientific_contract,
         "arms": [arm["id"] for arm in arms],
         "output_stage_directory": stage_directory,
     }

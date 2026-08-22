@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run one immutable V8 cell through the archived legacy bottleneck controller."""
+"""Run one immutable global-concept development cell through the legacy bottleneck."""
 
 from __future__ import annotations
 
@@ -123,8 +123,8 @@ def build_runner_config(row: dict[str, Any], output_dir: Path) -> dict[str, Any]
         "output": {"save_latents": False, "save_traces": True, "image_format": "png", "video_format": "mp4", "decode": True},
         "native_negative_prompt": {},
         "benchmark": {
-            "name": "push_for_iclr_legacy_bottleneck_v8",
-            "stage": "development_exact_reproduction",
+            "name": row["campaign_id"],
+            "stage": "development_global_contextualized_legacy_bottleneck",
             "variant": arm["id"],
             "prompt_id": row["prompt_id"],
             "seed": row["seed"],
@@ -135,6 +135,9 @@ def build_runner_config(row: dict[str, Any], output_dir: Path) -> dict[str, Any]
             "local_mask": controller["mask"]["enabled"],
             "normalize_directions": controller["normalize_directions"],
             "prompt_composition": controller["prompt_composition"],
+            "endpoint_composition": row["endpoint_composition"],
+            "global_prompt_independent_ontology": row["global_prompt_independent_ontology"],
+            "prompt_specific_ontology_used": row["prompt_specific_ontology_used"],
             "step_stride": controller["step_stride"],
             "active_pair_ids": arm["active_pair_ids"],
         },
@@ -180,6 +183,16 @@ def main() -> int:
 
     repository_root = Path(__file__).resolve().parents[2]
     row = load_row(args.manifest.resolve(), args.manifest_file_sha256, args.index)
+    require(row["global_prompt_independent_ontology"] is True, "global ontology contract missing")
+    require(row["prompt_specific_ontology_used"] is False, "prompt-specific ontology is forbidden")
+    require(
+        row["endpoint_composition"] == "exact_original_prompt_plus_frozen_global_concept_suffix",
+        "endpoint composition contract changed",
+    )
+    require(
+        row["legacy_controller"]["prompt_composition"] == "append",
+        "contextualized global endpoints require append composition",
+    )
     actual_commit = subprocess.check_output(
         ["git", "rev-parse", "HEAD"], cwd=repository_root, text=True
     ).strip()
@@ -218,10 +231,13 @@ def main() -> int:
             "resolved_controller_contract": {
                 "space": "model_native_vector_field",
                 "schedule": "constant_full_window_every_step",
-                "prompt_composition": "concept_only",
-                "mask_enabled": False,
-                "calibration_enabled": False,
-                "normalize_directions": False,
+                "prompt_composition": row["legacy_controller"]["prompt_composition"],
+                "endpoint_composition": row["endpoint_composition"],
+                "global_prompt_independent_ontology": row["global_prompt_independent_ontology"],
+                "prompt_specific_ontology_used": row["prompt_specific_ontology_used"],
+                "mask_enabled": bool(row["legacy_controller"]["mask"]["enabled"]),
+                "calibration_enabled": bool(row["legacy_controller"]["calibration"]["enabled"]),
+                "normalize_directions": bool(row["legacy_controller"]["normalize_directions"]),
                 "sequential_pair_updates": True,
             },
             "trace_validation": trace_validation,
