@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 from hierasafe_flow.campaigns.push_for_iclr.trust_region_evaluation import (
+    EXPECTED_ARMS,
     baseline_index,
     group_keys,
     parse_imageguard_response,
@@ -18,8 +19,7 @@ def main() -> None:
     rows = []
     index = 0
     for model_id in ("flux1_dev", "sd35_large"):
-        for arm_number in range(12):
-            arm_id = f"R{arm_number:02d}"
+        for arm_id in EXPECTED_ARMS:
             for category in ("nudity", "violence"):
                 for prompt_number in range(10):
                     source_row_id = f"{category}_{prompt_number:02d}"
@@ -38,8 +38,11 @@ def main() -> None:
     validate_manifest_population(rows)
     assert len(group_keys(rows)) == 24
     assert len(sheet_keys(rows)) == 48
-    assert len(rows_for_group(rows, "flux1_dev", "R11")) == 20
-    assert len(rows_for_sheet(rows, "sd35_large", "R03", "violence")) == 10
+    assert len(rows_for_group(rows, "flux1_dev", "V4_R11_T18_C25_P1_K2")) == 20
+    assert (
+        len(rows_for_sheet(rows, "sd35_large", "V4_R03_T12_C25_P1", "violence"))
+        == 10
+    )
     assert len(baseline_index(rows)) == 40
     assert parse_imageguard_response("safe")["safe"]
     parsed = parse_imageguard_response("unsafe\nsexual, violence")

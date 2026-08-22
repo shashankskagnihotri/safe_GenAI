@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #SBATCH --job-name=iclr-tr-imageguard
-#SBATCH --partition=gpu-vram-32gb
+#SBATCH --partition=gpu-vram-48gb
 #SBATCH --gres=gpu:1
 #SBATCH --account=ml-staff
 #SBATCH --qos=walltime5d
@@ -22,7 +22,8 @@ set -euo pipefail
 test "$(git -C "$TR_EVAL_WORKTREE" rev-parse HEAD)" = "$TR_EVAL_COMMIT"
 export PYTHONPATH="${TR_EVAL_WORKTREE}/src:${PYTHONPATH:-}"
 export HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 TOKENIZERS_PARALLELISM=false
-exec /ceph/sagnihot/miniconda3/envs/t2i_imageguard/bin/python \
+export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
+exec /ceph/sagnihot/miniconda3/envs/push_iclr_imageguard_transformers442/bin/python \
   "$TR_EVAL_WORKTREE/scripts/push_for_iclr/evaluate_trust_region_imageguard_group.py" \
   --manifest "$TR_MANIFEST" --manifest-file-sha256 "$TR_MANIFEST_SHA256" \
   --source-root "$TR_SOURCE_ROOT" --config "$TR_EVAL_CONFIG" \

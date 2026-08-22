@@ -6,17 +6,29 @@ human_visual_adjudication_is_mandatory: true
 gemini_or_external_api_judging_enabled: false
 
 population:
-  source_manifest: outputs/PUSH_FOR_ICLR/MANIFESTS/trust_region_development_480.jsonl
+  source_manifest: outputs/PUSH_FOR_ICLR/MANIFESTS/trust_region_development_480_v4.jsonl
   cells: 480
   models: [flux1_dev, sd35_large]
-  arms: [R00, R01, R02, R03, R04, R05, R06, R07, R08, R09, R10, R11]
+  arms:
+    - R00_BASELINE
+    - V4_R01_T04_C25_P1
+    - V4_R02_T08_C25_P1
+    - V4_R03_T12_C25_P1
+    - V4_R04_T16_C25_P1
+    - V4_R05_T18_C25_P1
+    - V4_R06_T22_C25_P1
+    - V4_R07_T25_C25_P1
+    - V4_R08_T18_C25_P0
+    - V4_R09_T18_C25_P05
+    - V4_R10_T18_C25_P1_E50
+    - V4_R11_T18_C25_P1_K2
   categories: [nudity, violence]
   prompts_per_model_arm_category: 10
 
 imageguard:
   repository_revision: e40dad31ec43ea8b4c82b24527f1d39c441a2485
   repository_path: /ceph/sagnihot/projects/safety_genAI/debugging/t2i_safety_27_july/upstream/repos/ImageGuard
-  environment_python: /ceph/sagnihot/miniconda3/envs/t2i_imageguard/bin/python
+  environment_python: /ceph/sagnihot/miniconda3/envs/push_iclr_imageguard_transformers442/bin/python
   base_model_snapshot_revision: c67bd06390dbe068a582c6561570725b1289a7c5
   base_model_snapshot_path: /home/sagnihot/.cache/huggingface/hub/models--internlm--internlm-xcomposer2-vl-7b/snapshots/c67bd06390dbe068a582c6561570725b1289a7c5
   lora_adapter_sha256: 0cc549f4f6f3a2763298d164ee5589fc213e716d8286b3af5fbe0dbda6bd01d9
@@ -27,12 +39,15 @@ imageguard:
   probability_policy: official_evaluator_does_not_expose_calibrated_probability
 
 fidelity:
-  environment_python: /ceph/sagnihot/miniconda3/envs/safe_genai_conceptsteer/bin/python
+  environment_python: /ceph/sagnihot/miniconda3/envs/push_iclr_eval_torch26_pipcu124/bin/python
+  minimum_torch_version: 2.6.0
+  torch_version_reason: CVE-2025-32434_safe_loading_of_official_pytorch_bin
   clip:
     repository: openai/clip-vit-large-patch14-336
     snapshot_revision: ce19dc912ca5cd21c8a653c79e251e808ccabcd1
     snapshot_path: /home/sagnihot/.cache/huggingface/hub/models--openai--clip-vit-large-patch14-336/snapshots/ce19dc912ca5cd21c8a653c79e251e808ccabcd1
     config_sha256: 51b1c14aabcdf639c4a0370eeda1010b773bbe1df78319c7d0f5882c22ac0ac0
+    weights_sha256: c6032c2e0caae3dc2d4fba35535fa6307dbb49df59c7e182b1bc4b3329b81801
     preprocessor_config_sha256: d253881f65322dc546df59cf925a408e5538b8ecb5a1b496cdd36af9992686d4
     tokenizer_config_sha256: 83cef1a5979147985887a84eda9cb13bae5f3f5413c74c92360f310a35361755
     vocab_sha256: 5047b556ce86ccaf6aa22b3ffccfc52d391ea4accdab9c2f2407da5b742d4363
@@ -44,6 +59,7 @@ fidelity:
     snapshot_revision: 5931719e67bbdb9737e363e781fb0c67687896bc
     snapshot_path: /home/sagnihot/.cache/huggingface/hub/models--facebook--dinov3-vitb16-pretrain-lvd1689m/snapshots/5931719e67bbdb9737e363e781fb0c67687896bc
     config_sha256: 3c9cc418f4622fd6d5587fd142b6f3cba0ba6a69f67ced907d8b7f26118451ec
+    weights_sha256: 9a21ac3df0c63839d62612dda6f454d816c25611cc7a52966ed5a5a94921dc8b
     preprocessor_config_sha256: 960c41d1f3a7778b936365769a2d90550b318a6c0a53a0296957adacfe5e0dd7
     metric: normalized_cls_cosine_to_matched_R00_baseline
 
@@ -65,7 +81,7 @@ manual_review:
 selection:
   split: development
   objective: pareto_safety_gain_subject_to_prompt_and_visual_fidelity
-  baseline_arm: R00
+  baseline_arm: R00_BASELINE
   target_category_mapping:
     nudity: sexual
     violence: violence

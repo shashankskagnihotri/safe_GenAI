@@ -39,6 +39,15 @@ class FidelityRuntime:
     def __init__(self, config: dict[str, Any]) -> None:
         if not torch.cuda.is_available():
             raise RuntimeError("Fidelity evaluation requires a visible CUDA GPU.")
+        torch_release = tuple(
+            int(component)
+            for component in torch.__version__.split("+")[0].split(".")[:2]
+        )
+        if torch_release < (2, 6):
+            raise RuntimeError(
+                "Torch >=2.6 is mandatory for CVE-2025-32434-safe loading of the "
+                f"official CLIP checkpoint; observed {torch.__version__}."
+            )
         self.device = torch.device("cuda")
         clip_cfg = config["clip"]
         dino_cfg = config["dino"]
@@ -46,6 +55,7 @@ class FidelityRuntime:
         dino_path = Path(dino_cfg["snapshot_path"])
         pinned_assets = (
             (clip_path / "config.json", clip_cfg["config_sha256"]),
+            (clip_path / "pytorch_model.bin", clip_cfg["weights_sha256"]),
             (
                 clip_path / "preprocessor_config.json",
                 clip_cfg["preprocessor_config_sha256"],
@@ -58,6 +68,7 @@ class FidelityRuntime:
                 clip_cfg["special_tokens_map_sha256"],
             ),
             (dino_path / "config.json", dino_cfg["config_sha256"]),
+            (dino_path / "model.safetensors", dino_cfg["weights_sha256"]),
             (
                 dino_path / "preprocessor_config.json",
                 dino_cfg["preprocessor_config_sha256"],
@@ -82,6 +93,7 @@ class FidelityRuntime:
         self.provenance = {
             "clip_snapshot_revision": clip_cfg["snapshot_revision"],
             "clip_config_sha256": clip_cfg["config_sha256"],
+            "clip_weights_sha256": clip_cfg["weights_sha256"],
             "clip_preprocessor_config_sha256": clip_cfg[
                 "preprocessor_config_sha256"
             ],
@@ -93,10 +105,12 @@ class FidelityRuntime:
             ],
             "dino_snapshot_revision": dino_cfg["snapshot_revision"],
             "dino_config_sha256": dino_cfg["config_sha256"],
+            "dino_weights_sha256": dino_cfg["weights_sha256"],
             "dino_preprocessor_config_sha256": dino_cfg[
                 "preprocessor_config_sha256"
             ],
             "torch_dtype": "float16",
+            "torch_version": torch.__version__,
         }
 
     @torch.inference_mode()
@@ -185,7 +199,7 @@ def main() -> None:
                 "image_sha256": image_sha256,
                 "baseline_image_path": str(baseline_image),
                 "baseline_image_sha256": baseline_sha256,
-                "baseline_arm_id": "R00",
+                "baseline_arm_id": "R00_BASELINE",
                 "prompt_sha256": row["original_prompt_sha256"],
                 "metrics": metrics,
                 "elapsed_seconds": time.monotonic() - started,

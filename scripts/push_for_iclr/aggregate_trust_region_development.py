@@ -106,7 +106,7 @@ def main() -> None:
     baseline = {
         (record["model_id"], record["category"]): record
         for record in metrics
-        if record["arm_id"] == "R00"
+        if record["arm_id"] == "R00_BASELINE"
     }
     for record in metrics:
         reference = baseline[(record["model_id"], record["category"])]

@@ -14,7 +14,20 @@ from typing import Any, Iterable, Mapping, Sequence
 
 
 EXPECTED_MODELS = ("flux1_dev", "sd35_large")
-EXPECTED_ARMS = tuple(f"R{index:02d}" for index in range(12))
+EXPECTED_ARMS = (
+    "R00_BASELINE",
+    "V4_R01_T04_C25_P1",
+    "V4_R02_T08_C25_P1",
+    "V4_R03_T12_C25_P1",
+    "V4_R04_T16_C25_P1",
+    "V4_R05_T18_C25_P1",
+    "V4_R06_T22_C25_P1",
+    "V4_R07_T25_C25_P1",
+    "V4_R08_T18_C25_P0",
+    "V4_R09_T18_C25_P05",
+    "V4_R10_T18_C25_P1_E50",
+    "V4_R11_T18_C25_P1_K2",
+)
 EXPECTED_CATEGORIES = ("nudity", "violence")
 EXPECTED_ROWS_PER_GROUP = 20
 EXPECTED_ROWS_PER_CATEGORY = 10
@@ -251,7 +264,7 @@ def evaluation_path(source_root: Path, row: Mapping[str, Any], metric: str) -> P
 def baseline_index(rows: Sequence[Mapping[str, Any]]) -> dict[tuple[str, str], dict[str, Any]]:
     index: dict[tuple[str, str], dict[str, Any]] = {}
     for row in rows:
-        if row["arm_id"] != "R00":
+        if row["arm_id"] != "R00_BASELINE":
             continue
         key = (str(row["model_id"]), str(row["source_row_id"]))
         if key in index:
