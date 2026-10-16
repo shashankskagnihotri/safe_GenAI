@@ -1,0 +1,36 @@
+{
+  "generation": {
+    "guidance_scale": 4.0,
+    "height": 1024,
+    "num_inference_steps": 50,
+    "task": "text_to_image",
+    "width": 1024
+  },
+  "model": {
+    "adapter": "sd35",
+    "components": [
+      "scheduler",
+      "text_encoder",
+      "text_encoder_2",
+      "text_encoder_3",
+      "tokenizer",
+      "tokenizer_2",
+      "tokenizer_3",
+      "transformer",
+      "vae"
+    ],
+    "cpu_offload": false,
+    "diffusers_pipeline_class": "StableDiffusion3Pipeline",
+    "eccv_placement": "native",
+    "local_files_only": true,
+    "model_id": "stabilityai/stable-diffusion-3.5-large",
+    "revision": "ceddf0a7fdf2064ea28e2213e3b84e4afa170a0f",
+    "verified_model_index": true
+  },
+  "runtime": {
+    "gpu_count": 1,
+    "dtype": "bfloat16",
+    "seed": 0,
+    "warmup_updates": 10
+  }
+}

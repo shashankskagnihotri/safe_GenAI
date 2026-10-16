@@ -1,0 +1,34 @@
+{
+  "generation": {
+    "guidance_scale": 4.0,
+    "height": 1024,
+    "num_inference_steps": 50,
+    "task": "text_to_image",
+    "width": 1024
+  },
+  "model": {
+    "adapter": "flux",
+    "components": [
+      "scheduler",
+      "text_encoder",
+      "text_encoder_2",
+      "tokenizer",
+      "tokenizer_2",
+      "transformer",
+      "vae"
+    ],
+    "cpu_offload": false,
+    "diffusers_pipeline_class": "FluxPipeline",
+    "eccv_placement": "native",
+    "local_files_only": true,
+    "model_id": "black-forest-labs/FLUX.1-dev",
+    "revision": "3de623fc3c33e44ffbe2bad470d0f45bccf2eb21",
+    "verified_model_index": true
+  },
+  "runtime": {
+    "gpu_count": 1,
+    "dtype": "bfloat16",
+    "seed": 0,
+    "warmup_updates": 10
+  }
+}

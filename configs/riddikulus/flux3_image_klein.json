@@ -1,0 +1,40 @@
+{
+  "model": {
+    "model_id": "black-forest-labs/flux-3-image-klein",
+    "revision": "337337621b8526e120f2275d250242f4a6bedd75",
+    "adapter": "flux3",
+    "reference_source_commit": "e53f4ea697fe45db8f38fca91a90f5623f7f8f37",
+    "cpu_offload": false,
+    "prompt_upsampling": false,
+    "safety": false,
+    "reference_source_sha256": {
+      "flux3/__init__.py": "3b3abca628f914a41617041b8a5e550e71fde73d25dbde6e546ed49aa4ca74fc",
+      "flux3/autoencoder.py": "960e2a98046bcb78f2d36fbbd4848db726f14810c7887485f7e2682346f95189",
+      "flux3/bbox.py": "fbea10c1c53980df1665d3cb6cc6264b8f50633399bf6809c91650f1dcf4fc37",
+      "flux3/checkpoint.py": "a49b33fc83c391fdac6628be39ca3748c88bfd8e63b731f997d2f161d5ef9be3",
+      "flux3/dit.py": "d4c0d2aea5282ae63ac32a1f3029a738ddab951bb1033d6f3a2e9bd192c89934",
+      "flux3/fp8.py": "25d426251a6cb862452a380cd7e644443f04cb4d3390fe2b327fb9202054fc23",
+      "flux3/generate.py": "07b4fe53d2b26f7068cb0e6cd22f2dd0e685245bc1fee2eb9130d1210a2badd5",
+      "flux3/nvfp4.py": "6d4e2e0cc1652f503e9b44284fdb110a1741de2d5bced803add8db09ba6348a3",
+      "flux3/pipeline.py": "33c323ebaeaf56790f3d0022a57827b5348446a8a4b372ab2bcc606d722e76a9",
+      "flux3/pup.py": "e3561ae3cbff1a080ad8854c0b89bd0687c1ea9d84c74f5203b44844cbd4684d",
+      "flux3/safety.py": "8af6f79384c82a364c551b3f371c7e1705721adc4fc6b466c124f8dd38dd9bc3",
+      "flux3/sampling.py": "22be0d823fb6a2c5bc993c77fe0836ca729219d34cc08e86d01a398e04bdcdf5",
+      "flux3/text_encoder.py": "3bce784f43b8e8d9eee0dab75d928006398efd80e77f9f179bba6ddd28ffe74b"
+    }
+  },
+  "generation": {
+    "task": "text_to_image",
+    "height": 1024,
+    "width": 1024,
+    "num_inference_steps": 16,
+    "guidance_scale": 1.0,
+    "schedule_alpha": 6.93
+  },
+  "runtime": {
+    "gpu_count": 1,
+    "dtype": "bfloat16",
+    "seed": 0,
+    "warmup_updates": 3
+  }
+}

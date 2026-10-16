@@ -1,0 +1,30 @@
+{
+  "generation": {
+    "guidance_scale": 4.0,
+    "height": 1024,
+    "num_inference_steps": 50,
+    "task": "text_to_image",
+    "width": 1024
+  },
+  "model": {
+    "adapter": "cosmos3_t2i",
+    "cpu_offload": false,
+    "diffusers_pipeline_class": "DiffusionPipeline",
+    "diffusers_revision": "2f7e0154a9db246e95c9ede43edba7db5b130805",
+    "eccv_placement": "two_gpu_bf16",
+    "load_kwargs": {
+      "enable_safety_checker": false
+    },
+    "local_files_only": true,
+    "model_id": "nvidia/Cosmos3-Super-Text2Image",
+    "offline_research_disable_guardrails": true,
+    "revision": "c92432b9dff7eeb055d11ef5cf01c2c85bda0f28",
+    "verified_model_index": false
+  },
+  "runtime": {
+    "gpu_count": 2,
+    "dtype": "bfloat16",
+    "seed": 0,
+    "warmup_updates": 10
+  }
+}

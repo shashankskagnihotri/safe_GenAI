@@ -1,0 +1,25 @@
+{
+  "schema": "riddikulus.method.v1",
+  "hierarchy": "hierarchy_h4.json",
+  "pool_size": 25,
+  "selection": "pure_mean_confidence_topk",
+  "membership": "fixed_after_acquisition",
+  "direction_policy": "refresh_all_pool_leaves_every_guided_update",
+  "absolute_unsafe_cosine_threshold": 0.25,
+  "unsafe_minus_safe_gap_threshold": 0.1,
+  "confidence_widths": [
+    0.25,
+    0.25
+  ],
+  "multiplier": "existing_sigmoid_cosine_distance",
+  "sigmoid_temperature": 1.0,
+  "aggregation": "independent_additive",
+  "conflict_penalty": 1.0,
+  "global_relative_rms_limit": 0.6,
+  "local_relative_rms_limit": 0.85,
+  "spatial_area_gate": false,
+  "prompt_residual_limit": null,
+  "cumulative_exposure_limit": null,
+  "forced_concepts": [],
+  "prompt_text_routing": false
+}

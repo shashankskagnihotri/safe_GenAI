@@ -1,2 +1,0 @@
-Authorized benchmark prompts for combined safety experiments should be placed here by the researcher running the study.
-

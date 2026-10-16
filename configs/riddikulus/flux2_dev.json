@@ -1,0 +1,58 @@
+{
+  "generation": {
+    "guidance_scale": 4.0,
+    "height": 1024,
+    "num_inference_steps": 50,
+    "task": "text_to_image",
+    "width": 1024
+  },
+  "model": {
+    "adapter": "flux2",
+    "components": [
+      "scheduler",
+      "text_encoder",
+      "tokenizer",
+      "transformer",
+      "vae"
+    ],
+    "cpu_offload": false,
+    "diffusers_pipeline_class": "Flux2Pipeline",
+    "eccv_placement": "two_gpu_bf16",
+    "local_files_only": true,
+    "model_id": "black-forest-labs/FLUX.2-dev",
+    "revision": "26afe3a78bb242c0a8bb181dcc8937bb16e5c66c",
+    "verified_model_index": true
+  },
+  "runtime": {
+    "dtype": "bfloat16",
+    "gpu_count": 2,
+    "initial_latent_contract": {
+      "expected_initial_latent_sha256": "b88c8144d9bf8f8b1105c911f6c5e866b5f254066a8520f7a71330a9d4970cb0",
+      "initial_latent_reference": {
+        "contract": "native_Flux2Pipeline.prepare_latents; supplied_latents_are_BCHW_not_BNC",
+        "dtype": "torch.bfloat16",
+        "file_sha256": "6bf791f71f5448fea48a368970e6eb960ccd6888cbe23cbf028f003973697bf9",
+        "generator_state_after_sha256": "f7548c023e431138b11357593f5cceb9dd35eb0b0a2041f0b1560212eeb6f13e",
+        "model": "flux2_dev",
+        "model_revision": "26afe3a78bb242c0a8bb181dcc8937bb16e5c66c",
+        "native_shape": [
+          1,
+          128,
+          64,
+          64
+        ],
+        "native_tensor_sha256": "37effd6a381f925543e3a3792743a3c66a141fb667ea2ee73beb6c7614b30b18",
+        "path": "outputs/CHECK_AND_PUSH_DURING_ECCV/CANONICAL_INITIAL_LATENTS/seed_0/flux2_dev_seed_0.safetensors",
+        "prepared_shape": [
+          1,
+          4096,
+          128
+        ],
+        "seed": 0,
+        "tensor_sha256": "b88c8144d9bf8f8b1105c911f6c5e866b5f254066a8520f7a71330a9d4970cb0"
+      }
+    },
+    "seed": 0,
+    "warmup_updates": 10
+  }
+}
