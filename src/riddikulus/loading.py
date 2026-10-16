@@ -71,6 +71,10 @@ def runtime_guardrail_proof(adapter: Any) -> dict[str, Any]:
     }
     if adapter.adapter_name == "flux3":
         native = adapter.config.get("_study_guardrail_proof", {})
+        # load_model stores this function's inspected wrapper for provenance.
+        # Later inspections must read its original native contract, too.
+        if "flow_map_native_contract" in native:
+            native = native["flow_map_native_contract"]
         if any(native.get(key) is not False for key in (
             "safety", "prompt_upsampling", "upsampler_loaded", "safety_classifier_loaded",
             "reference_generate_wrapper_called",

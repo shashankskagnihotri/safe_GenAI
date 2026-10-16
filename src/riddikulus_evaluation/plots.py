@@ -20,6 +20,23 @@ METRIC_LABELS = {
     "nudity_amount": "Nudity", "violence_amount": "Violence", "safety_severity": "Safety severity",
     "prompt_distance_oversuppression": "Safe-prompt distance", "artifacts_distortion": "Artifacts",
 }
+MODEL_LABELS = {
+    "flux1_dev": "FLUX.1", "flux2_dev": "FLUX.2", "flux3_image_klein": "FLUX.3 Klein",
+    "cosmos3_super_text2image": "Cosmos 3 Super", "sd35_large": "SD 3.5 Large",
+}
+
+
+def prompt_interval(values: np.ndarray, categories: np.ndarray) -> tuple[float | None, float | None]:
+    """Resample prompts within categories; never resample judges as prompt units."""
+    if len(values) < 2:
+        return None, None
+    rng = np.random.default_rng(BOOTSTRAP_SEED)
+    sums = np.zeros(BOOTSTRAPS)
+    for category in sorted(set(categories)):
+        stratum = values[categories == category]
+        draws = rng.integers(0, len(stratum), size=(BOOTSTRAPS, len(stratum)))
+        sums += stratum[draws].sum(axis=1)
+    return tuple(float(v) for v in np.quantile(sums / len(values), [0.025, 0.975]))
 
 
 def write_csv(path: Path, rows: list[dict], fields: list[str] | None = None) -> None:
@@ -183,6 +200,64 @@ def aggregate(rows: list[dict]) -> tuple[list[dict], list[dict], list[dict]]:
     return aggregates, paired, variances
 
 
+def aggregate_judges(per_image: list[dict]) -> tuple[list[dict], list[dict]]:
+    """Average judges within image before computing any prompt-level statistic.
+
+    Every group retains its expected inventory, but an observed metric requires
+    both judges. Judge variability compares their two means on that same common
+    set; it is not the average of per-image variances or a confidence interval.
+    """
+    groups = defaultdict(list)
+    for row in per_image:
+        for category in (row["category"], "all"):
+            groups[(row["model_key"], category, row["arm"], row["metric"])].append(row)
+    aggregates = []
+    for (model, category, arm, metric), subset in sorted(groups.items()):
+        common = [row for row in subset if row["judge_mean"] is not None]
+        values = np.array([row["judge_mean"] for row in common], dtype=float)
+        categories = np.array([row["category"] for row in common])
+        judge_means = [float(np.mean([row[j + "_score"] for row in common]))
+                       for j in ("gemini", "sol")] if common else []
+        lo, hi = prompt_interval(values, categories)
+        aggregates.append({"model_key": model, "category": category, "arm": arm, "metric": metric,
+                           "expected_n": len(subset), "observed_n": len(common),
+                           "mean": float(values.mean()) if common else None,
+                           "gemini_mean_common_images": judge_means[0] if common else None,
+                           "sol_mean_common_images": judge_means[1] if common else None,
+                           "across_judge_sample_variance_ddof1": float(np.var(judge_means, ddof=1)) if common else None,
+                           "across_judge_sd": float(np.std(judge_means, ddof=1)) if common else None,
+                           "prompt_sample_sd": float(values.std(ddof=1)) if len(common) > 1 else None,
+                           "prompt_ci95_low": lo, "prompt_ci95_high": hi,
+                           "bootstrap_replicates": BOOTSTRAPS, "bootstrap_seed": BOOTSTRAP_SEED,
+                           "complete": len(common) == len(subset),
+                           "common_prompt_ids": [row["prompt_id"] for row in common]})
+    paired = []
+    for model, category, metric in sorted({(key[0], key[1], key[3]) for key in groups}):
+        baseline = {row["prompt_id"]: row for row in groups.get((model, category, "Baseline", metric), [])}
+        method = {row["prompt_id"]: row for row in groups.get((model, category, "Riddikulus", metric), [])}
+        expected_ids = set(baseline) | set(method)
+        ids = sorted(key for key in set(baseline) & set(method)
+                     if baseline[key]["judge_mean"] is not None and method[key]["judge_mean"] is not None)
+        delta = np.array([method[key]["judge_mean"] - baseline[key]["judge_mean"] for key in ids], dtype=float)
+        categories = np.array([baseline[key]["category"] for key in ids])
+        judge_effects = [float(np.mean([method[key][judge + "_score"] - baseline[key][judge + "_score"]
+                                      for key in ids])) for judge in ("gemini", "sol")] if ids else []
+        lo, hi = prompt_interval(delta, categories)
+        paired.append({"model_key": model, "category": category, "metric": metric,
+                       "expected_pairs": len(expected_ids), "observed_pairs": len(ids),
+                       "riddikulus_minus_baseline": float(delta.mean()) if ids else None,
+                       "gemini_effect_common_pairs": judge_effects[0] if ids else None,
+                       "sol_effect_common_pairs": judge_effects[1] if ids else None,
+                       "across_judge_sample_variance_ddof1": float(np.var(judge_effects, ddof=1)) if ids else None,
+                       "across_judge_sd": float(np.std(judge_effects, ddof=1)) if ids else None,
+                       "prompt_ci95_low": lo, "prompt_ci95_high": hi,
+                       "bootstrap_replicates": BOOTSTRAPS, "bootstrap_seed": BOOTSTRAP_SEED,
+                       "complete": len(ids) == len(expected_ids), "paired_prompt_ids": ids,
+                       "inference_scope": "full registered cohort" if len(ids) == len(expected_ids)
+                       else "interim observed pairs scored by both judges; missingness may bias estimates"})
+    return aggregates, paired
+
+
 def timing_rows(images: Path) -> list[dict]:
     rows = []
     for source in protocol.read_manifest(images):
@@ -252,7 +327,7 @@ def render_variance(output: Path, rows: list[dict]) -> None:
                     ax.bar(i + offset, np.mean(values), .36, color=color, label=arm if i == 0 else None)
                     ax.text(i + offset, .2, str(len(values)), rotation=90, ha="center", va="bottom", fontsize=7)
         ax.set_title(METRIC_LABELS[metric])
-        ax.set_xticks(range(len(models)), models, rotation=35, ha="right")
+        ax.set_xticks(range(len(models)), [MODEL_LABELS.get(model, model) for model in models], rotation=35, ha="right")
         ax.set_ylim(0, 50)
         ax.grid(axis="y", alpha=.2)
     axes[0].set_ylabel("Mean across-image judge sample variance\nTwo judges per image; ddof=1")
@@ -266,6 +341,95 @@ def render_variance(output: Path, rows: list[dict]) -> None:
 def _save(figure, directory: Path, name: str) -> None:
     for suffix in ("png", "pdf", "svg"):
         figure.savefig(directory / f"{name}.{suffix}", dpi=220, bbox_inches="tight")
+
+
+def render_combined(output: Path, aggregates: list[dict], paired: list[dict]) -> None:
+    """Separate disagreement across judges from sampling uncertainty over prompts."""
+    import matplotlib.pyplot as plt
+    models = sorted({row["model_key"] for row in aggregates})
+    labels = [MODEL_LABELS.get(model, model) for model in models]
+    colors = {"Baseline": "#0072B2", "Riddikulus": "#D55E00"}
+    for is_paired, table, filename in ((False, aggregates, "scores"),
+                                       (True, paired, "paired_differences")):
+        fig, axes = plt.subplots(2, len(rubric.METRICS), figsize=(20, 9), sharey=True)
+        for row_index, uncertainty in enumerate(("judges", "prompts")):
+            for ax, metric in zip(axes[row_index], rubric.METRICS):
+                arms = ((0, None),) if is_paired else ((-.19, "Baseline"), (.19, "Riddikulus"))
+                for offset, arm in arms:
+                    subset = {row["model_key"]: row for row in table
+                              if row["metric"] == metric and row["category"] == "all"
+                              and (is_paired or row["arm"] == arm)}
+                    for i, model in enumerate(models):
+                        row = subset.get(model)
+                        field = "riddikulus_minus_baseline" if is_paired else "mean"
+                        if row is None or row[field] is None:
+                            continue
+                        value = row[field]
+                        color = colors[arm or "Riddikulus"]
+                        ax.plot(i + offset, value, "o", color=color,
+                                label=arm if arm and not any(line.get_label() == arm for line in ax.lines) else None)
+                        if uncertainty == "judges":
+                            sd = row["across_judge_sd"]
+                            ax.vlines(i + offset, value - sd, value + sd, color=color)
+                        elif row["prompt_ci95_low"] is not None:
+                            ax.vlines(i + offset, row["prompt_ci95_low"], row["prompt_ci95_high"], color=color)
+                        observed = row["observed_pairs" if is_paired else "observed_n"]
+                        expected = row["expected_pairs" if is_paired else "expected_n"]
+                        ax.annotate(f"{observed}/{expected}", (i + offset, value), xytext=(3, 5),
+                                    textcoords="offset points", fontsize=7, rotation=90 if not is_paired else 0)
+                ax.set_xticks(range(len(models)), labels, rotation=35, ha="right")
+                ax.grid(axis="y", alpha=.2)
+                if row_index == 0:
+                    ax.set_title(METRIC_LABELS[metric])
+                if is_paired:
+                    ax.axhline(0, color="black", linewidth=.7)
+            unit = "Riddikulus − Baseline" if is_paired else "Score (0–10, lower is better)"
+            axes[row_index, 0].set_ylabel(unit + ("\nWhiskers: across-judge SD" if uncertainty == "judges"
+                                                 else "\nWhiskers: 95% prompt bootstrap CI"))
+        if not is_paired:
+            axes[0, -1].legend(frameon=False)
+        fig.text(.5, -.015, "Equal mean of both judges per image; both required. Top: sample SD of the two judge means on the same images/pairs (ddof=1).\n"
+                 "Bottom: 10,000 category-stratified prompt resamples; judges are not extra samples. Labels: scored/expected; incomplete coverage is interim.",
+                 ha="center", fontsize=9)
+        fig.tight_layout()
+        _save(fig, output / "Across_Judges", filename)
+        plt.close(fig)
+
+
+def allocation_summary(rows: list[dict], models: list[str]) -> list[dict]:
+    result = []
+    for model in models:
+        subset = [row for row in rows if row["model_key"] == model]
+        observed = [row["allocated_gpu_hours"] for row in subset if row["allocated_gpu_hours"] is not None]
+        result.append({"model_key": model, "ended_allocations_recorded": len(subset),
+                       "allocations_with_gpu_hours": len(observed),
+                       "allocations_with_unknown_gpu_count": len(subset) - len(observed),
+                       "allocated_gpu_hours_observed": float(sum(observed)) if observed else None,
+                       "scope": "recorded ended shared chunk allocations only; running and pending allocations excluded"})
+    return result
+
+
+def render_gpu_hours(output: Path, rows: list[dict]) -> None:
+    import matplotlib.pyplot as plt
+    fig, ax = plt.subplots(figsize=(8, 4.5))
+    for i, row in enumerate(rows):
+        value = row["allocated_gpu_hours_observed"]
+        if value is None:
+            ax.text(i, .02, "Pending", transform=ax.get_xaxis_transform(), ha="center", fontsize=9)
+        else:
+            ax.bar(i, value, .6, color="#009E73")
+            ax.annotate(f"{row['allocations_with_gpu_hours']} allocations", (i, value),
+                        xytext=(0, 5), textcoords="offset points", ha="center", fontsize=8)
+    ax.set_xticks(range(len(rows)), [MODEL_LABELS.get(row["model_key"], row["model_key"]) for row in rows],
+                  rotation=25, ha="right")
+    ax.set_ylim(bottom=0)
+    ax.set_ylabel("Observed allocated GPU-hours\nEnded chunk allocations only")
+    ax.grid(axis="y", alpha=.2)
+    fig.text(.5, -.04, "Actual scheduler elapsed time × allocated GPUs; shared costs counted once.\n"
+             "Includes failed attempts, loading, generation and idle allocation time. Missing accounting remains pending.", ha="center", fontsize=9)
+    fig.tight_layout()
+    _save(fig, output / "Timing", "allocated_gpu_hours")
+    plt.close(fig)
 
 
 def render(output: Path, aggregates: list[dict], paired: list[dict], timing: list[dict]) -> None:
@@ -291,7 +455,7 @@ def render(output: Path, aggregates: list[dict], paired: list[dict], timing: lis
                                yerr=row["sample_sd"], capsize=2, label=arm if i == 0 else None)
                         ax.text(i + offset, .12, f"{row['observed_n']}/{row['expected_n']}",
                                 rotation=90, ha="center", va="bottom", fontsize=7)
-            ax.set_xticks(range(len(models)), models, rotation=35, ha="right")
+            ax.set_xticks(range(len(models)), [MODEL_LABELS.get(model, model) for model in models], rotation=35, ha="right")
             ax.set_ylim(0, 10)
             ax.set_title(METRIC_LABELS[metric])
             ax.grid(axis="y", alpha=.2)
@@ -314,7 +478,7 @@ def render(output: Path, aggregates: list[dict], paired: list[dict], timing: lis
                         ax.vlines(i, row["ci95_low"], row["ci95_high"], color=colors["Riddikulus"])
                     ax.annotate(f"{row['observed_pairs']}/{row['expected_pairs']}", (i, value), xytext=(5, 5), textcoords="offset points", fontsize=7)
             ax.axhline(0, color="black", linewidth=.7)
-            ax.set_xticks(range(len(models)), models, rotation=35, ha="right")
+            ax.set_xticks(range(len(models)), [MODEL_LABELS.get(model, model) for model in models], rotation=35, ha="right")
             ax.set_ylim(-10, 10)
             ax.set_title(METRIC_LABELS[metric])
             ax.grid(axis="y", alpha=.2)
@@ -340,7 +504,7 @@ def render(output: Path, aggregates: list[dict], paired: list[dict], timing: lis
                     ax.bar(i + offset, np.mean(values), .36, color=colors[arm],
                            yerr=np.std(values, ddof=1) if len(values) > 1 else None, capsize=2,
                            label=arm if i == 0 else None)
-        ax.set_xticks(range(len(models)), models, rotation=25, ha="right")
+        ax.set_xticks(range(len(models)), [MODEL_LABELS.get(model, model) for model in models], rotation=25, ha="right")
         ax.set_ylabel("Recorded generation trajectory seconds\nMean ± sample SD; loading and judging excluded")
         ax.legend(frameon=False)
         ax.grid(axis="y", alpha=.2)
@@ -355,6 +519,7 @@ def run(evaluation: Path, images: Path, expected: Path, output: Path,
     output.mkdir(parents=True, exist_ok=True)
     rows, stage_rows, coverage = collect(evaluation, images, expected)
     aggregates, paired, variances = aggregate(rows)
+    combined_aggregates, combined_paired = aggregate_judges(variances)
     valid_only = [{**row, **{m: row[m] if row["safety_valid_image" if m in rubric.METRICS[:3] else "quality_valid_image"] is True else None
                             for m in rubric.METRICS}} for row in rows]
     valid_aggregates, valid_paired, _ = aggregate(valid_only)
@@ -371,22 +536,33 @@ def run(evaluation: Path, images: Path, expected: Path, output: Path,
     for directory in ("Across_Judges", "Timing"):
         (output / directory).mkdir(parents=True, exist_ok=True)
     write_csv(output / "Across_Judges" / "sample_variance.csv", variances)
+    write_csv(output / "Across_Judges" / "aggregate_scores.csv", combined_aggregates)
+    write_csv(output / "Across_Judges" / "paired_differences.csv", combined_paired)
     write_csv(output / "Timing" / "timings.csv", timing, fields=sorted({k for r in timing for k in r}) or ["status"])
+    allocation_rows = []
     if campaign_state is not None:
         allocation_rows = scheduler_rows(campaign_state, scheduler_timezone)
         write_csv(output / "Timing" / "scheduler_allocations.csv", allocation_rows,
                   fields=sorted({k for r in allocation_rows for k in r}) or ["status"])
         coverage["evidence_sha256"][str(campaign_state.resolve())] = protocol.sha256(campaign_state)
         coverage["scheduler_accounting"] = {"ended_allocations_observed": len(allocation_rows),
-            "allocated_gpu_hours_observed": sum(r["allocated_gpu_hours"] for r in allocation_rows if r["allocated_gpu_hours"] is not None),
+            "allocated_gpu_hours_observed": (sum(r["allocated_gpu_hours"] for r in allocation_rows if r["allocated_gpu_hours"] is not None)
+                                             if any(r["allocated_gpu_hours"] is not None for r in allocation_rows) else None),
             "unobserved_gpu_allocation_count": sum(r["allocated_gpu_hours"] is None for r in allocation_rows),
             "scope": "ended recorded chunk allocations only; pending/running allocations excluded, shared cost not duplicated per image"}
     coverage.update({"bootstrap_replicates": BOOTSTRAPS, "bootstrap_seed": BOOTSTRAP_SEED,
-                     "bootstrap_unit": "prompt pair, stratified by dataset category; judges analyzed separately",
+                     "bootstrap_unit": "prompt or matched prompt pair, stratified by dataset category; never individual judges",
                      "across_judge_variance": "sample variance, ddof=1, across the two judges for the same image/metric",
+                     "combined_judge_analysis": "Equal mean per image only when both judges score that metric. Paired comparisons require both judges on both arms. All expected denominators retained.",
+                     "combined_judge_variability": "Sample variance/SD (ddof=1) of two judge means on the identical common image set, or two mean paired effects on identical common prompt pairs. Descriptive disagreement, not prompt uncertainty.",
+                     "combined_prompt_uncertainty": "95% category-stratified bootstrap interval for the mean of per-image equal judge means or their within-prompt paired differences; requires at least two observed prompts.",
                      "score_scale": "raw 0–10, lower is better; no probability reinterpretation",
                      "script_sha256": protocol.sha256(__file__)})
     protocol.atomic_json(output / "coverage_and_provenance.json", coverage)
+    gpu_hours = allocation_summary(allocation_rows, sorted({row["model_key"] for row in aggregates}))
+    write_csv(output / "Timing" / "gpu_hours_by_model.csv", gpu_hours)
     render(output, aggregates, paired, timing)
     render_variance(output, variances)
+    render_combined(output, combined_aggregates, combined_paired)
+    render_gpu_hours(output, gpu_hours)
     return coverage

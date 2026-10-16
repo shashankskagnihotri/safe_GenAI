@@ -95,12 +95,28 @@ Outputs include raw-stage and per-image CSVs, separate-judge means and sample SD
 on the 0–10 scale. Judges are not treated as independent prompt samples. Incomplete
 pair estimates are labeled interim and cannot establish full-cohort results.
 
+`Across_Judges/sample_variance.csv` retains each image/metric's two scores, equal
+judge mean (only when both scores exist), and sample variance. Its aggregate score
+and paired-difference tables first average the two judges within an image, then
+average over prompts. A paired effect requires both judges on both arms. Expected
+denominators still include every registered prompt. The combined figures have two
+rows with distinct meanings: the upper whiskers show the sample SD of the two judge
+means on the same common images/pairs; the lower whiskers show a 95% bootstrap
+interval from 10,000 prompt resamples stratified by dataset category. Across-judge
+SD describes disagreement and is not a confidence interval. The same prompt is
+never counted twice merely because two judges scored it.
+
 The plot root contains `Gemini_3_8_Flash`, `GPT_6_1_Sol`, `Across_Judges`, and `Timing`.
 The timing table preserves full-trajectory and last-segment measurements separately.
 Shared model loading is not repeatedly charged, and nested component timers are not
 summed with their containing stage timers. Optional root Slurm accounting gives ended
 chunk-allocation GPU-hours, not per-image costs. Queue timestamp interpretation is
 explicit (`--scheduler-timezone Europe/Berlin` by default).
+`Timing/gpu_hours_by_model.csv` and its figure sum actual recorded ended chunk
+allocations once per job. Running allocations are not extrapolated, shared costs
+are not attributed independently to both arms, and unavailable accounting is shown
+as pending rather than zero. These totals include allocation overhead and therefore
+are not interchangeable with image-generation latency.
 
 For durable Gemini dispatch, first create a new source snapshot with
 `seal.py --output ABSOLUTE_NEW_SNAPSHOT_DIRECTORY`. The snapshot's
