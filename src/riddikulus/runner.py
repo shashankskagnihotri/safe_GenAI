@@ -261,6 +261,171 @@ def restore_artifacts(receipt, attempt, selection):
             raise RuntimeError(f'Copied checkpoint diagnostic artifact corrupted: {relative}')
 
 
+def _restore_decode_artifacts(receipt, attempt, selection, spec):
+    restore_artifacts(receipt, attempt, selection)
+    repair = spec.get('infrastructure_resume_repair', {})
+    if (repair.get('kind') != 'sd35-native-vae-shift-decode-only.v1'
+            or read(receipt)['spec_sha256'] != repair['source_spec_sha256']):
+        return
+    moved = []
+    for relative, expected in list(selection['committed_artifacts'].items()):
+        rel = Path(relative)
+        if rel.parts[0] != 'previews' or rel.parts[1] == 'historical_decoder_invalid':
+            continue
+        historical = Path('previews/historical_decoder_invalid') / Path(*rel.parts[1:])
+        target = attempt / historical
+        target.parent.mkdir(parents=True, exist_ok=True)
+        if target.exists():
+            raise RuntimeError('Historical decoder-invalid preview destination already exists')
+        (attempt / rel).rename(target)
+        del selection['committed_artifacts'][relative]
+        selection['committed_artifacts'][str(historical)] = expected
+        moved.append({'original_relative_path': relative, 'historical_relative_path': str(historical),
+                      'sha256': expected, 'status': 'HISTORICAL_DECODER_INVALID'})
+    if moved:
+        path = attempt / 'previews/historical_decoder_invalid/manifest.json'
+        atomic(path, {'schema': 'sd35-historical-decoder-invalid-previews.v1',
+                     'status': 'HISTORICAL_DECODER_INVALID', 'source_checkpoint_receipt': str(receipt),
+                     'reason': 'Original SD3.5 decoder omitted the native VAE shift factor.',
+                     'reconstruction_limit': 'These predicted-clean estimates used pre-update latents and predictions, '
+                         'which cannot be exactly recovered from post-update checkpoints. Original bytes are preserved; '
+                         'these are not corrected previews and must not be used for corrected visual evaluation.',
+                     'artifacts': moved})
+        _remember_artifacts(selection, attempt, [path])
+
+
+def _sd35_decode_image(adapter, latents, state, attempt, index, terminal):
+    if adapter.adapter_name != 'sd35':
+        return legacy._decoded_to_pil(adapter.decode_latents(latents, state))
+    before_sha = tensor_sha256(latents)
+    adapter._sd35_native_decode_evidence = None
+    with ForwardCounter(adapter.pipeline.transformer) as forwards:
+        image = legacy._decoded_to_pil(adapter.decode_latents(latents, state))
+    proof = adapter._sd35_native_decode_evidence
+    if (forwards.count != 0 or tensor_sha256(latents) != before_sha or not isinstance(proof, dict)
+            or proof.get('latent_sha256') != before_sha or proof.get('formula_contract') != 'SOURCE_AUDITED_NATIVE_AFFINE'
+            or proof.get('finite') is not True):
+        raise RuntimeError('SD3.5 decode changed latents, called a denoiser, or lacks native decode proof')
+    append(attempt / 'traces/native_decode.jsonl', dict(proof, step=index,
+           kind='final' if terminal else 'predicted_clean_estimate', fed_back=False,
+           additional_denoiser_forwards=forwards.count, input_latent_unchanged=True, utc=utc()))
+    return image
+
+
+def _sd35_repair_runner_ast(path):
+    """Remove only the named decode/diagnostic handoff additions for comparison."""
+    import ast
+    tree = ast.parse(Path(path).read_text())
+    helpers = {'_restore_decode_artifacts', '_sd35_decode_image',
+               '_sd35_repair_runner_ast', '_validate_sd35_decode_repair'}
+    tree.body = [node for node in tree.body
+                 if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)) or node.name not in helpers]
+    substitutions = {
+        "_restore_decode_artifacts(resume, attempt, selection, spec)":
+            "restore_artifacts(resume, attempt, selection)",
+        "_sd35_decode_image(adapter, preview.detach(), state, attempt, index, index == steps - 1)":
+            "legacy._decoded_to_pil(adapter.decode_latents(preview.detach(), state))",
+        "_sd35_decode_image(adapter, latents, state, attempt, steps - 1, True)":
+            "legacy._decoded_to_pil(adapter.decode_latents(latents, state))",
+    }
+    replacements = {ast.dump(ast.parse(old, mode='eval').body): ast.parse(new, mode='eval').body
+                    for old, new in substitutions.items()}
+    branch = ast.dump(ast.parse(
+        "if repair.get('kind') == 'sd35-native-vae-shift-decode-only.v1':\n"
+        "    return _validate_sd35_decode_repair(spec, spec_sha, receipt_path, receipt, repair, old)\n").body[0])
+    artifact_branch = ast.dump(ast.parse(
+        "if adapter.adapter_name == 'sd35':\n"
+        "    files += ['traces/native_decode.jsonl']\n").body[0])
+    class Normalize(ast.NodeTransformer):
+        def visit_FunctionDef(self, node):
+            if node.name == 'resume_spec_sha':
+                node.body = [child for child in node.body if ast.dump(child) != branch]
+            if node.name == 'generate_latent':
+                node.body = [child for child in node.body if ast.dump(child) != artifact_branch]
+            return self.generic_visit(node)
+        def visit_Call(self, node):
+            return copy.deepcopy(replacements.get(ast.dump(node), node))
+    return ast.dump(Normalize().visit(tree))
+
+
+def _validate_sd35_decode_repair(spec, spec_sha, receipt_path, receipt, repair, old):
+    """Authenticate the exact two-file SD3.5 decoder repair and unchanged science."""
+    import ast
+    kind = 'sd35-native-vae-shift-decode-only.v1'
+    proof_path = Path(repair['repair_receipt'])
+    if digest(proof_path) != repair['repair_receipt_sha256']:
+        raise RuntimeError('SD3.5 decode repair receipt hash differs')
+    proof = read(proof_path)
+    identity_keys = ('source_spec', 'source_spec_sha256', 'checkpoint_receipt',
+                     'checkpoint_receipt_sha256', 'checkpoint_sha256', 'changed_source_files')
+    if (proof.get('schema') != kind or proof.get('scientific_retuning') is not False
+            or any(proof.get(key) != repair[key] for key in identity_keys)):
+        raise RuntimeError('SD3.5 decode repair receipt identity differs')
+    if (digest(receipt['path']) != repair['checkpoint_sha256']
+            or spec['model_config']['model']['adapter'] != 'sd35'
+            or spec['model_config']['model']['model_id'] != 'stabilityai/stable-diffusion-3.5-large'
+            or spec['model_config']['model']['revision'] != old['reference_cell']['model_revision']):
+        raise RuntimeError('SD3.5 decode repair checkpoint/model identity differs')
+    allowed = ['src/riddikulus/adapters/sd35_adapter.py', 'src/riddikulus/runner.py']
+    if (set(old['source_sha256']) != set(spec['source_sha256'])
+            or sorted(k for k in old['source_sha256'] if old['source_sha256'][k] != spec['source_sha256'][k]) != allowed
+            or repair['changed_source_files'] != allowed
+            or proof.get('source_file_changes') != {
+                relative: {'old_sha256': old['source_sha256'][relative],
+                           'new_sha256': spec['source_sha256'][relative]} for relative in allowed}):
+        raise RuntimeError('SD3.5 decode repair changed files beyond the explicit two-file receipt')
+    for label, source_spec in (('old_source', old), ('new_source', spec)):
+        expected = {'root': source_spec['source_root'], 'manifest': source_spec['source_manifest'],
+                    'manifest_sha256': source_spec['source_manifest_sha256'],
+                    'source_sha256': source_spec['source_sha256']}
+        if proof.get(label) != expected or digest(expected['manifest']) != expected['manifest_sha256']:
+            raise RuntimeError('SD3.5 decode repair source manifest identity differs: ' + label)
+        manifest = read(expected['manifest'])
+        if (manifest.get('schema') != 'riddikulus-benchmark.generation-source.v1'
+                or manifest['source_sha256'] != expected['source_sha256']):
+            raise RuntimeError('SD3.5 decode repair manifest contents differ: ' + label)
+        for relative, sha in expected['source_sha256'].items():
+            rel = Path(relative)
+            if rel.is_absolute() or '..' in rel.parts or digest(Path(expected['root']) / rel) != sha:
+                raise RuntimeError('SD3.5 decode repair sealed source changed: ' + relative)
+    # Each source field was individually authenticated above, before normalization.
+    mutable = {'created_utc', 'source_root', 'source_sha256', 'source_manifest', 'source_manifest_sha256',
+               'infrastructure_resume_repair', '_shared_model_load_seconds', '_baseline_attempt'}
+    if ({k: v for k, v in old.items() if k not in mutable}
+            != {k: v for k, v in spec.items() if k not in mutable}):
+        raise RuntimeError('SD3.5 decode repair changed the scientific specification')
+    old_root, new_root = Path(old['source_root']), Path(spec['source_root'])
+    adapter_path = Path('src/riddikulus/adapters/sd35_adapter.py')
+    before, after = (ast.parse((root / adapter_path).read_text()) for root in (old_root, new_root))
+    classes = [node for node in after.body if isinstance(node, ast.ClassDef) and node.name == 'StableDiffusion35Adapter']
+    if len(classes) != 1:
+        raise RuntimeError('SD3.5 repair does not expose its exact native adapter class')
+    decode_methods = [node for node in classes[0].body if isinstance(node, ast.FunctionDef) and node.name == 'decode_latents']
+    if len(decode_methods) != 1:
+        raise RuntimeError('SD3.5 repair must add exactly one native decode override')
+    classes[0].body.remove(decode_methods[0])
+    if (ast.dump(before) != ast.dump(after)
+            or _sd35_repair_runner_ast(old_root / 'src/riddikulus/runner.py')
+            != _sd35_repair_runner_ast(new_root / 'src/riddikulus/runner.py')):
+        raise RuntimeError('SD3.5 decode repair changed native predictions, scheduler, controller or selection code')
+    native = proof['native_decode']
+    framework = read(old['source_manifest'])['framework_provenance'][old['environment_python']]
+    if (digest(native['pipeline_source_path']) != native['pipeline_source_sha256']
+            or framework['native_files_sha256'].get(native['pipeline_source_path']) != native['pipeline_source_sha256']
+            or digest(native['vae_config_path']) != native['vae_config_sha256']
+            or Path(native['vae_config_path']).resolve() !=
+                (Path(spec['model_config']['model']['local_snapshot_path']) / 'vae/config.json').resolve()
+            or (native['scaling_factor'], native['shift_factor']) != (1.5305, 0.0609)):
+        raise RuntimeError('SD3.5 repair native pipeline/VAE provenance differs')
+    vae_config = read(native['vae_config_path'])
+    if (vae_config['scaling_factor'], vae_config['shift_factor']) != (native['scaling_factor'], native['shift_factor']):
+        raise RuntimeError('SD3.5 repair VAE inverse-normalization constants differ')
+    new_framework = read(spec['source_manifest'])['framework_provenance'][spec['environment_python']]
+    if new_framework != framework:
+        raise RuntimeError('SD3.5 decode repair changed its pinned native framework')
+    return repair['source_spec_sha256']
+
+
 def resume_spec_sha(spec, spec_sha, receipt_path):
     """Authorize one recorded infrastructure-only source handoff, never retuning."""
     receipt = read(receipt_path)
@@ -277,6 +442,8 @@ def resume_spec_sha(spec, spec_sha, receipt_path):
             or receipt['sha256'] != repair['checkpoint_sha256']):
         raise RuntimeError('Infrastructure repair source/checkpoint identity differs')
     old = read(old_path)
+    if repair.get('kind') == 'sd35-native-vae-shift-decode-only.v1':
+        return _validate_sd35_decode_repair(spec, spec_sha, receipt_path, receipt, repair, old)
     mutable = {'created_utc', 'source_root', 'source_sha256',
                'scientific_fingerprint', 'infrastructure_resume_repair',
                '_shared_model_load_seconds', '_baseline_attempt'}
@@ -564,7 +731,7 @@ def generate_latent(adapter, spec, spec_sha, attempt, world_size, load_seconds, 
     if resume:
         latents, state, start_index = restore(resume, attempt, resume_spec_sha(spec, spec_sha, resume), adapter, generator, exposure,
                                              condition_sha, selection, timers)
-        restore_artifacts(resume, attempt, selection)
+        _restore_decode_artifacts(resume, attempt, selection, spec)
         if selection['initial_latent_sha256'] != initial_sha:
             raise RuntimeError('Resume native seed draw differs from the original initial latent')
     else:
@@ -732,7 +899,7 @@ def generate_latent(adapter, spec, spec_sha, attempt, world_size, load_seconds, 
                 if index in preview_steps or index == steps - 1:
                     phase = time.perf_counter()
                     preview = latents if index == steps - 1 else (before.float() - sigma * prediction.float()).to(before.dtype)
-                    image = legacy._decoded_to_pil(adapter.decode_latents(preview.detach(), state))
+                    image = _sd35_decode_image(adapter, preview.detach(), state, attempt, index, index == steps - 1)
                     path = attempt / ('image.png' if index == steps - 1 else f'previews/step_{index:02d}_predicted_clean.png')
                     legacy._atomic_image(path, image)
                     atomic(path.with_suffix('.json'), {'step': index, 'kind': 'final' if index == steps - 1 else 'predicted_clean_estimate',
@@ -805,7 +972,7 @@ def generate_latent(adapter, spec, spec_sha, attempt, world_size, load_seconds, 
     if start_index == steps:
         phase = time.perf_counter()
         with torch.inference_mode():
-            image = legacy._decoded_to_pil(adapter.decode_latents(latents, state))
+            image = _sd35_decode_image(adapter, latents, state, attempt, steps - 1, True)
         legacy._atomic_image(attempt / 'image.png', image)
         atomic(attempt / 'image.json', {'step': steps - 1, 'kind': 'final', 'sha256': digest(attempt / 'image.png'),
                                       'restored_from_committed_terminal_latent': True, 'utc': utc()})
@@ -854,6 +1021,8 @@ def generate_latent(adapter, spec, spec_sha, attempt, world_size, load_seconds, 
     files = ['initial_latent.safetensors', 'guardrail_proof.json', 'image.png', 'image.json', 'metadata.json', 'timing.json', 'selection.json', 'numerical_audit.json',
              'traces/steering.jsonl', 'traces/hierarchy.jsonl', 'traces/leaf_activation.jsonl',
              'traces/selection_events.jsonl','traces/pool_events.jsonl', 'traces/latent_effect.jsonl', 'traces/checkpoint_timing.jsonl']
+    if adapter.adapter_name == 'sd35':
+        files += ['traces/native_decode.jsonl']
     files += sorted(selection['committed_artifacts'])
     atomic(attempt / '_GENERATION_SUCCESS', {'spec_sha256': spec_sha, 'artifact_sha256': {p: digest(attempt / p) for p in files},
            'visual_success': None, 'utc': utc()})

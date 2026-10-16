@@ -39,6 +39,52 @@ class StableDiffusion35Adapter(DiffusersFrozenAdapter):
         "negative_pooled_prompt_embeds",
     )
 
+    def decode_latents(self, latents: torch.Tensor, state: AdapterState) -> Any:
+        """Use the native SD3 inverse VAE normalization without changing precision."""
+        import hashlib
+        import inspect
+        from pathlib import Path
+        from ..numerics import tensor_sha256
+
+        self._require_loaded()
+        del state
+        assert self.pipeline is not None
+        vae = self.pipeline.vae
+        scaling = float(vae.config.scaling_factor)
+        shift = float(vae.config.shift_factor)
+        if latents.ndim != 4 or latents.shape[1] != int(vae.config.latent_channels):
+            raise RuntimeError("SD3.5 decode requires native [B, latent_channels, H, W] latents.")
+        if not bool(torch.isfinite(latents).all()) or not scaling > 0:
+            raise RuntimeError("SD3.5 decode received nonfinite latents or invalid VAE scaling.")
+        # Exactly StableDiffusion3Pipeline.__call__: no upcast or decoder fallback.
+        vae_input = (latents / vae.config.scaling_factor) + vae.config.shift_factor
+        if not bool(torch.isfinite(vae_input).all()):
+            raise RuntimeError("SD3.5 native VAE input is nonfinite.")
+        decoded = vae.decode(vae_input, return_dict=False)[0]
+        expected_shape = [int(latents.shape[0]), int(vae.config.out_channels),
+                          int(latents.shape[2]) * int(self.pipeline.vae_scale_factor),
+                          int(latents.shape[3]) * int(self.pipeline.vae_scale_factor)]
+        if list(decoded.shape) != expected_shape or not bool(torch.isfinite(decoded).all()):
+            raise RuntimeError("SD3.5 VAE returned nonfinite pixels or an unexpected image shape.")
+        images = self.pipeline.image_processor.postprocess(decoded, output_type="pil")
+        pipeline_source = Path(inspect.getsourcefile(type(self.pipeline)))
+        self._sd35_native_decode_evidence = {
+            "schema": "sd35-native-vae-decode.v1",
+            "formula": "(latents / vae.config.scaling_factor) + vae.config.shift_factor",
+            "scaling_factor": scaling, "shift_factor": shift,
+            "formula_contract": "SOURCE_AUDITED_NATIVE_AFFINE", "finite": True,
+            "comparison_scope": "VAE input normalization contract; no independent full-pipeline image comparison",
+            "precision_policy": "Native SD3 pipeline arithmetic and VAE decode; no dtype conversion",
+            "latent_sha256": tensor_sha256(latents), "latent": _trace_tensor_stats(latents),
+            "vae_input_sha256": tensor_sha256(vae_input), "vae_input": _trace_tensor_stats(vae_input),
+            "decoded_tensor_sha256": tensor_sha256(decoded), "decoded": _trace_tensor_stats(decoded),
+            "expected_decoded_shape": expected_shape,
+            "postprocess": "pipeline.image_processor.postprocess(decoded, output_type='pil')",
+            "pipeline_source_path": str(pipeline_source),
+            "pipeline_source_sha256": hashlib.sha256(pipeline_source.read_bytes()).hexdigest(),
+        }
+        return images
+
     def predict_vector_field(
         self,
         latents: torch.Tensor,

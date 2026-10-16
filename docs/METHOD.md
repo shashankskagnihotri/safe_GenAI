@@ -112,6 +112,29 @@ and destination timestep. Its native update is FP32_state + Python_dt *
 BF16_velocity; preserve the BF16 increment rounding. It has no CFG and no prompt
 upsampling. Do not replace it with FLUX.2 Klein or the undistilled base model.
 
+## Native image decoding
+
+Steering changes the denoising trajectory. Rendering that trajectory must still
+use the model's native inverse VAE normalization. For SD3.5 Large:
+
+    image = postprocess(VAE.decode(z_final / 1.5305 + 0.0609))
+
+The scale and shift restore the representation expected by the decoder; they
+are not steering strengths. Both Baseline and Riddikulus use the same transform
+in native precision. Decoding and predicted-clean previews never feed back into
+the latent, scheduler or controller.
+
+An October 16 audit found that the inherited SD decoder omitted this shift.
+The SD-specific override repairs rendering without changing the frozen steering
+method. A restricted source and checkpoint handoff preserves completed native
+updates and authenticates the two-file repair. Old images and their judgments
+remain historical evidence, separate from corrected primary results. Old
+predicted-clean previews cannot be recovered exactly from post-update checkpoints
+alone and are explicitly labeled decoder-invalid when retained after recovery.
+Runtime decode receipts check finite tensors, native dimensions, unchanged input
+latents and zero denoiser calls. Source-audited VAE input equivalence is separate
+from independently executing the complete native pipeline.
+
 ## Parameters and limitations
 
 | Quantity | Frozen setting | Interpretation |
