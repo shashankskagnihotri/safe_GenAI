@@ -496,7 +496,7 @@ def render(output: Path, aggregates: list[dict], paired: list[dict], timing: lis
         if isinstance(value, (int, float)) and np.isfinite(value):
             groups[(row["model_key"], row["arm"])].append(value)
     if groups:
-        fig, ax = plt.subplots(figsize=(8, 4))
+        fig, ax = plt.subplots(figsize=(8, 4.5))
         for offset, arm in ((-.19, "Baseline"), (.19, "Riddikulus")):
             for i, model in enumerate(models):
                 values = groups.get((model, arm), [])
@@ -505,9 +505,11 @@ def render(output: Path, aggregates: list[dict], paired: list[dict], timing: lis
                            yerr=np.std(values, ddof=1) if len(values) > 1 else None, capsize=2,
                            label=arm if i == 0 else None)
         ax.set_xticks(range(len(models)), [MODEL_LABELS.get(model, model) for model in models], rotation=25, ha="right")
-        ax.set_ylabel("Recorded generation trajectory seconds\nMean ± sample SD; loading and judging excluded")
+        ax.set_ylabel("Generation time (seconds)")
         ax.legend(frameon=False)
         ax.grid(axis="y", alpha=.2)
+        fig.text(.5, -.04, "Mean ± sample SD of recorded generation trajectories.\n"
+                 "Includes previews and checkpoints; excludes loading and judging.", ha="center", fontsize=9)
         fig.tight_layout()
         (output / "Timing").mkdir(parents=True, exist_ok=True)
         _save(fig, output / "Timing", "generation_time")
