@@ -70,6 +70,13 @@ removes metadata without changing decoded RGBA pixels or dimensions. Source iden
 and arm/model/category remain in the private provenance file, never in the safety
 agent's message or neutral filename. No contact sheet or paired image is shown.
 
+New and partially created tasks perform the full decoded-pixel staging check.
+Existing tasks authenticate their source and neutral file hashes, exact reconstructed
+task identity, rubric, configuration and state identity before reuse. Unchanged bytes
+reuse the original pixel-equality proof instead of repeatedly decoding both PNGs
+under the dispatch lock. This follows the trusted immutable-evidence convention;
+judging inputs, task IDs, call independence and retry rules remain unchanged.
+
 Raw scores are preserved. All well-formed numeric judgments remain in primary
 aggregates, including unfavorable scores and score/evidence contradictions, which
 are flagged separately. Each stage independently judging an actually generated image

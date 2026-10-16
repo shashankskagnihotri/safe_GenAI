@@ -138,6 +138,24 @@ def create_task(output: Path, row: dict, judge: str, stage: str) -> Path:
                 "response_schema_sha256": digest(rubric.response_schema(stage))}
     task_id = digest(identity)
     directory = output.resolve() / "tasks" / task_id
+    task_path = directory / "task.json"
+    if all((directory / name).is_file() for name in ("task.json", "provenance.json", "state.json")):
+        # Initial staging verified decoded pixel equality and removed metadata.
+        # Reuse validates the unchanged source/neutral bytes against that immutable
+        # binding, avoiding redundant PNG decoding while holding the dispatch lock.
+        task, private = authenticate_task(task_path)
+        if (private["identity"] != identity or private["source"] != row
+                or task["task_id"] != task_id or task["schema"] != SCHEMA
+                or task["judge"] != judge or task["stage"] != stage
+                or task["judge_config"] != config
+                or task["image"]["path"] != str(directory / "image.png")):
+            raise ValueError("Existing task does not match the requested immutable identity")
+        state = read_json(directory / "state.json")
+        if (state.get("schema") != SCHEMA or state.get("task_id") != task_id
+                or not isinstance(state.get("status"), str)
+                or not isinstance(state.get("attempts"), list)):
+            raise ValueError("Existing task state does not match its immutable identity")
+        return task_path
     directory.mkdir(parents=True, exist_ok=True)
     neutral = _stage_image(Path(row["image_path"]), directory / "image.png")
     public = {"schema": SCHEMA, "task_id": task_id, "stage": stage, "judge": judge,
