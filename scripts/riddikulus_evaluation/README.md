@@ -87,14 +87,29 @@ Absent images, policy blocks, API refusals, technical failures and pending stage
 never assigned 10 or 0. Additional valid-only tables supplement, never replace, the
 primary failure-penalized results. The expected inventory is always the full cohort.
 
+Freeze inputs before plotting an active campaign. This copies the full manifests,
+campaign state, primary task membership and JSON receipts, and exact renderer
+source. Two unequal reads or an incomplete result commit fail without producing a
+completed snapshot. Use a new output directory and preserve the snapshot receipt:
+
 ```bash
-python scripts/riddikulus_evaluation/plot_results.py \
-  --evaluation outputs/FINALIZED_WORKING_METHOD_16_OCT/EVALUATION \
-  --images outputs/FINALIZED_WORKING_METHOD_16_OCT/image_manifest.jsonl \
-  --expected outputs/FINALIZED_WORKING_METHOD_16_OCT/expected_image_manifest.jsonl \
-  --campaign-state outputs/FINALIZED_WORKING_METHOD_16_OCT/campaign_state.json \
+python -B scripts/riddikulus_evaluation/capture_plot_inputs.py \
+  --campaign outputs/FINALIZED_WORKING_METHOD_16_OCT \
+  --expected-images 300 --output outputs/FINALIZED_WORKING_METHOD_16_OCT/Plots/INPUTS_0001
+
+python -B outputs/FINALIZED_WORKING_METHOD_16_OCT/Plots/INPUTS_0001/SOURCE/scripts/riddikulus_evaluation/plot_results.py \
+  --evaluation outputs/FINALIZED_WORKING_METHOD_16_OCT/Plots/INPUTS_0001/EVALUATION \
+  --images outputs/FINALIZED_WORKING_METHOD_16_OCT/Plots/INPUTS_0001/image_manifest.jsonl \
+  --expected outputs/FINALIZED_WORKING_METHOD_16_OCT/Plots/INPUTS_0001/expected_image_manifest.jsonl \
+  --campaign-state outputs/FINALIZED_WORKING_METHOD_16_OCT/Plots/INPUTS_0001/campaign_state.json \
   --output Plots
 ```
+
+The capture is a stable observed copy, not a cross-file storage transaction. Final
+capture should follow verified writer closure. Original absolute artifact and raw
+response paths remain unchanged and required; this is not a portable archive.
+Never prepare or ingest tasks in the copied tree. Recheck every snapshot-receipt
+hash before and after rendering, and keep the source CSVs and rendering environment.
 
 Outputs include raw-stage and per-image CSVs, separate-judge means and sample SD,
 10,000 category-stratified paired bootstrap intervals, across-judge sample variance
