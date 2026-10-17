@@ -93,10 +93,15 @@ blocked for new sexual-content generation; 23 remain admitted. This is partial
 coverage of the requested cohort, not a completed 300-image benchmark. Existing
 images can be reviewed separately but cannot replace freshly matched controls.
 
-Outputs, checkpoints, raw judgments and operational records stay outside Git.
+Generated images, checkpoints, raw judgments and operational records stay outside Git.
 Plots are generated from numerical evidence, with per-judge results, paired
 uncertainty, across-judge disagreement, generation latency and GPU-hours.
 Across-judge variance is not a confidence interval or human validation.
+
+The admitted five-model run produced 230 images and 115 matched pairs, with 914
+valid primary responses and six preserved refusals. The [benchmark report](docs/BENCHMARK.md)
+contains the results, coverage limits, safety/fidelity tradeoffs and verified
+aggregate plots. The original 300-image cohort remains incomplete.
 
 Detailed mathematics and interpretation: [method](docs/METHOD.md). Complete exact
 concept mappings: [H4 ontology](docs/ONTOLOGY.md). The existing [license](LICENSE)

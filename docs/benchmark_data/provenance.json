@@ -1,0 +1,947 @@
+{
+  "byte_identical_table_sources": {
+    "combined_aggregate_scores.csv": {
+      "rows": 150,
+      "source_file": "outputs/FINALIZED_WORKING_METHOD_16_OCT/Plots/FINAL_ADMITTED_0001/RESULTS/Across_Judges/aggregate_scores.csv",
+      "source_sha256": "f89dcde8f9ad1bc0a33697e2ff5dd81215282bd6dc90ac74af203d11ff4a37f6",
+      "transformation": "byte-identical public-safe aggregate CSV; exact column allowlist checked"
+    },
+    "combined_paired_effects.csv": {
+      "rows": 75,
+      "source_file": "outputs/FINALIZED_WORKING_METHOD_16_OCT/Plots/FINAL_ADMITTED_0001/RESULTS/Across_Judges/paired_differences.csv",
+      "source_sha256": "816c6cc056d52164de1e43dac4afed409a23b26131a55caeb324a6493e10199e",
+      "transformation": "byte-identical public-safe aggregate CSV; exact column allowlist checked"
+    },
+    "gemini_aggregate_scores.csv": {
+      "rows": 150,
+      "source_file": "outputs/FINALIZED_WORKING_METHOD_16_OCT/Plots/FINAL_ADMITTED_0001/RESULTS/Gemini_3_8_Flash/aggregate_scores.csv",
+      "source_sha256": "938d36bfafde1eb2e88a58dee65adedb38d54c55455ad197366285dde3a9d355",
+      "transformation": "byte-identical public-safe aggregate CSV; exact column allowlist checked"
+    },
+    "gemini_paired_effects.csv": {
+      "rows": 75,
+      "source_file": "outputs/FINALIZED_WORKING_METHOD_16_OCT/Plots/FINAL_ADMITTED_0001/RESULTS/Gemini_3_8_Flash/paired_differences.csv",
+      "source_sha256": "c88b1bc379d85fee854d24d5cbefa13eaa296fc4bb7dbc4f59cd17410c76775c",
+      "transformation": "byte-identical public-safe aggregate CSV; exact column allowlist checked"
+    },
+    "gpu_hours_by_model.csv": {
+      "rows": 5,
+      "source_file": "outputs/FINALIZED_WORKING_METHOD_16_OCT/Plots/FINAL_ADMITTED_0001/RESULTS/Timing/gpu_hours_by_model.csv",
+      "source_sha256": "746077158bb5201de00ffe6c7d6ddfebb86dc120046a4f203bb3d346ea34643a",
+      "transformation": "byte-identical public-safe aggregate CSV; exact column allowlist checked"
+    },
+    "sol_aggregate_scores.csv": {
+      "rows": 150,
+      "source_file": "outputs/FINALIZED_WORKING_METHOD_16_OCT/Plots/FINAL_ADMITTED_0001/RESULTS/GPT_6_1_Sol/aggregate_scores.csv",
+      "source_sha256": "dd96064b15074310ee6858e8df616a3590109f0a7f97d8c5323c595aa9d86cb1",
+      "transformation": "byte-identical public-safe aggregate CSV; exact column allowlist checked"
+    },
+    "sol_paired_effects.csv": {
+      "rows": 75,
+      "source_file": "outputs/FINALIZED_WORKING_METHOD_16_OCT/Plots/FINAL_ADMITTED_0001/RESULTS/GPT_6_1_Sol/paired_differences.csv",
+      "source_sha256": "e9715e85fa66fddf197261a64e312374ed12722fa3b4c1a2a216aedee9a5a0a8",
+      "transformation": "byte-identical public-safe aggregate CSV; exact column allowlist checked"
+    }
+  },
+  "claim_sources": {
+    "activation_counts": {
+      "json_pointers": [
+        "/completed_methods",
+        "/registered_total_methods",
+        "/excluded_methods",
+        "/missing_methods",
+        "/leaf_acquisition_rows",
+        "/guided_updates",
+        "/leaf_update_rows",
+        "/resumed_current_attempts",
+        "/authentication"
+      ],
+      "source_file": "outputs/FINALIZED_WORKING_METHOD_16_OCT/Analysis/FINAL_ANALYSIS_PREPARATION_0002/ACTIVATION_FINAL_REPLAY_0001/summary.json"
+    },
+    "actual_judge_bindings": {
+      "json_pointers": [
+        "/status",
+        "/distinct_successful_Sol_children",
+        "/Gemini_returned_model_versions",
+        "/limits"
+      ],
+      "source_file": "outputs/FINALIZED_WORKING_METHOD_16_OCT/Plots/FINAL_ADMITTED_0001/judge_execution_audit.json"
+    },
+    "all_model_effects": {
+      "columns": [
+        "observed_pairs",
+        "expected_pairs",
+        "riddikulus_minus_baseline",
+        "prompt_ci95_low or ci95_low",
+        "prompt_ci95_high or ci95_high",
+        "across_judge_sd where combined",
+        "paired_prompt_ids"
+      ],
+      "csv_row_filter": {
+        "category": "all",
+        "metric": [
+          "nudity_amount",
+          "violence_amount",
+          "safety_severity",
+          "prompt_distance_oversuppression",
+          "artifacts_distortion"
+        ],
+        "model_key": [
+          "cosmos3_super_text2image",
+          "flux1_dev",
+          "flux2_dev",
+          "flux3_image_klein",
+          "sd35_large"
+        ]
+      },
+      "source_files": [
+        "outputs/FINALIZED_WORKING_METHOD_16_OCT/Plots/FINAL_ADMITTED_0001/RESULTS/Across_Judges/paired_differences.csv",
+        "outputs/FINALIZED_WORKING_METHOD_16_OCT/Plots/FINAL_ADMITTED_0001/RESULTS/Gemini_3_8_Flash/paired_differences.csv",
+        "outputs/FINALIZED_WORKING_METHOD_16_OCT/Plots/FINAL_ADMITTED_0001/RESULTS/GPT_6_1_Sol/paired_differences.csv"
+      ]
+    },
+    "allocation": {
+      "json_pointers": [
+        "/allocated_GPU_hours_by_model_all_terminal_attempts",
+        "/all_historical_root_jobs",
+        "/never_started_job_ids",
+        "/allocation_scope"
+      ],
+      "source_file": "outputs/FINALIZED_WORKING_METHOD_16_OCT/Plots/FINAL_ADMITTED_0001/RESULTS/final_coverage_timing_accounting.json",
+      "total": 54.39666666666666,
+      "whole_generation_GPU_hour_derivation": "sum five actual terminal model totals, each root allocation counted once"
+    },
+    "coverage": {
+      "json_pointers": [
+        "/original_expected_images",
+        "/original_expected_pairs",
+        "/original_expected_primary_responses",
+        "/original_expected_metric_slots",
+        "/observed_images",
+        "/observed_pairs",
+        "/terminal_primary_stage_states",
+        "/primary_numeric_scores_raw",
+        "/metric_slots_in_completed_primary_responses",
+        "/numeric_slots_after_stage_local_invalid_penalties",
+        "/derived_penalty_metric_slots",
+        "/missing_original_images",
+        "/provider_refusal_stages_unscored"
+      ],
+      "source_file": "outputs/FINALIZED_WORKING_METHOD_16_OCT/Plots/FINAL_ADMITTED_0001/RESULTS/final_coverage_timing_accounting.json"
+    },
+    "frozen_method": {
+      "sections": [
+        "Same-state predictions and evidence",
+        "Fixed pool acquisition and fresh corrections",
+        "Conflicts and bounds",
+        "Native solver and actual intervention",
+        "Native image decoding",
+        "Parameters and limitations"
+      ],
+      "source_file": "docs/METHOD.md"
+    },
+    "judge_requested_settings": {
+      "json_pointers": [
+        "/judge_model_settings/gemini/model",
+        "/judge_model_settings/gemini/thinking_level",
+        "/judge_model_settings/gemini/max_output_tokens",
+        "/judge_model_settings/sol/model",
+        "/judge_model_settings/sol/reasoning_effort",
+        "/judge_model_settings/sol/fork_turns",
+        "/judge_model_settings/sol/transport"
+      ],
+      "source_file": "outputs/FINALIZED_WORKING_METHOD_16_OCT/Analysis/FINAL_ANALYSIS_PREPARATION_0002/configuration.json"
+    },
+    "operational_review_coverage": {
+      "derivation": "115 authenticated paired review entries, each binding both images and both specifications",
+      "json_pointer": "/operational_reviews",
+      "source_file": "outputs/FINALIZED_WORKING_METHOD_16_OCT/Plots/FINAL_ADMITTED_0001/readiness.json"
+    },
+    "uncertainty_and_penalties": {
+      "source_file": "scripts/riddikulus_evaluation/README.md",
+      "support": "Exact stage independence, invalidity/refusal accounting and prompt-bootstrap versus across-judge variability definitions."
+    },
+    "validity_and_flags": {
+      "json_pointers": [
+        "/validity_disagreement_count",
+        "/consistency_flagged_image_judgments",
+        "/per_judge",
+        "/generation_complete",
+        "/evaluation_complete"
+      ],
+      "source_file": "outputs/FINALIZED_WORKING_METHOD_16_OCT/Plots/FINAL_ADMITTED_0001/RESULTS/coverage_and_provenance.json",
+      "stage_identity_source": {
+        "json_pointers": [
+          "/perceptually_invalid_stages",
+          "/cross_stage_validity_disagreements"
+        ],
+        "source_file": "outputs/FINALIZED_WORKING_METHOD_16_OCT/Plots/FINAL_ADMITTED_0001/judge_execution_audit.json"
+      }
+    },
+    "verification_and_exports": {
+      "json_pointers": [
+        "/status",
+        "/numeric_checks",
+        "/copied_files_before_and_after",
+        "/csv_tables",
+        "/figures",
+        "/limitations",
+        "/capture_receipt_scope"
+      ],
+      "source_file": "outputs/FINALIZED_WORKING_METHOD_16_OCT/Plots/FINAL_ADMITTED_0001/RESULTS/artifact_verification.json"
+    }
+  },
+  "derived_table_sources": [
+    {
+      "json_pointers_per_matching_record": [
+        "/provenance/model_id",
+        "/provenance/model_revision",
+        "/provenance/seed",
+        "/provenance/generation/height",
+        "/provenance/generation/width",
+        "/provenance/generation/num_inference_steps",
+        "/provenance/generation/guidance_scale"
+      ],
+      "jsonl_record_filter": {
+        "model_key": "cosmos3_super_text2image"
+      },
+      "model_key": "cosmos3_super_text2image",
+      "optional_json_pointer": "/provenance/generation/schedule_alpha",
+      "output": "provenance.json:model_profiles",
+      "records_cross_checked": 46,
+      "source_file": "outputs/FINALIZED_WORKING_METHOD_16_OCT/Plots/FINAL_ADMITTED_0001/INPUTS/image_manifest.jsonl"
+    },
+    {
+      "json_pointers_per_matching_record": [
+        "/provenance/model_id",
+        "/provenance/model_revision",
+        "/provenance/seed",
+        "/provenance/generation/height",
+        "/provenance/generation/width",
+        "/provenance/generation/num_inference_steps",
+        "/provenance/generation/guidance_scale"
+      ],
+      "jsonl_record_filter": {
+        "model_key": "flux1_dev"
+      },
+      "model_key": "flux1_dev",
+      "optional_json_pointer": "/provenance/generation/schedule_alpha",
+      "output": "provenance.json:model_profiles",
+      "records_cross_checked": 46,
+      "source_file": "outputs/FINALIZED_WORKING_METHOD_16_OCT/Plots/FINAL_ADMITTED_0001/INPUTS/image_manifest.jsonl"
+    },
+    {
+      "json_pointers_per_matching_record": [
+        "/provenance/model_id",
+        "/provenance/model_revision",
+        "/provenance/seed",
+        "/provenance/generation/height",
+        "/provenance/generation/width",
+        "/provenance/generation/num_inference_steps",
+        "/provenance/generation/guidance_scale"
+      ],
+      "jsonl_record_filter": {
+        "model_key": "flux2_dev"
+      },
+      "model_key": "flux2_dev",
+      "optional_json_pointer": "/provenance/generation/schedule_alpha",
+      "output": "provenance.json:model_profiles",
+      "records_cross_checked": 46,
+      "source_file": "outputs/FINALIZED_WORKING_METHOD_16_OCT/Plots/FINAL_ADMITTED_0001/INPUTS/image_manifest.jsonl"
+    },
+    {
+      "json_pointers_per_matching_record": [
+        "/provenance/model_id",
+        "/provenance/model_revision",
+        "/provenance/seed",
+        "/provenance/generation/height",
+        "/provenance/generation/width",
+        "/provenance/generation/num_inference_steps",
+        "/provenance/generation/guidance_scale"
+      ],
+      "jsonl_record_filter": {
+        "model_key": "flux3_image_klein"
+      },
+      "model_key": "flux3_image_klein",
+      "optional_json_pointer": "/provenance/generation/schedule_alpha",
+      "output": "provenance.json:model_profiles",
+      "records_cross_checked": 46,
+      "source_file": "outputs/FINALIZED_WORKING_METHOD_16_OCT/Plots/FINAL_ADMITTED_0001/INPUTS/image_manifest.jsonl"
+    },
+    {
+      "json_pointers_per_matching_record": [
+        "/provenance/model_id",
+        "/provenance/model_revision",
+        "/provenance/seed",
+        "/provenance/generation/height",
+        "/provenance/generation/width",
+        "/provenance/generation/num_inference_steps",
+        "/provenance/generation/guidance_scale"
+      ],
+      "jsonl_record_filter": {
+        "model_key": "sd35_large"
+      },
+      "model_key": "sd35_large",
+      "optional_json_pointer": "/provenance/generation/schedule_alpha",
+      "output": "provenance.json:model_profiles",
+      "records_cross_checked": 46,
+      "source_file": "outputs/FINALIZED_WORKING_METHOD_16_OCT/Plots/FINAL_ADMITTED_0001/INPUTS/image_manifest.jsonl"
+    },
+    {
+      "arm": "Baseline",
+      "cross_checked_against": {
+        "column": "generation_trajectory_seconds_including_committed_prior_segments",
+        "csv_row_filter": {
+          "arm": "Baseline",
+          "model_key": "cosmos3_super_text2image"
+        },
+        "source_file": "outputs/FINALIZED_WORKING_METHOD_16_OCT/Plots/FINAL_ADMITTED_0001/RESULTS/Timing/timings.csv"
+      },
+      "json_pointer": "/generation_trajectory_timing/Baseline",
+      "model_key": "cosmos3_super_text2image",
+      "output": "generation_timing.csv",
+      "source_file": "outputs/FINALIZED_WORKING_METHOD_16_OCT/Analysis/cosmos_generation_completion_0001.json"
+    },
+    {
+      "arm": "Riddikulus",
+      "cross_checked_against": {
+        "column": "generation_trajectory_seconds_including_committed_prior_segments",
+        "csv_row_filter": {
+          "arm": "Riddikulus",
+          "model_key": "cosmos3_super_text2image"
+        },
+        "source_file": "outputs/FINALIZED_WORKING_METHOD_16_OCT/Plots/FINAL_ADMITTED_0001/RESULTS/Timing/timings.csv"
+      },
+      "json_pointer": "/generation_trajectory_timing/Riddikulus",
+      "model_key": "cosmos3_super_text2image",
+      "output": "generation_timing.csv",
+      "source_file": "outputs/FINALIZED_WORKING_METHOD_16_OCT/Analysis/cosmos_generation_completion_0001.json"
+    },
+    {
+      "arm": "Baseline",
+      "cross_checked_against": {
+        "column": "generation_trajectory_seconds_including_committed_prior_segments",
+        "csv_row_filter": {
+          "arm": "Baseline",
+          "model_key": "flux1_dev"
+        },
+        "source_file": "outputs/FINALIZED_WORKING_METHOD_16_OCT/Plots/FINAL_ADMITTED_0001/RESULTS/Timing/timings.csv"
+      },
+      "json_pointer": "/generation_trajectory_timing/Baseline",
+      "model_key": "flux1_dev",
+      "output": "generation_timing.csv",
+      "source_file": "outputs/FINALIZED_WORKING_METHOD_16_OCT/Analysis/flux1_generation_completion_0001.json"
+    },
+    {
+      "arm": "Riddikulus",
+      "cross_checked_against": {
+        "column": "generation_trajectory_seconds_including_committed_prior_segments",
+        "csv_row_filter": {
+          "arm": "Riddikulus",
+          "model_key": "flux1_dev"
+        },
+        "source_file": "outputs/FINALIZED_WORKING_METHOD_16_OCT/Plots/FINAL_ADMITTED_0001/RESULTS/Timing/timings.csv"
+      },
+      "json_pointer": "/generation_trajectory_timing/Riddikulus",
+      "model_key": "flux1_dev",
+      "output": "generation_timing.csv",
+      "source_file": "outputs/FINALIZED_WORKING_METHOD_16_OCT/Analysis/flux1_generation_completion_0001.json"
+    },
+    {
+      "arm": "Baseline",
+      "cross_checked_against": {
+        "column": "generation_trajectory_seconds_including_committed_prior_segments",
+        "csv_row_filter": {
+          "arm": "Baseline",
+          "model_key": "flux2_dev"
+        },
+        "source_file": "outputs/FINALIZED_WORKING_METHOD_16_OCT/Plots/FINAL_ADMITTED_0001/RESULTS/Timing/timings.csv"
+      },
+      "json_pointer": "/generation_timing/Baseline",
+      "model_key": "flux2_dev",
+      "output": "generation_timing.csv",
+      "source_file": "outputs/FINALIZED_WORKING_METHOD_16_OCT/Analysis/FINAL_ANALYSIS_PREPARATION_0002/FLUX2_FULL_AUDIT_0001/flux2_generation_completion.json"
+    },
+    {
+      "arm": "Riddikulus",
+      "cross_checked_against": {
+        "column": "generation_trajectory_seconds_including_committed_prior_segments",
+        "csv_row_filter": {
+          "arm": "Riddikulus",
+          "model_key": "flux2_dev"
+        },
+        "source_file": "outputs/FINALIZED_WORKING_METHOD_16_OCT/Plots/FINAL_ADMITTED_0001/RESULTS/Timing/timings.csv"
+      },
+      "json_pointer": "/generation_timing/Riddikulus",
+      "model_key": "flux2_dev",
+      "output": "generation_timing.csv",
+      "source_file": "outputs/FINALIZED_WORKING_METHOD_16_OCT/Analysis/FINAL_ANALYSIS_PREPARATION_0002/FLUX2_FULL_AUDIT_0001/flux2_generation_completion.json"
+    },
+    {
+      "arm": "Baseline",
+      "cross_checked_against": {
+        "column": "generation_trajectory_seconds_including_committed_prior_segments",
+        "csv_row_filter": {
+          "arm": "Baseline",
+          "model_key": "flux3_image_klein"
+        },
+        "source_file": "outputs/FINALIZED_WORKING_METHOD_16_OCT/Plots/FINAL_ADMITTED_0001/RESULTS/Timing/timings.csv"
+      },
+      "json_pointer": "/generation_timing/Baseline",
+      "model_key": "flux3_image_klein",
+      "output": "generation_timing.csv",
+      "source_file": "outputs/FINALIZED_WORKING_METHOD_16_OCT/Analysis/flux3_generation_completion_0001.json"
+    },
+    {
+      "arm": "Riddikulus",
+      "cross_checked_against": {
+        "column": "generation_trajectory_seconds_including_committed_prior_segments",
+        "csv_row_filter": {
+          "arm": "Riddikulus",
+          "model_key": "flux3_image_klein"
+        },
+        "source_file": "outputs/FINALIZED_WORKING_METHOD_16_OCT/Plots/FINAL_ADMITTED_0001/RESULTS/Timing/timings.csv"
+      },
+      "json_pointer": "/generation_timing/Riddikulus",
+      "model_key": "flux3_image_klein",
+      "output": "generation_timing.csv",
+      "source_file": "outputs/FINALIZED_WORKING_METHOD_16_OCT/Analysis/flux3_generation_completion_0001.json"
+    },
+    {
+      "arm": "Baseline",
+      "cross_checked_against": {
+        "column": "generation_trajectory_seconds_including_committed_prior_segments",
+        "csv_row_filter": {
+          "arm": "Baseline",
+          "model_key": "sd35_large"
+        },
+        "source_file": "outputs/FINALIZED_WORKING_METHOD_16_OCT/Plots/FINAL_ADMITTED_0001/RESULTS/Timing/timings.csv"
+      },
+      "json_pointer": "/generation_timing/Baseline",
+      "model_key": "sd35_large",
+      "output": "generation_timing.csv",
+      "source_file": "outputs/FINALIZED_WORKING_METHOD_16_OCT/Analysis/sd35_generation_completion_0001.json"
+    },
+    {
+      "arm": "Riddikulus",
+      "cross_checked_against": {
+        "column": "generation_trajectory_seconds_including_committed_prior_segments",
+        "csv_row_filter": {
+          "arm": "Riddikulus",
+          "model_key": "sd35_large"
+        },
+        "source_file": "outputs/FINALIZED_WORKING_METHOD_16_OCT/Plots/FINAL_ADMITTED_0001/RESULTS/Timing/timings.csv"
+      },
+      "json_pointer": "/generation_timing/Riddikulus",
+      "model_key": "sd35_large",
+      "output": "generation_timing.csv",
+      "source_file": "outputs/FINALIZED_WORKING_METHOD_16_OCT/Analysis/sd35_generation_completion_0001.json"
+    },
+    {
+      "corpus_category": "NUDITY",
+      "json_pointer": "/groups/0",
+      "model_key": "cosmos3_super_text2image",
+      "output": "activation_diagnostics.csv",
+      "source_file": "outputs/FINALIZED_WORKING_METHOD_16_OCT/Analysis/FINAL_ANALYSIS_PREPARATION_0002/ACTIVATION_FINAL_REPLAY_0001/summary.json",
+      "zero_request_derivation": {
+        "columns": [
+          "selected_count",
+          "nonzero_requested_leaf_count"
+        ],
+        "csv_row_filter": {
+          "corpus_category": "NUDITY",
+          "model": "cosmos3_super_text2image"
+        },
+        "definition": "sum(selected_count - nonzero_requested_leaf_count); counts records, not absent selected identities",
+        "source_file": "outputs/FINALIZED_WORKING_METHOD_16_OCT/Analysis/FINAL_ANALYSIS_PREPARATION_0002/ACTIVATION_FINAL_REPLAY_0001/per_update.csv"
+      }
+    },
+    {
+      "corpus_category": "VIOLENCE",
+      "json_pointer": "/groups/1",
+      "model_key": "cosmos3_super_text2image",
+      "output": "activation_diagnostics.csv",
+      "source_file": "outputs/FINALIZED_WORKING_METHOD_16_OCT/Analysis/FINAL_ANALYSIS_PREPARATION_0002/ACTIVATION_FINAL_REPLAY_0001/summary.json",
+      "zero_request_derivation": {
+        "columns": [
+          "selected_count",
+          "nonzero_requested_leaf_count"
+        ],
+        "csv_row_filter": {
+          "corpus_category": "VIOLENCE",
+          "model": "cosmos3_super_text2image"
+        },
+        "definition": "sum(selected_count - nonzero_requested_leaf_count); counts records, not absent selected identities",
+        "source_file": "outputs/FINALIZED_WORKING_METHOD_16_OCT/Analysis/FINAL_ANALYSIS_PREPARATION_0002/ACTIVATION_FINAL_REPLAY_0001/per_update.csv"
+      }
+    },
+    {
+      "corpus_category": "NUDITY",
+      "json_pointer": "/groups/2",
+      "model_key": "flux1_dev",
+      "output": "activation_diagnostics.csv",
+      "source_file": "outputs/FINALIZED_WORKING_METHOD_16_OCT/Analysis/FINAL_ANALYSIS_PREPARATION_0002/ACTIVATION_FINAL_REPLAY_0001/summary.json",
+      "zero_request_derivation": {
+        "columns": [
+          "selected_count",
+          "nonzero_requested_leaf_count"
+        ],
+        "csv_row_filter": {
+          "corpus_category": "NUDITY",
+          "model": "flux1_dev"
+        },
+        "definition": "sum(selected_count - nonzero_requested_leaf_count); counts records, not absent selected identities",
+        "source_file": "outputs/FINALIZED_WORKING_METHOD_16_OCT/Analysis/FINAL_ANALYSIS_PREPARATION_0002/ACTIVATION_FINAL_REPLAY_0001/per_update.csv"
+      }
+    },
+    {
+      "corpus_category": "VIOLENCE",
+      "json_pointer": "/groups/3",
+      "model_key": "flux1_dev",
+      "output": "activation_diagnostics.csv",
+      "source_file": "outputs/FINALIZED_WORKING_METHOD_16_OCT/Analysis/FINAL_ANALYSIS_PREPARATION_0002/ACTIVATION_FINAL_REPLAY_0001/summary.json",
+      "zero_request_derivation": {
+        "columns": [
+          "selected_count",
+          "nonzero_requested_leaf_count"
+        ],
+        "csv_row_filter": {
+          "corpus_category": "VIOLENCE",
+          "model": "flux1_dev"
+        },
+        "definition": "sum(selected_count - nonzero_requested_leaf_count); counts records, not absent selected identities",
+        "source_file": "outputs/FINALIZED_WORKING_METHOD_16_OCT/Analysis/FINAL_ANALYSIS_PREPARATION_0002/ACTIVATION_FINAL_REPLAY_0001/per_update.csv"
+      }
+    },
+    {
+      "corpus_category": "NUDITY",
+      "json_pointer": "/groups/4",
+      "model_key": "flux2_dev",
+      "output": "activation_diagnostics.csv",
+      "source_file": "outputs/FINALIZED_WORKING_METHOD_16_OCT/Analysis/FINAL_ANALYSIS_PREPARATION_0002/ACTIVATION_FINAL_REPLAY_0001/summary.json",
+      "zero_request_derivation": {
+        "columns": [
+          "selected_count",
+          "nonzero_requested_leaf_count"
+        ],
+        "csv_row_filter": {
+          "corpus_category": "NUDITY",
+          "model": "flux2_dev"
+        },
+        "definition": "sum(selected_count - nonzero_requested_leaf_count); counts records, not absent selected identities",
+        "source_file": "outputs/FINALIZED_WORKING_METHOD_16_OCT/Analysis/FINAL_ANALYSIS_PREPARATION_0002/ACTIVATION_FINAL_REPLAY_0001/per_update.csv"
+      }
+    },
+    {
+      "corpus_category": "VIOLENCE",
+      "json_pointer": "/groups/5",
+      "model_key": "flux2_dev",
+      "output": "activation_diagnostics.csv",
+      "source_file": "outputs/FINALIZED_WORKING_METHOD_16_OCT/Analysis/FINAL_ANALYSIS_PREPARATION_0002/ACTIVATION_FINAL_REPLAY_0001/summary.json",
+      "zero_request_derivation": {
+        "columns": [
+          "selected_count",
+          "nonzero_requested_leaf_count"
+        ],
+        "csv_row_filter": {
+          "corpus_category": "VIOLENCE",
+          "model": "flux2_dev"
+        },
+        "definition": "sum(selected_count - nonzero_requested_leaf_count); counts records, not absent selected identities",
+        "source_file": "outputs/FINALIZED_WORKING_METHOD_16_OCT/Analysis/FINAL_ANALYSIS_PREPARATION_0002/ACTIVATION_FINAL_REPLAY_0001/per_update.csv"
+      }
+    },
+    {
+      "corpus_category": "NUDITY",
+      "json_pointer": "/groups/6",
+      "model_key": "flux3_image_klein",
+      "output": "activation_diagnostics.csv",
+      "source_file": "outputs/FINALIZED_WORKING_METHOD_16_OCT/Analysis/FINAL_ANALYSIS_PREPARATION_0002/ACTIVATION_FINAL_REPLAY_0001/summary.json",
+      "zero_request_derivation": {
+        "columns": [
+          "selected_count",
+          "nonzero_requested_leaf_count"
+        ],
+        "csv_row_filter": {
+          "corpus_category": "NUDITY",
+          "model": "flux3_image_klein"
+        },
+        "definition": "sum(selected_count - nonzero_requested_leaf_count); counts records, not absent selected identities",
+        "source_file": "outputs/FINALIZED_WORKING_METHOD_16_OCT/Analysis/FINAL_ANALYSIS_PREPARATION_0002/ACTIVATION_FINAL_REPLAY_0001/per_update.csv"
+      }
+    },
+    {
+      "corpus_category": "VIOLENCE",
+      "json_pointer": "/groups/7",
+      "model_key": "flux3_image_klein",
+      "output": "activation_diagnostics.csv",
+      "source_file": "outputs/FINALIZED_WORKING_METHOD_16_OCT/Analysis/FINAL_ANALYSIS_PREPARATION_0002/ACTIVATION_FINAL_REPLAY_0001/summary.json",
+      "zero_request_derivation": {
+        "columns": [
+          "selected_count",
+          "nonzero_requested_leaf_count"
+        ],
+        "csv_row_filter": {
+          "corpus_category": "VIOLENCE",
+          "model": "flux3_image_klein"
+        },
+        "definition": "sum(selected_count - nonzero_requested_leaf_count); counts records, not absent selected identities",
+        "source_file": "outputs/FINALIZED_WORKING_METHOD_16_OCT/Analysis/FINAL_ANALYSIS_PREPARATION_0002/ACTIVATION_FINAL_REPLAY_0001/per_update.csv"
+      }
+    },
+    {
+      "corpus_category": "NUDITY",
+      "json_pointer": "/groups/8",
+      "model_key": "sd35_large",
+      "output": "activation_diagnostics.csv",
+      "source_file": "outputs/FINALIZED_WORKING_METHOD_16_OCT/Analysis/FINAL_ANALYSIS_PREPARATION_0002/ACTIVATION_FINAL_REPLAY_0001/summary.json",
+      "zero_request_derivation": {
+        "columns": [
+          "selected_count",
+          "nonzero_requested_leaf_count"
+        ],
+        "csv_row_filter": {
+          "corpus_category": "NUDITY",
+          "model": "sd35_large"
+        },
+        "definition": "sum(selected_count - nonzero_requested_leaf_count); counts records, not absent selected identities",
+        "source_file": "outputs/FINALIZED_WORKING_METHOD_16_OCT/Analysis/FINAL_ANALYSIS_PREPARATION_0002/ACTIVATION_FINAL_REPLAY_0001/per_update.csv"
+      }
+    },
+    {
+      "corpus_category": "VIOLENCE",
+      "json_pointer": "/groups/9",
+      "model_key": "sd35_large",
+      "output": "activation_diagnostics.csv",
+      "source_file": "outputs/FINALIZED_WORKING_METHOD_16_OCT/Analysis/FINAL_ANALYSIS_PREPARATION_0002/ACTIVATION_FINAL_REPLAY_0001/summary.json",
+      "zero_request_derivation": {
+        "columns": [
+          "selected_count",
+          "nonzero_requested_leaf_count"
+        ],
+        "csv_row_filter": {
+          "corpus_category": "VIOLENCE",
+          "model": "sd35_large"
+        },
+        "definition": "sum(selected_count - nonzero_requested_leaf_count); counts records, not absent selected identities",
+        "source_file": "outputs/FINALIZED_WORKING_METHOD_16_OCT/Analysis/FINAL_ANALYSIS_PREPARATION_0002/ACTIVATION_FINAL_REPLAY_0001/per_update.csv"
+      }
+    },
+    {
+      "copied_fields": [
+        "provenance/source/model_key",
+        "provenance/source/prompt_id",
+        "provenance/source/arm",
+        "stage"
+      ],
+      "json_pointer": "/items/0",
+      "output": "provider_refusals.csv",
+      "row_index_zero_based": 0,
+      "score_json_pointer": "/items/0/score",
+      "source_file": "outputs/FINALIZED_WORKING_METHOD_16_OCT/Analysis/gemini_provider_refusal_blocker_0003.json"
+    },
+    {
+      "copied_fields": [
+        "provenance/source/model_key",
+        "provenance/source/prompt_id",
+        "provenance/source/arm",
+        "stage"
+      ],
+      "json_pointer": "/items/1",
+      "output": "provider_refusals.csv",
+      "row_index_zero_based": 1,
+      "score_json_pointer": "/items/1/score",
+      "source_file": "outputs/FINALIZED_WORKING_METHOD_16_OCT/Analysis/gemini_provider_refusal_blocker_0003.json"
+    },
+    {
+      "copied_fields": [
+        "provenance/source/model_key",
+        "provenance/source/prompt_id",
+        "provenance/source/arm",
+        "stage"
+      ],
+      "json_pointer": "/items/2",
+      "output": "provider_refusals.csv",
+      "row_index_zero_based": 2,
+      "score_json_pointer": "/items/2/score",
+      "source_file": "outputs/FINALIZED_WORKING_METHOD_16_OCT/Analysis/gemini_provider_refusal_blocker_0003.json"
+    },
+    {
+      "copied_fields": [
+        "provenance/source/model_key",
+        "provenance/source/prompt_id",
+        "provenance/source/arm",
+        "stage"
+      ],
+      "json_pointer": "/items/3",
+      "output": "provider_refusals.csv",
+      "row_index_zero_based": 3,
+      "score_json_pointer": "/items/3/score",
+      "source_file": "outputs/FINALIZED_WORKING_METHOD_16_OCT/Analysis/gemini_provider_refusal_blocker_0003.json"
+    },
+    {
+      "copied_fields": [
+        "provenance/source/model_key",
+        "provenance/source/prompt_id",
+        "provenance/source/arm",
+        "stage"
+      ],
+      "json_pointer": "/items/4",
+      "output": "provider_refusals.csv",
+      "row_index_zero_based": 4,
+      "score_json_pointer": "/items/4/score",
+      "source_file": "outputs/FINALIZED_WORKING_METHOD_16_OCT/Analysis/gemini_provider_refusal_blocker_0003.json"
+    },
+    {
+      "copied_fields": [
+        "provenance/source/model_key",
+        "provenance/source/prompt_id",
+        "provenance/source/arm",
+        "stage"
+      ],
+      "json_pointer": "/items/5",
+      "output": "provider_refusals.csv",
+      "row_index_zero_based": 5,
+      "score_json_pointer": "/items/5/score",
+      "source_file": "outputs/FINALIZED_WORKING_METHOD_16_OCT/Analysis/gemini_provider_refusal_blocker_0003.json"
+    }
+  ],
+  "intended_public_document": "docs/BENCHMARK.md",
+  "intended_public_summary_directory": "docs/benchmark_data/",
+  "method_and_evidence_limits": [
+    "One seed per prompt and two judges; intervals condition on available scored prompts.",
+    "Terminal admitted scope does not complete the original 300-image/1200-response request.",
+    "Provider refusals remain unscored, no judge substitution.",
+    "No new method tuning, pixel judging, bootstrap replay, tensor replay, jobs or provider calls by this report.",
+    "Selected pool membership does not imply visible harm, nonzero requested correction or successful visible replacement.",
+    "Execution receipts do not attest hidden provider backend model/thinking execution or parent-observed child pixel-tool events."
+  ],
+  "model_profiles": [
+    {
+      "guidance_scale": 4.0,
+      "height": 1024,
+      "model_id": "nvidia/Cosmos3-Super-Text2Image",
+      "model_key": "cosmos3_super_text2image",
+      "model_revision": "c92432b9dff7eeb055d11ef5cf01c2c85bda0f28",
+      "native_updates": 50,
+      "schedule_alpha": "",
+      "seed": 0,
+      "width": 1024
+    },
+    {
+      "guidance_scale": 4.0,
+      "height": 1024,
+      "model_id": "black-forest-labs/FLUX.1-dev",
+      "model_key": "flux1_dev",
+      "model_revision": "3de623fc3c33e44ffbe2bad470d0f45bccf2eb21",
+      "native_updates": 50,
+      "schedule_alpha": "",
+      "seed": 0,
+      "width": 1024
+    },
+    {
+      "guidance_scale": 4.0,
+      "height": 1024,
+      "model_id": "black-forest-labs/FLUX.2-dev",
+      "model_key": "flux2_dev",
+      "model_revision": "26afe3a78bb242c0a8bb181dcc8937bb16e5c66c",
+      "native_updates": 50,
+      "schedule_alpha": "",
+      "seed": 0,
+      "width": 1024
+    },
+    {
+      "guidance_scale": 1.0,
+      "height": 1024,
+      "model_id": "black-forest-labs/flux-3-image-klein",
+      "model_key": "flux3_image_klein",
+      "model_revision": "337337621b8526e120f2275d250242f4a6bedd75",
+      "native_updates": 16,
+      "schedule_alpha": 6.93,
+      "seed": 0,
+      "width": 1024
+    },
+    {
+      "guidance_scale": 4.0,
+      "height": 1024,
+      "model_id": "stabilityai/stable-diffusion-3.5-large",
+      "model_key": "sd35_large",
+      "model_revision": "ceddf0a7fdf2064ea28e2213e3b84e4afa170a0f",
+      "native_updates": 50,
+      "schedule_alpha": "",
+      "seed": 0,
+      "width": 1024
+    }
+  ],
+  "original_scope_complete": false,
+  "public_bundle_policy": "Allowlisted aggregate CSV columns and small scalar summaries only. No raw generation prompts, raw tasks/responses, credentials, provider response IDs, generated images or original binary payloads copied.",
+  "public_figure_directory": "docs/benchmark_data/figures/",
+  "reproduction_limit": "Summary files are portable. Re-extracting them requires the saved local final source tables/audits; this is not a public portable raw-evidence archive. Source paths are repository-relative and outputs/ is Git-ignored.",
+  "root_final_review_sha256": "83a885804eff52a38db78f4c8988a4a2e3ef0d216b56fbe06580c384772f8030",
+  "schema": "riddikulus.final-admitted-public-summary.v1",
+  "source_awaiting_review_provenance_sha256": "8f76f4c1191f7bf1ccd69212ce4cc0ea66ff759553f0e7ab4585ea78fa08b847",
+  "source_files": [
+    {
+      "bytes": 8005,
+      "path": "docs/METHOD.md",
+      "sha256": "d3b8ae9f6975c4cefe650c610c8e7319a7f094d5e95bebe2494e41bf50180128"
+    },
+    {
+      "bytes": 2139,
+      "path": "outputs/FINALIZED_WORKING_METHOD_16_OCT/Analysis/FINAL_ANALYSIS_PREPARATION_0002/ACTIVATION_FINAL_REPLAY_0001/execution.json",
+      "sha256": "56b990fb14de49d1373b4161ac8858aa63087dd178cb784e0c8fcb15a3044e7b"
+    },
+    {
+      "bytes": 332,
+      "path": "outputs/FINALIZED_WORKING_METHOD_16_OCT/Analysis/FINAL_ANALYSIS_PREPARATION_0002/ACTIVATION_FINAL_REPLAY_0001/final_admitted_coverage.json",
+      "sha256": "8722fa00b9cd949c44655abfc54851d59afef2ae74a3059f00d6f3146fb02fb1"
+    },
+    {
+      "bytes": 2097852,
+      "path": "outputs/FINALIZED_WORKING_METHOD_16_OCT/Analysis/FINAL_ANALYSIS_PREPARATION_0002/ACTIVATION_FINAL_REPLAY_0001/per_update.csv",
+      "sha256": "ff997007fc799cad5c1430e443c41cc783edd9fd63fc5956a3b74773a84fca67"
+    },
+    {
+      "bytes": 940,
+      "path": "outputs/FINALIZED_WORKING_METHOD_16_OCT/Analysis/FINAL_ANALYSIS_PREPARATION_0002/ACTIVATION_FINAL_REPLAY_0001/replay_execution.json",
+      "sha256": "70963894ee4d521e618e7d719506dfd6048eb7a990002cd86612b30b156278e3"
+    },
+    {
+      "bytes": 24809,
+      "path": "outputs/FINALIZED_WORKING_METHOD_16_OCT/Analysis/FINAL_ANALYSIS_PREPARATION_0002/ACTIVATION_FINAL_REPLAY_0001/summary.json",
+      "sha256": "540e38aabd3d6c90ed1217eee19306a241fd0265f149f8bc3f0eb95e7d803f89"
+    },
+    {
+      "bytes": 1115,
+      "path": "outputs/FINALIZED_WORKING_METHOD_16_OCT/Analysis/FINAL_ANALYSIS_PREPARATION_0002/FLUX2_FULL_AUDIT_0001/audit_execution.json",
+      "sha256": "0ae5b9f591acb72d5e058132138b2eb68139ddae7e4927713e0604fea9dd1603"
+    },
+    {
+      "bytes": 55545,
+      "path": "outputs/FINALIZED_WORKING_METHOD_16_OCT/Analysis/FINAL_ANALYSIS_PREPARATION_0002/FLUX2_FULL_AUDIT_0001/flux2_generation_completion.json",
+      "sha256": "778ad3462fed9474fc2a8057ece4d29d9cb5577778a8bd06b12b6fe189240a40"
+    },
+    {
+      "bytes": 18172,
+      "path": "outputs/FINALIZED_WORKING_METHOD_16_OCT/Analysis/FINAL_ANALYSIS_PREPARATION_0002/SOURCE/Analysis/analyze_final_replay.py",
+      "sha256": "c04bad15aa680a72c897e17c69cac2145c1c171dadb91368e1a47f7f18cf3972"
+    },
+    {
+      "bytes": 5521,
+      "path": "outputs/FINALIZED_WORKING_METHOD_16_OCT/Analysis/FINAL_ANALYSIS_PREPARATION_0002/configuration.json",
+      "sha256": "011702bab6511283f72ea77fc9f3ed7e84d6b18e7649f5447e32fe59a1150ec1"
+    },
+    {
+      "bytes": 25796,
+      "path": "outputs/FINALIZED_WORKING_METHOD_16_OCT/Analysis/cosmos_generation_completion_0001.json",
+      "sha256": "6d47f5c13b1d7fc02daa0b09fb8b54bcd05c9f18cd2fb61a5a0e03c2dd787527"
+    },
+    {
+      "bytes": 441418,
+      "path": "outputs/FINALIZED_WORKING_METHOD_16_OCT/Analysis/flux1_generation_completion_0001.json",
+      "sha256": "9f847eb891bda81c1eaabe1b82062c59f98a3242614ab0404772e456d0eebee8"
+    },
+    {
+      "bytes": 55523,
+      "path": "outputs/FINALIZED_WORKING_METHOD_16_OCT/Analysis/flux3_generation_completion_0001.json",
+      "sha256": "b9fa81ba72ea337f4a20c261803c59646efedce96945863ec1dde225ec975363"
+    },
+    {
+      "bytes": 27446,
+      "path": "outputs/FINALIZED_WORKING_METHOD_16_OCT/Analysis/gemini_provider_refusal_blocker_0003.json",
+      "sha256": "7749fc2e10980036d8acb8758891d6793d79a6e77637ca65deaba96637a3c21e"
+    },
+    {
+      "bytes": 56185,
+      "path": "outputs/FINALIZED_WORKING_METHOD_16_OCT/Analysis/sd35_generation_completion_0001.json",
+      "sha256": "44e47d74acb0bbd31e7a86b0a4feab29b7d359c1d2b88a8fb53f93bbf9b76498"
+    },
+    {
+      "bytes": 472932,
+      "path": "outputs/FINALIZED_WORKING_METHOD_16_OCT/Plots/FINAL_ADMITTED_0001/INPUTS/image_manifest.jsonl",
+      "sha256": "93dc7dbfaef8705024eb9bf38fec389929366d0f239e85f49d90be8692e349fb"
+    },
+    {
+      "bytes": 2708347,
+      "path": "outputs/FINALIZED_WORKING_METHOD_16_OCT/Plots/FINAL_ADMITTED_0001/INPUTS/snapshot_receipt.json",
+      "sha256": "fff8edc6226031210e4eae956a8458ec2b96c8cadfc33c2b3459bec3e35be9b6"
+    },
+    {
+      "bytes": 69535,
+      "path": "outputs/FINALIZED_WORKING_METHOD_16_OCT/Plots/FINAL_ADMITTED_0001/RESULTS/Across_Judges/aggregate_scores.csv",
+      "sha256": "f89dcde8f9ad1bc0a33697e2ff5dd81215282bd6dc90ac74af203d11ff4a37f6"
+    },
+    {
+      "bytes": 37410,
+      "path": "outputs/FINALIZED_WORKING_METHOD_16_OCT/Plots/FINAL_ADMITTED_0001/RESULTS/Across_Judges/paired_differences.csv",
+      "sha256": "816c6cc056d52164de1e43dac4afed409a23b26131a55caeb324a6493e10199e"
+    },
+    {
+      "bytes": 14748,
+      "path": "outputs/FINALIZED_WORKING_METHOD_16_OCT/Plots/FINAL_ADMITTED_0001/RESULTS/GPT_6_1_Sol/aggregate_scores.csv",
+      "sha256": "dd96064b15074310ee6858e8df616a3590109f0a7f97d8c5323c595aa9d86cb1"
+    },
+    {
+      "bytes": 32289,
+      "path": "outputs/FINALIZED_WORKING_METHOD_16_OCT/Plots/FINAL_ADMITTED_0001/RESULTS/GPT_6_1_Sol/paired_differences.csv",
+      "sha256": "e9715e85fa66fddf197261a64e312374ed12722fa3b4c1a2a216aedee9a5a0a8"
+    },
+    {
+      "bytes": 15662,
+      "path": "outputs/FINALIZED_WORKING_METHOD_16_OCT/Plots/FINAL_ADMITTED_0001/RESULTS/Gemini_3_8_Flash/aggregate_scores.csv",
+      "sha256": "938d36bfafde1eb2e88a58dee65adedb38d54c55455ad197366285dde3a9d355"
+    },
+    {
+      "bytes": 32450,
+      "path": "outputs/FINALIZED_WORKING_METHOD_16_OCT/Plots/FINAL_ADMITTED_0001/RESULTS/Gemini_3_8_Flash/paired_differences.csv",
+      "sha256": "c88b1bc379d85fee854d24d5cbefa13eaa296fc4bb7dbc4f59cd17410c76775c"
+    },
+    {
+      "bytes": 759,
+      "path": "outputs/FINALIZED_WORKING_METHOD_16_OCT/Plots/FINAL_ADMITTED_0001/RESULTS/Timing/gpu_hours_by_model.csv",
+      "sha256": "746077158bb5201de00ffe6c7d6ddfebb86dc120046a4f203bb3d346ea34643a"
+    },
+    {
+      "bytes": 785584,
+      "path": "outputs/FINALIZED_WORKING_METHOD_16_OCT/Plots/FINAL_ADMITTED_0001/RESULTS/Timing/timings.csv",
+      "sha256": "44e721e7b0bcfc15ba2ddc5e9551a8faca915be07da786a2af6e773ab9212d7a"
+    },
+    {
+      "bytes": 1677854,
+      "path": "outputs/FINALIZED_WORKING_METHOD_16_OCT/Plots/FINAL_ADMITTED_0001/RESULTS/artifact_verification.json",
+      "sha256": "be59518ea045e79395e9eee1c058615babaa160127c9b697e8757d1592a5e0eb"
+    },
+    {
+      "bytes": 768866,
+      "path": "outputs/FINALIZED_WORKING_METHOD_16_OCT/Plots/FINAL_ADMITTED_0001/RESULTS/coverage_and_provenance.json",
+      "sha256": "b2649d98b907ea83e4df7626ae61b5be57576664120f58f69c891827cac882ad"
+    },
+    {
+      "bytes": 17582,
+      "path": "outputs/FINALIZED_WORKING_METHOD_16_OCT/Plots/FINAL_ADMITTED_0001/RESULTS/final_coverage_timing_accounting.json",
+      "sha256": "3f7933a2762c83e8af3ddf30bb2125ea8f49d01055c47b0fe635dadf6f7ff246"
+    },
+    {
+      "bytes": 6643,
+      "path": "outputs/FINALIZED_WORKING_METHOD_16_OCT/Plots/FINAL_ADMITTED_0001/RESULTS/visual_inspection.json",
+      "sha256": "a1b504f7ec0685d7765a622925a561182efc428a17210da9bd9539830827e4db"
+    },
+    {
+      "bytes": 787602,
+      "path": "outputs/FINALIZED_WORKING_METHOD_16_OCT/Plots/FINAL_ADMITTED_0001/judge_execution_audit.json",
+      "sha256": "9c5547940605a598b7df4dceb946a165cbd912a34dba1ccb10eef7618a4035aa"
+    },
+    {
+      "bytes": 188399,
+      "path": "outputs/FINALIZED_WORKING_METHOD_16_OCT/Plots/FINAL_ADMITTED_0001/readiness.json",
+      "sha256": "005b2ac44471712277d0268b3440f6e9c915b5239daf2653793ddaa38b8bf481"
+    },
+    {
+      "bytes": 10171,
+      "path": "scripts/riddikulus_evaluation/README.md",
+      "sha256": "49f9e294305e486e644e698ae04b6a7976ad714a53075e5356e920ca267f3125"
+    }
+  ],
+  "status": "ROOT_REVIEWED_ADMITTED_RESULTS_ORIGINAL_BENCHMARK_INCOMPLETE",
+  "utc": "2026-10-17T08:24:39.793184+00:00"
+}

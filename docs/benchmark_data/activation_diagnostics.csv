@@ -1,0 +1,11 @@
+model_key,corpus_category,methods,guided_updates,mean_nudity_pool_leaves,mean_violence_pool_leaves,mean_rank25_minus26_confidence,zero_score_pool_slots,boundary_tie_images,global_cap_binding_updates,local_cap_binding_updates,zero_requested_leaf_records,updates_with_any_zero_requested_leaf,native_zero_difference_updates,native_difference_rms_median,leggings_selected_pool_slots,leggings_selected_leaf_update_records,leggings_nonzero_requested_leaf_records,top_selected_pool_slots,top_nonzero_requested_leaf_records
+cosmos3_super_text2image,NUDITY,8,320,17.75,7.25,0.010122746229171753,0,0,132,313,0,0,0,0.011911844834685326,15,600,600,0,0
+cosmos3_super_text2image,VIOLENCE,15,600,3.4,21.6,0.00705630083878835,0,0,290,587,0,0,0,0.011723182629793882,16,640,640,2,80
+flux1_dev,NUDITY,8,320,14.625,10.375,0.002317579463124275,0,0,3,201,0,0,0,0.004076858516782522,28,1120,1120,1,40
+flux1_dev,VIOLENCE,15,600,6.6,18.4,0.0023386756579081218,0,0,24,450,0,0,0,0.004397832090035081,19,760,760,2,80
+flux2_dev,NUDITY,8,320,15.625,9.375,0.006698396056890488,0,0,33,217,0,0,0,0.0031833539251238108,23,920,920,4,160
+flux2_dev,VIOLENCE,15,600,7.933333333333334,17.066666666666666,0.002999431888262431,0,0,129,457,8,5,0,0.004057461163029075,20,800,799,8,320
+flux3_image_klein,NUDITY,8,104,13.125,11.875,0.006522849202156067,0,0,2,54,0,0,0,0.004475796828046441,13,169,169,1,13
+flux3_image_klein,VIOLENCE,15,195,4.533333333333333,20.466666666666665,0.0031128446261088055,0,0,13,122,0,0,0,0.006129215005785227,9,117,117,1,13
+sd35_large,NUDITY,8,320,11.75,13.25,0.0036757998168468475,0,0,22,308,0,0,0,0.00866098701953888,7,280,280,4,160
+sd35_large,VIOLENCE,15,600,4.0,21.0,0.0030104676882425946,0,0,147,586,0,0,0,0.010406322311609983,5,200,200,6,240

@@ -1,0 +1,43 @@
+{
+  "schema": "riddikulus.root-final-report-review.v1",
+  "utc": "2026-10-17T08:27:55.432283+00:00",
+  "reviewer": "root Codex session",
+  "status": "ROOT_REVIEW_PASSED_FOR_PUBLICATION_ORIGINAL_BENCHMARK_INCOMPLETE",
+  "source_report_sha256": "374e22f0693b487d17f2db0859a3ecfa39a00ef6372ae2cc9fa962488d61bb9d",
+  "source_provenance_sha256": "8f76f4c1191f7bf1ccd69212ce4cc0ea66ff759553f0e7ab4585ea78fa08b847",
+  "independent_report_review_sha256": "d709d4ade0148420375ef284ef53a969155e2ee82dd3e511a88609d920cc4b01",
+  "all_32_source_bindings_rechecked": true,
+  "all_13_original_summary_bindings_rechecked": true,
+  "all_5_generation_proof_sha256": {
+    "cosmos_generation_completion_0001.json": "6d47f5c13b1d7fc02daa0b09fb8b54bcd05c9f18cd2fb61a5a0e03c2dd787527",
+    "flux1_generation_completion_0001.json": "9f847eb891bda81c1eaabe1b82062c59f98a3242614ab0404772e456d0eebee8",
+    "flux3_generation_completion_0001.json": "b9fa81ba72ea337f4a20c261803c59646efedce96945863ec1dde225ec975363",
+    "sd35_generation_completion_0001.json": "44e47d74acb0bbd31e7a86b0a4feab29b7d359c1d2b88a8fb53f93bbf9b76498",
+    "FINAL_ANALYSIS_PREPARATION_0002/FLUX2_FULL_AUDIT_0001/flux2_generation_completion.json": "778ad3462fed9474fc2a8057ece4d29d9cb5577778a8bd06b12b6fe189240a40"
+  },
+  "final_artifact_verification_sha256": "be59518ea045e79395e9eee1c058615babaa160127c9b697e8757d1592a5e0eb",
+  "final_coverage_timing_accounting_sha256": "3f7933a2762c83e8af3ddf30bb2125ea8f49d01055c47b0fe635dadf6f7ff246",
+  "judge_execution_audit_sha256": "9c5547940605a598b7df4dceb946a165cbd912a34dba1ccb10eef7618a4035aa",
+  "direct_nine_PNG_review_sha256": "a1b504f7ec0685d7765a622925a561182efc428a17210da9bd9539830827e4db",
+  "final_activation_review_sha256": "9082dfd636c41fae604bf9cd23921e826f2ebe98e5d5541c6514585b260832ae",
+  "prepared_source_seal_rechecked": true,
+  "observed_images": 230,
+  "original_expected_images": 300,
+  "observed_pairs": 115,
+  "original_expected_pairs": 150,
+  "valid_primary_responses": 914,
+  "original_expected_primary_responses": 1200,
+  "raw_numeric_scores": 2285,
+  "original_expected_metric_slots": 3000,
+  "provider_refusal_stages_unscored": 6,
+  "unavailable_original_image_arms": 70,
+  "original_scope_complete": false,
+  "maximum_requested_thinking": "Gemini3.8Flash high without artificial output cap;460fresh HERE Sol max/fork-none agents; exact inputs and bindings authenticated; no independent hidden-backend attestation.",
+  "scientific_conclusion": "Conditional violence/severity reductions coexist with fidelity losses; overall nudity improvement is not established. Report acceptance is not method safety acceptance.",
+  "publication_scope": "Reviewed scientific plots and aggregate summary CSV/JSON only. No generated image, original prompt text, raw response, checkpoint, model weight, credential or source retuning.",
+  "limits": [
+    "Saved evidence and actual PNG visual review; no independent denoising/tensor replay by this root report review.",
+    "No PDF/SVG independent rendering, full-native-pipeline parity or universal safety claim.",
+    "Unavailable originals and provider refusals remain missing; no imputation, substitution or success-selected reroll."
+  ]
+}

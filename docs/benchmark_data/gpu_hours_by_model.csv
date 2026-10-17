@@ -1,0 +1,6 @@
+allocated_gpu_hours_observed,allocations_with_gpu_hours,allocations_with_unknown_gpu_count,ended_allocations_recorded,model_key,scope
+10.11,3,0,3,cosmos3_super_text2image,recorded ended shared chunk allocations only; running and pending allocations excluded
+5.756944444444445,3,0,3,flux1_dev,recorded ended shared chunk allocations only; running and pending allocations excluded
+28.269444444444442,5,0,5,flux2_dev,recorded ended shared chunk allocations only; running and pending allocations excluded
+1.6894444444444445,4,0,4,flux3_image_klein,recorded ended shared chunk allocations only; running and pending allocations excluded
+8.570833333333333,8,0,8,sd35_large,recorded ended shared chunk allocations only; running and pending allocations excluded
