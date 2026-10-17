@@ -327,8 +327,8 @@ def enable_model(model_key, model_registry_path):
 
 
 def reconcile():
-    visible = queue()
     with campaign_lock():
+        visible = queue()
         current = read(STATE); stopped = (CAMPAIGN / 'STOP').exists()
         for chunk in current['chunks'].values():
             if chunk['status'] == 'SUBMITTING':
@@ -340,7 +340,17 @@ def reconcile():
                 if stopped: cancel_owned(job); chunk['status'] = 'STOPPING'
                 elif record['state'] == 'RUNNING': chunk['status'] = 'RUNNING'
                 continue
-            record = accounting(job['job_id']); chunk.setdefault('accounting', []).append(record)
+            record = accounting(job['job_id'])
+            if record['state'] in {
+                    'PENDING', 'RUNNING', 'SUSPENDED', 'CONFIGURING', 'COMPLETING',
+                    'REQUEUED', 'REQUEUE_FED', 'REQUEUE_HOLD', 'RESIZING', 'RESV_DEL_HOLD',
+                    'SIGNALING', 'SPECIAL_EXIT', 'STAGE_OUT', 'STOPPED', 'POWER_UP_NODE',
+                    'EXPEDITING', 'LAUNCH_FAILED', 'RECONFIG_FAIL', 'UPDATE_DB'}:
+                # Accounting can precede queue visibility; this is not an ended allocation.
+                chunk.setdefault('nonterminal_accounting_history', []).append(
+                    dict(record, observed_utc=utc()))
+                continue
+            chunk.setdefault('accounting', []).append(record)
             for cell_id in chunk['cell_ids']:
                 cell = current['cells'][cell_id]
                 if cell['admission']['status'] != 'APPROVED': continue
