@@ -318,22 +318,26 @@ def render_variance(output: Path, rows: list[dict]) -> None:
     if not any(r["sample_variance_ddof1"] is not None for r in rows):
         return
     fig, axes = plt.subplots(1, len(rubric.METRICS), figsize=(20, 4.5), sharey=True)
+    plotted_means = []
     for ax, metric in zip(axes, rubric.METRICS):
         for offset, arm, color in ((-.19, "Baseline", "#0072B2"), (.19, "Riddikulus", "#D55E00")):
             for i, model in enumerate(models):
                 values = [r["sample_variance_ddof1"] for r in rows if r["model_key"] == model
                           and r["arm"] == arm and r["metric"] == metric and r["sample_variance_ddof1"] is not None]
                 if values:
-                    ax.bar(i + offset, np.mean(values), .36, color=color, label=arm if i == 0 else None)
-                    ax.text(i + offset, .2, str(len(values)), rotation=90, ha="center", va="bottom", fontsize=7)
+                    mean = np.mean(values)
+                    plotted_means.append(mean)
+                    ax.bar(i + offset, mean, .36, color=color, label=arm if i == 0 else None)
+                    ax.annotate(str(len(values)), (i + offset, mean), xytext=(0, 4),
+                                textcoords="offset points", rotation=90, ha="center", va="bottom", fontsize=7)
         ax.set_title(METRIC_LABELS[metric])
         ax.set_xticks(range(len(models)), [MODEL_LABELS.get(model, model) for model in models], rotation=35, ha="right")
-        ax.set_ylim(0, 50)
         ax.grid(axis="y", alpha=.2)
+    axes[0].set_ylim(0, max(1.0, max(plotted_means) * 1.25))
     axes[0].set_ylabel("Mean across-image judge sample variance\nTwo judges per image; ddof=1")
-    axes[-1].legend(frameon=False)
+    _figure_legend(fig, axes)
     fig.text(.5, -.05, "Labels show images scored by both judges. This is disagreement, not a confidence interval.", ha="center")
-    fig.tight_layout()
+    fig.tight_layout(rect=(0, 0, 1, .92))
     _save(fig, output / "Across_Judges", "sample_variance")
     plt.close(fig)
 
@@ -341,6 +345,17 @@ def render_variance(output: Path, rows: list[dict]) -> None:
 def _save(figure, directory: Path, name: str) -> None:
     for suffix in ("png", "pdf", "svg"):
         figure.savefig(directory / f"{name}.{suffix}", dpi=220, bbox_inches="tight")
+
+
+def _figure_legend(figure, axes) -> None:
+    """Reserve the figure margin for a shared arm legend, clear of data."""
+    entries = {}
+    for ax in np.asarray(axes).flat:
+        handles, labels = ax.get_legend_handles_labels()
+        entries.update(zip(labels, handles))
+    if entries:
+        figure.legend(entries.values(), entries.keys(), loc="upper center", ncol=2,
+                      frameon=False, bbox_to_anchor=(.5, 1.0))
 
 
 def render_combined(output: Path, aggregates: list[dict], paired: list[dict]) -> None:
@@ -371,14 +386,24 @@ def render_combined(output: Path, aggregates: list[dict], paired: list[dict]) ->
                         if uncertainty == "judges":
                             sd = row["across_judge_sd"]
                             ax.vlines(i + offset, value - sd, value + sd, color=color)
+                            lower = value - sd
+                            upper = value + sd
                         elif row["prompt_ci95_low"] is not None:
                             ax.vlines(i + offset, row["prompt_ci95_low"], row["prompt_ci95_high"], color=color)
+                            lower = min(value, row["prompt_ci95_low"])
+                            upper = max(value, row["prompt_ci95_high"])
+                        else:
+                            lower = upper = value
                         observed = row["observed_pairs" if is_paired else "observed_n"]
                         expected = row["expected_pairs" if is_paired else "expected_n"]
-                        ax.annotate(f"{observed}/{expected}", (i + offset, value), xytext=(3, 5),
-                                    textcoords="offset points", fontsize=7, rotation=90 if not is_paired else 0)
+                        below = is_paired and value < 0
+                        ax.annotate(f"{observed}/{expected}", (i + offset, lower if below else upper),
+                                    xytext=(0, -4 if below else 4), textcoords="offset points", fontsize=7,
+                                    ha="center", va="top" if below else "bottom",
+                                    rotation=90 if not is_paired else 0)
                 ax.set_xticks(range(len(models)), labels, rotation=35, ha="right")
                 ax.grid(axis="y", alpha=.2)
+                ax.margins(y=.2)
                 if row_index == 0:
                     ax.set_title(METRIC_LABELS[metric])
                 if is_paired:
@@ -387,11 +412,11 @@ def render_combined(output: Path, aggregates: list[dict], paired: list[dict]) ->
             axes[row_index, 0].set_ylabel(unit + ("\nWhiskers: across-judge SD" if uncertainty == "judges"
                                                  else "\nWhiskers: 95% prompt bootstrap CI"))
         if not is_paired:
-            axes[0, -1].legend(frameon=False)
+            _figure_legend(fig, axes)
         fig.text(.5, -.015, "Equal mean of both judges per image; both required. Top: sample SD of the two judge means on the same images/pairs (ddof=1).\n"
                  "Bottom: 10,000 category-stratified prompt resamples; judges are not extra samples. Labels: scored/expected; incomplete coverage is interim.",
                  ha="center", fontsize=9)
-        fig.tight_layout()
+        fig.tight_layout(rect=(0, 0, 1, .95 if not is_paired else 1))
         _save(fig, output / "Across_Judges", filename)
         plt.close(fig)
 
@@ -418,7 +443,8 @@ def render_gpu_hours(output: Path, rows: list[dict]) -> None:
             ax.text(i, .02, "Pending", transform=ax.get_xaxis_transform(), ha="center", fontsize=9)
         else:
             ax.bar(i, value, .6, color="#009E73")
-            ax.annotate(f"{row['allocations_with_gpu_hours']} allocations", (i, value),
+            count = row['allocations_with_gpu_hours']
+            ax.annotate(f"{count} allocation{'s' if count != 1 else ''}", (i, value),
                         xytext=(0, 5), textcoords="offset points", ha="center", fontsize=8)
     ax.set_xticks(range(len(rows)), [MODEL_LABELS.get(row["model_key"], row["model_key"]) for row in rows],
                   rotation=25, ha="right")
@@ -453,16 +479,16 @@ def render(output: Path, aggregates: list[dict], paired: list[dict], timing: lis
                     if row and row["mean"] is not None:
                         ax.bar(i + offset, row["mean"], .36, color=colors[arm],
                                yerr=row["sample_sd"], capsize=2, label=arm if i == 0 else None)
-                        ax.text(i + offset, .12, f"{row['observed_n']}/{row['expected_n']}",
+                        ax.text(i + offset + .1, .12, f"{row['observed_n']}/{row['expected_n']}",
                                 rotation=90, ha="center", va="bottom", fontsize=7)
             ax.set_xticks(range(len(models)), [MODEL_LABELS.get(model, model) for model in models], rotation=35, ha="right")
             ax.set_ylim(0, 10)
             ax.set_title(METRIC_LABELS[metric])
             ax.grid(axis="y", alpha=.2)
         axes[0].set_ylabel("Score (0–10, lower is better)\nBars: mean; whiskers: sample SD")
-        axes[-1].legend(loc="upper right", frameon=False)
+        _figure_legend(fig, axes)
         fig.text(.5, -.05, f"{judge}: labels show scored/expected images. Missing observations are not zero.", ha="center")
-        fig.tight_layout()
+        fig.tight_layout(rect=(0, 0, 1, .92))
         _save(fig, destination, "scores")
         plt.close(fig)
         fig, axes = plt.subplots(1, len(rubric.METRICS), figsize=(20, 4.5), sharey=True)
@@ -476,7 +502,12 @@ def render(output: Path, aggregates: list[dict], paired: list[dict], timing: lis
                     ax.plot(i, value, "o", color=colors["Riddikulus"])
                     if row["ci95_low"] is not None:
                         ax.vlines(i, row["ci95_low"], row["ci95_high"], color=colors["Riddikulus"])
-                    ax.annotate(f"{row['observed_pairs']}/{row['expected_pairs']}", (i, value), xytext=(5, 5), textcoords="offset points", fontsize=7)
+                    upper = max(value, row["ci95_high"]) if row["ci95_high"] is not None else value
+                    lower = min(value, row["ci95_low"]) if row["ci95_low"] is not None else value
+                    below = value < 0
+                    ax.annotate(f"{row['observed_pairs']}/{row['expected_pairs']}", (i, lower if below else upper),
+                                xytext=(0, -4 if below else 4), textcoords="offset points", fontsize=7,
+                                ha="center", va="top" if below else "bottom")
             ax.axhline(0, color="black", linewidth=.7)
             ax.set_xticks(range(len(models)), [MODEL_LABELS.get(model, model) for model in models], rotation=35, ha="right")
             ax.set_ylim(-10, 10)
@@ -506,11 +537,14 @@ def render(output: Path, aggregates: list[dict], paired: list[dict], timing: lis
                            label=arm if i == 0 else None)
         ax.set_xticks(range(len(models)), [MODEL_LABELS.get(model, model) for model in models], rotation=25, ha="right")
         ax.set_ylabel("Generation time (seconds)")
-        ax.legend(frameon=False)
+        _figure_legend(fig, [ax])
         ax.grid(axis="y", alpha=.2)
         fig.text(.5, -.04, "Mean ± sample SD of recorded generation trajectories.\n"
-                 "Includes previews and checkpoints; excludes loading and judging.", ha="center", fontsize=9)
-        fig.tight_layout()
+                 "Includes previews and checkpoints; excludes loading and judging.\n"
+                 "FLUX.3 Klein: 16 native / 3 warm-up updates; others: 50 / 10.\n"
+                 "H100 GPUs/job: FLUX.2 and Cosmos 3 Super, 2; all others, 1. Profiles differ across models.",
+                 ha="center", va="top", fontsize=8.5)
+        fig.tight_layout(rect=(0, 0, 1, .92))
         (output / "Timing").mkdir(parents=True, exist_ok=True)
         _save(fig, output / "Timing", "generation_time")
         plt.close(fig)
